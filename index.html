@@ -58,7 +58,10 @@
     cursor: pointer; user-select: none; z-index: 203; line-height: 1.6;
   }
   #site-name-label { font-weight: 400; }
-  #site-name.active #site-name-label { font-weight: 700; }
+  #site-name.active #site-name-label,
+  #site-name:hover #site-name-label { 
+    font-weight: 700; 
+  }
 
   /* ── INDEX ITEMS ── */
   .index-item {
@@ -246,7 +249,6 @@
       <a href="mailto:mollybakerragan@gmail.com"><img src="/images/links/mail.png" alt="mail"></a>
       <a href="https://www.are.na/molly-ragan/channels" target="_blank" rel="noopener"><img src="/images/links/arena.png" alt="arena"></a>
       <a href="https://www.instagram.com/molly.baker.ragan/" target="_blank" rel="noopener"><img src="/images/links/instagram.png" alt="instagram"></a>
-      <a href="https://soundcloud.com/mollybakerragan/radio-mix-2" target="_blank" rel="noopener"><img src="/images/links/soundcloud.png" alt="soundcloud"></a>
     </div>
     <span id="links-toggle"><img src="/images/link.png" alt="links"></span>
   </div>
@@ -271,7 +273,7 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 async function fetchGalleryImages() {
   try {
     const res = await fetch(
-      `${SUPABASE_URL}/rest/v1/images?select=project,url,sort_order,taken_at,location,lat,lng,plant,book,scanned,book_link&order=sort_order.desc`,
+      `${SUPABASE_URL}/rest/v1/images?select=project,url,sort_order,taken_at,location,lat,lng,plant,book,scanned,book_link,question_1,question_2&order=sort_order.desc`,
       { headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` } }
     );
     const data = await res.json();
@@ -289,6 +291,8 @@ async function fetchGalleryImages() {
         book:     row.book  || null,
         scanned:  row.scanned || null,
         book_link:row.book_link || null,
+        question_1:row.question_1 || null,
+        question_2:row.question_2 || null,
       });
     });
     Object.keys(byProject).forEach(key => {
@@ -313,8 +317,10 @@ async function fetchGalleryImages() {
       const item = document.querySelector(`.index-item[data-project="${key}"]`);
       if (item) {
         const img = item.querySelector('.index-thumb-wrap img');
-        if (img) img.src = byProject[key][0].url;
-      }
+      if (img && byProject[key][0].url && !byProject[key][0].url.endsWith('.pdf')) {
+        img.src = byProject[key][0].url;
+      }      
+    }
     });
   } catch (e) { console.warn('Could not fetch gallery images:', e); }
 }
@@ -342,6 +348,14 @@ let activeKey      = null;
 let lightboxImages = [];
 let lightboxIndex  = 0;
 let poppingState   = false;
+let panelDragging = false;
+let panelStartX = 0;
+let panelCurrentX = 0;
+let highestZ = 1;
+
+function bringToFront(item) {
+  item.style.zIndex = ++highestZ;
+}
 
 // Per-item state: { left, top, size, pinned }
 // pinned = true means user has manually positioned/sized it
@@ -460,7 +474,6 @@ function initDrag(item) {
     startY = e.clientY;
     origLeft = parseInt(item.style.left) || 0;
     origTop  = parseInt(item.style.top)  || 0;
-    item.style.zIndex = 100;
     document.body.style.userSelect = 'none';
   });
 
@@ -482,7 +495,7 @@ function initDrag(item) {
     document.body.style.userSelect = '';
     if (moved) {
       // Keep this item visually on top of anything it was dragged over
-      item.style.zIndex = 10;
+      bringToFront(item);
       const s = itemState[key] || {};
       itemState[key] = {
         left:   parseInt(item.style.left),
@@ -498,9 +511,10 @@ function initDrag(item) {
 
   // Click guard — suppress click if we dragged
   wrap.addEventListener('click', e => {
-    if (moved) { e.stopImmediatePropagation(); moved = false; }
-  }, true);
-}
+  if (moved) {
+    e.stopImmediatePropagation();
+  }
+}, true); }
 
 // ── RESIZE (corner handle + edges, desktop) ──
 function initResize(item) {
@@ -572,7 +586,7 @@ function initResize(item) {
     origSize = parseInt(wrap.style.width) || wrap.offsetWidth || 200;
     origLeft = parseInt(item.style.left) || 0;
     origTop  = parseInt(item.style.top)  || 0;
-    item.style.zIndex = 100;
+    bringToFront(item);
     document.body.style.userSelect = 'none';
   }
 
@@ -642,7 +656,7 @@ function initResize(item) {
   document.addEventListener('mouseup', e => {
     if (!resizing) return;
     resizing = false;
-    item.style.zIndex = 10; // keep on top after resize
+    bringToFront(item);
     document.body.style.userSelect = '';
     const newSize = parseInt(wrap.style.width);
     const s = itemState[key] || {};
@@ -662,14 +676,13 @@ function initMobileTouch(item) {
   const wrap = item.querySelector('.index-thumb-wrap');
   const MIN_SIZE = 60;
 
-  // Gesture state
-  let mode = null; // null | 'drag' | 'pinch'
+  let mode = null;
   let dragId = null;
   let dragStartX, dragStartY, dragOrigLeft, dragOrigTop;
   let dragMoved = false;
-  let itemWasMoved = false; // true if item moved at all this gesture (drag OR pinch)
+  let itemWasMoved = false;
   let pinchStartDist = 0, pinchOrigSize = 0;
-  let pinchMidOrigLeft, pinchMidOrigTop; // item position when pinch started
+  let pinchMidOrigLeft, pinchMidOrigTop;
 
   function touchDist(t1, t2) {
     const dx = t1.clientX - t2.clientX, dy = t1.clientY - t2.clientY;
@@ -681,10 +694,7 @@ function initMobileTouch(item) {
   }
 
   wrap.addEventListener('touchstart', e => {
-    item.style.zIndex = 100;
-
     if (e.touches.length === 1 && mode === null) {
-      // Start drag
       mode = 'drag';
       dragMoved = false;
       const t = e.touches[0];
@@ -693,9 +703,7 @@ function initMobileTouch(item) {
       dragStartY = t.clientY;
       dragOrigLeft = parseInt(item.style.left) || 0;
       dragOrigTop  = parseInt(item.style.top)  || 0;
-
     } else if (e.touches.length === 2) {
-      // Switch to pinch — take snapshot of current state
       mode = 'pinch';
       pinchStartDist = touchDist(e.touches[0], e.touches[1]);
       pinchOrigSize  = parseInt(wrap.style.width) || 200;
@@ -705,18 +713,18 @@ function initMobileTouch(item) {
   }, { passive: true });
 
   wrap.addEventListener('touchmove', e => {
-    e.preventDefault(); // prevent page scroll during any gesture
-
+    if (mode === 'drag' || mode === 'pinch') e.preventDefault();
     if (mode === 'drag' && e.touches.length === 1) {
       const t = Array.from(e.touches).find(x => x.identifier === dragId);
       if (!t) return;
       const dx = t.clientX - dragStartX;
       const dy = t.clientY - dragStartY;
-      if (Math.abs(dx) > 5 || Math.abs(dy) > 5) { dragMoved = true; itemWasMoved = true; }
+      if (Math.abs(dx) > 10 || Math.abs(dy) > 10) {
+        dragMoved = true; itemWasMoved = true; bringToFront(item);
+      }
       if (!dragMoved) return;
       item.style.left = (dragOrigLeft + dx) + 'px';
       item.style.top  = (dragOrigTop  + dy) + 'px';
-
     } else if (mode === 'pinch' && e.touches.length >= 2) {
       const d = touchDist(e.touches[0], e.touches[1]);
       const scale = d / pinchStartDist;
@@ -725,7 +733,7 @@ function initMobileTouch(item) {
       wrap.style.width  = newSize + 'px';
       wrap.style.height = newSize + 'px';
       itemWasMoved = true;
-      // Keep the image centered on the pinch midpoint
+      bringToFront(item);
       const mid = touchMid(e.touches[0], e.touches[1]);
       item.style.left = (mid.x - newSize / 2) + 'px';
       item.style.top  = (mid.y - newSize / 2) + 'px';
@@ -734,38 +742,40 @@ function initMobileTouch(item) {
 
   wrap.addEventListener('touchend', e => {
     if (e.touches.length === 0) {
-      // All fingers lifted — save and reset
+      const wasTap = !dragMoved && !itemWasMoved;
       const s = itemState[key] || {};
       itemState[key] = {
         left:   parseInt(item.style.left),
         top:    parseInt(item.style.top),
         size:   parseInt(wrap.style.width) || s.size || 200,
-        pinned: true,
+        pinned: !wasTap,
       };
-      saveState();
-      // Keep on top if item was moved at all this gesture
-      item.style.zIndex = itemWasMoved ? 10 : '';
-      mode = null;
-      dragId = null;
-      dragMoved = false;
-      itemWasMoved = false;
+      if (!wasTap) saveState();
+      mode = null; dragId = null; dragMoved = false; itemWasMoved = false;
 
+      if (wasTap) {
+        // Trigger action directly — no waiting for synthetic click
+        const p = projects[key]; if (!p) return;
+        if (activeKey === key) { closeGallery(); return; }
+        if (galleryProjects.includes(key)) {
+          activeKey = key;
+          stopAllSlideshows();
+          document.querySelectorAll('.index-item').forEach(el => el.classList.toggle('dimmed', el !== item));
+          openGallery(key);
+        } else {
+          if (p.link) window.open(p.link, '_blank', 'noopener');
+        }
+      }
     } else if (e.touches.length === 1 && mode === 'pinch') {
-      // One finger lifted during pinch — drop back to drag, preserve dragMoved
       mode = 'drag';
       const t = e.touches[0];
       dragId = t.identifier;
-      dragStartX = t.clientX;
-      dragStartY = t.clientY;
+      dragStartX = t.clientX; dragStartY = t.clientY;
       dragOrigLeft = parseInt(item.style.left) || 0;
       dragOrigTop  = parseInt(item.style.top)  || 0;
     }
   }, { passive: true });
 
-  // Suppress click after a drag
-  wrap.addEventListener('click', e => {
-    if (dragMoved) { e.stopImmediatePropagation(); dragMoved = false; }
-  }, true);
 }
 
 // ── INIT ──
@@ -775,7 +785,7 @@ window.addEventListener('load', () => {
 
   // Init interactions on each item
   document.querySelectorAll('.index-item').forEach(item => {
-    initDrag(item);       // mouse drag + click guard
+    if (!('ontouchstart' in window)) initDrag(item);
     initResize(item);     // corner handle (desktop)
     initMobileTouch(item); // unified drag + pinch (mobile)
   });
@@ -816,8 +826,14 @@ function stopAllSlideshows() {
 }
 
 // ── SITE NAME ──
-siteName.addEventListener('mouseenter', () => { if (activeKey) siteName.classList.add('active'); });
-siteName.addEventListener('mouseleave', () => siteName.classList.remove('active'));
+siteName.addEventListener('mouseenter', () => {
+  if (activeKey) siteName.classList.add('active');
+});
+
+siteName.addEventListener('mouseleave', () => {
+  siteName.classList.remove('active');
+});
+
 siteName.addEventListener('click', e => {
   e.stopPropagation();
   if (activeKey) {
@@ -866,10 +882,22 @@ function openGalleryUI(key) {
   const p = projects[key]; if (!p || !p.images) return;
   galleryGrid.innerHTML = '';
   p.images.forEach((imgData, i) => {
+  const isPdf = imgData.url.endsWith('.pdf');
+  if (isPdf) {
+    const wrap = document.createElement('div');
+  wrap.style.cssText = 'width:100%;position:relative;';
+  const embed = document.createElement('embed');
+  embed.src = imgData.url + '#toolbar=0&navpanes=0&scrollbar=0';
+  embed.type = 'application/pdf';
+  embed.style.cssText = 'width:100%;height:80vh;display:block;border:none;';
+  wrap.appendChild(embed);
+  galleryGrid.appendChild(wrap);
+  } else {
     const img = document.createElement('img');
     img.src = imgData.url; img.loading = 'lazy'; img.dataset.index = i;
     galleryGrid.appendChild(img);
-  });
+  }
+});
   galleryCloseBtn.style.display = 'block';
   const cols = { bioephemera: 3, headphones: 4, unsubscribe: 4, zines: 1 }[key] ?? 3;
   galleryGrid.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
@@ -920,6 +948,81 @@ function closeGallery() {
 }
 
 galleryCloseBtn.addEventListener('click', e => { e.stopPropagation(); closeGallery(); });
+
+function initGallerySwipe() {
+  let startX = 0;
+  let startY = 0;
+  let currentX = 0;
+  let dragging = false;
+  let axisLocked = null; // 'x' or 'y'
+
+  galleryOverlay.addEventListener('touchstart', e => {
+    if (!activeKey || lightbox.classList.contains('visible')) return;
+
+    startX = currentX = e.touches[0].clientX;
+    startY = e.touches[0].clientY;
+
+    dragging = true;
+    axisLocked = null;
+
+    galleryOverlay.style.transition = 'none';
+  }, { passive: true });
+
+  galleryOverlay.addEventListener('touchmove', e => {
+    if (!dragging) return;
+
+    const touch = e.touches[0];
+
+    const dx = touch.clientX - startX;
+    const dy = touch.clientY - startY;
+
+    // Decide gesture direction once
+    if (axisLocked === null) {
+      if (Math.abs(dx) > 10 || Math.abs(dy) > 10) {
+        axisLocked = Math.abs(dx) > Math.abs(dy) ? 'x' : 'y';
+      }
+    }
+
+    // Vertical scroll → ignore swipe logic
+    if (axisLocked === 'y') return;
+
+    e.preventDefault();
+
+    currentX = touch.clientX;
+
+    // Only drag left
+    if (dx > 0) return;
+
+    galleryOverlay.style.transform = `translateX(${dx}px)`;
+  }, { passive: false });
+
+  galleryOverlay.addEventListener('touchend', () => {
+    if (!dragging) return;
+
+    dragging = false;
+
+    // If it was a vertical gesture, do nothing
+    if (axisLocked === 'y') return;
+
+    const dx = currentX - startX;
+    const threshold = window.innerWidth * 0.25;
+
+    galleryOverlay.style.transition =
+      'transform 0.35s cubic-bezier(0.4,0,0.2,1)';
+
+    if (Math.abs(dx) > threshold) {
+      galleryOverlay.style.transform = 'translateX(-100%)';
+
+      setTimeout(() => {
+        history.back();
+      }, 350);
+    } else {
+      galleryOverlay.style.transform = 'translateX(0)';
+    }
+  });
+}
+
+initGallerySwipe ()
 
 // ── LIGHTBOX — UI only ──
 function formatMeta(imgData, key) {
@@ -1035,6 +1138,36 @@ document.addEventListener('keydown', e => {
     if (e.key === 'Escape') closeGallery();
   }
 });
+
+// ── TRACKPAD BACK GESTURE ──
+let wheelGestureLock = false;
+
+window.addEventListener('wheel', e => {
+  if (wheelGestureLock) return;
+
+  // only horizontal gestures
+  if (Math.abs(e.deltaX) < Math.abs(e.deltaY)) return;
+
+  const THRESHOLD = 80;
+
+  const isGalleryOpen =
+    activeKey || lightbox.classList.contains('visible');
+
+  if (!isGalleryOpen) return;
+
+  // LEFT swipe closes
+  const swipeLeft = e.deltaX > THRESHOLD;
+
+  if (swipeLeft) {
+    wheelGestureLock = true;
+    history.back();
+
+    setTimeout(() => {
+      wheelGestureLock = false;
+    }, 500);
+  }
+}, { passive: true });
+
 </script>
 </body>
 </html>

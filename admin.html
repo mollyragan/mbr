@@ -222,8 +222,7 @@ body {
     </div>
   </div>
 
-  <input type="file" id="fileInput" accept="image/*" multiple style="display:none;" />
-
+<input type="file" id="fileInput" accept="image/*,application/pdf" multiple style="display:none;" />
   <div id="progressWrap">
     <div id="progressBar"></div>
     <div id="progressLabel"></div>
@@ -351,13 +350,16 @@ async function loadExistingImages(project) {
 
 const hasMeta = (project === 'bioephemera' && (img.plant || img.book || img.scanned || img.location || img.book_link)) ||
                 (project === 'zines' && (img.question_1 || img.question_2 || img.scanned));     
-   wrap.innerHTML = `
-      <img src="${img.url}" loading="lazy">
-      <span class="order-badge">${i + 1}</span>
-      <button class="del-btn" data-id="${img.id}" data-path="${img.storage_path}">✕</button>
-      ${project === 'bioephemera' ? `<span class="meta-dot${hasMeta ? ' filled' : ''}"></span>` : ''}
-    `;
-
+  const isPdf = img.url.endsWith('.pdf');
+  wrap.innerHTML = `
+  ${isPdf
+    ? `<div style="width:100%;aspect-ratio:1;background:#f0f0f0;display:flex;align-items:center;justify-content:center;font-size:10px;color:#666;text-align:center;padding:4px;border-radius:3px;">${img.filename || 'PDF'}</div>`
+    : `<img src="${img.url}" loading="lazy">`
+  }
+  <span class="order-badge">${i + 1}</span>
+  <button class="del-btn" data-id="${img.id}" data-path="${img.storage_path}">✕</button>
+  ${project === 'bioephemera' ? `<span class="meta-dot${hasMeta ? ' filled' : ''}"></span>` : ''}
+`;
    // collect all rows for this project so lightbox can navigate
     const allRows = data;  // already fetched above
 
@@ -502,14 +504,20 @@ dropZone.addEventListener('click', () => fileInput.click());
 fileInput.addEventListener('change', () => handleFiles(fileInput.files));
 
 function handleFiles(files) {
-  currentFiles = Array.from(files).filter(f => f.type.startsWith('image/'));
-  if (!currentFiles.length) return;
+  currentFiles = Array.from(files).filter(f => f.type.startsWith('image/') || f.type === 'application/pdf');  if (!currentFiles.length) return;
   previewGrid.innerHTML = '';
   dropZoneText.style.display = 'none';
   currentFiles.forEach(file => {
+  if (file.type === 'application/pdf') {
+    const div = document.createElement('div');
+    div.style.cssText = 'width:100%;aspect-ratio:1;background:#f0f0f0;display:flex;align-items:center;justify-content:center;font-size:11px;color:#666;text-align:center;padding:4px;';
+    div.textContent = file.name;
+    previewGrid.appendChild(div);
+  } else {
     const reader = new FileReader();
     reader.onload = e => { const img = document.createElement('img'); img.src = e.target.result; previewGrid.appendChild(img); };
     reader.readAsDataURL(file);
+  }
   });
 }
 
@@ -565,14 +573,22 @@ submitBtn.addEventListener('click', async () => {
       const baseName = file.name.replace(/\.[^.]+$/, '');
       const ts       = Date.now();
       const origPath   = `${project}/originals/${baseName}_${ts}.${ext}`;
-      const masterPath = `${project}/edit/${baseName}_${ts}.jpg`;
 
       const { error: origErr } = await supabase.storage.from(STORAGE_BUCKET).upload(origPath, file, { contentType: file.type });
       if (origErr) throw origErr;
 
-      const blob = await resizeImage(file, IMAGE_MAX_W, JPEG_QUALITY);
-      const { error: uploadErr } = await supabase.storage.from(STORAGE_BUCKET).upload(masterPath, blob, { contentType: 'image/jpeg' });
-      if (uploadErr) throw uploadErr;
+      let masterPath, blob;
+      if (file.type === 'application/pdf') {
+        masterPath = `${project}/edit/${baseName}_${ts}.pdf`;
+        blob = file;
+      } else if (project === 'zines') {
+        masterPath = `${project}/edit/${baseName}_${ts}.jpg`;
+        blob = await resizeImage(file, file.naturalWidth || 99999, JPEG_QUALITY);
+      } else {
+        masterPath = `${project}/edit/${baseName}_${ts}.jpg`;
+        blob = await resizeImage(file, IMAGE_MAX_W, JPEG_QUALITY);
+      }
+            const { error: uploadErr } = await supabase.storage.from(STORAGE_BUCKET).upload(masterPath, blob, { contentType: file.type });
 
       const { data: urlData } = supabase.storage.from(STORAGE_BUCKET).getPublicUrl(masterPath);
 
