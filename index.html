@@ -106,6 +106,8 @@
     z-index: 150; background: #fff;
     overflow-x: hidden; overflow-y: auto;
     display: none;
+    -webkit-overflow-scrolling: auto;
+    overscroll-behavior: none;
   }
   #gallery-grid { display: grid; gap: 0; width: 100%; }
   #gallery-grid img { width: 100%; object-fit: cover; display: block; cursor: pointer; }
@@ -192,7 +194,7 @@
     #slide-panel { display: none !important; }
     #gallery-close-btn { top: 16px; right: 16px; }
     #lightbox-close { top: 16px; right: 16px; display: none; }
-    #gallery-overlay { width: 100% !important; }
+    #gallery-overlay { width: 100% !important; overscroll-behavior: auto;}
     #lightbox-img { max-width: 90vw; max-height: 70vh; }
     #lightbox-prev, #lightbox-next { padding: 24px 16px; font-size: 11px; }
     #lightbox-prev { left: -20px; display: none; }
@@ -208,6 +210,46 @@
     #mob-panel-title a { color: #000; text-decoration: none; }
     #mob-panel-title a:hover { font-weight: 700; }
   }
+
+/* ───────────────────────────────
+   ZINES GALLERY THEME OVERRIDES
+   ─────────────────────────────── */
+
+/* site name (top-left) */
+body.zines-open #site-name-label {
+  color: white;
+}
+
+/* project title (bottom left/right panel) */
+body.zines-open #desk-panel-title,
+body.zines-open #mob-panel-title {
+  color: white;
+}
+
+body.zines-open #desk-panel-title a,
+body.zines-open #mob-panel-title a {
+  color: white;
+}
+
+/* close button */
+body.zines-open #gallery-close-btn {
+  color: white;
+  opacity: 1;
+}
+
+/* lightbox controls (optional but usually wanted together) */
+body.zines-open #lightbox-close,
+body.zines-open #lightbox-prev,
+body.zines-open #lightbox-next {
+  color: white;
+}
+
+/* link icons (make PNGs “white”) */
+body.zines-open #links-list img,
+body.zines-open #links-toggle img {
+  filter: brightness(0) invert(1);
+}
+
 </style>
 </head>
 <body>
@@ -262,12 +304,12 @@
 <script>
 // ── PROJECTS ──
 const projects = {
-  zines:       { title: 'zines' },
+  zines:       { title: 'all my zines' },
   whatdoyousee:{ title: 'whatdoyousee.nyc',     link: 'https://www.whatdoyousee.nyc' },
   unlearning:  { title: 'unlearning library',   link: 'https://www.unlearninglibrary.com' },
-  bioephemera: { title: 'things stashed in pages' },
-  headphones:  { title: 'untangling headphones' },
-  unsubscribe: { title: 'unsubscribe' },
+  bioephemera: { title: 'all the plant matter i stash in my books' },
+  headphones:  { title: 'every time i have to untangle my headphones' },
+  unsubscribe: { title: 'every time i unsubscribe from an email list' },
 };
 const galleryProjects = ['bioephemera', 'headphones', 'unsubscribe', 'zines'];
 
@@ -910,6 +952,7 @@ function openGalleryUI(key) {
   galleryOverlay.style.transition = 'none';
   galleryOverlay.style.transform = 'translateX(-100%)';
   galleryOverlay.style.display = 'block';
+  document.body.classList.toggle('zines-open', key === 'zines');
   const titleEl = isMob() ? mobPanelTitle : deskPanelTitle;
   titleEl.innerHTML = p.link
     ? `<a href="${p.link}" target="_blank" rel="noopener">${p.title}</a>`
@@ -925,6 +968,7 @@ function openGalleryUI(key) {
 function closeGalleryUI() {
   activeKey = null;
   galleryCloseBtn.style.display = 'none';
+  document.body.classList.remove('zines-open');
   mobPanelTitle.classList.remove('visible');
   deskPanelTitle.classList.remove('visible');
   document.querySelectorAll('.index-item').forEach(el => el.classList.remove('dimmed'));
@@ -1030,6 +1074,7 @@ function initGallerySwipe() {
 initGallerySwipe ()
 
 // ── LIGHTBOX — UI only ──
+
 function formatMeta(imgData, key) {
   const lines = [];
   if (key === 'unsubscribe') {
