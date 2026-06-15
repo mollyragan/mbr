@@ -28,42 +28,27 @@
     display: block; 
     width: 13px; 
     height: 13px; 
-  
   }
   #links-toggle img { 
     width: 100%; 
     height: 100%;
-   display: block; 
-   transition: transform 0.2s ease; 
-   transform-origin: center; 
+    display: block; 
+    transition: transform 0.2s ease; 
+    transform-origin: center; 
   }
-
   #links-toggle:hover img, #links-toggle.active img { 
     transform: scale(1.15); 
   }
-
   #links-list {
     display: none; flex-direction: column; align-items: flex-end;
     gap: 13px; margin-bottom: 13px;
   }
-
-  #links-list.visible { 
-    display: flex; 
-  }
-
-  #links-list a { 
-    color: #000; 
-  }
-
+  #links-list.visible { display: flex; }
+  #links-list a { color: #000; }
   #links-list a img {
-    width: 15px; 
-    height: 15px; 
-    display: block; 
-    object-fit: contain;
-    transition: transform 0.2s ease; 
-    transform-origin: center;
+    width: 15px; height: 15px; display: block; object-fit: contain;
+    transition: transform 0.2s ease; transform-origin: center;
   }
-
   #links-list a:hover img { transform: scale(1.15); }
 
   /* ── SITE NAME ── */
@@ -79,17 +64,36 @@
   .index-item {
     position: absolute;
     display: flex; flex-direction: column; align-items: center;
+    /* no CSS transition — JS handles smooth layout, drag is instant */
+  }
+  .index-item.layout-animating {
     transition: left 0.5s cubic-bezier(0.4,0,0.2,1), top 0.5s cubic-bezier(0.4,0,0.2,1),
                 width 0.5s cubic-bezier(0.4,0,0.2,1), height 0.5s cubic-bezier(0.4,0,0.2,1);
   }
   .index-thumb-wrap {
     width: var(--sz); height: var(--sz);
-    background: transparent; overflow: hidden; cursor: pointer;
-    position: relative; transition: transform 0.2s ease;
+    background: transparent; overflow: hidden; cursor: grab;
+    position: relative;
   }
-  .index-thumb-wrap:hover { transform: scale(1.2); }
-  .index-thumb-wrap img { width: 100%; height: 100%; object-fit: contain; object-position: bottom left; display: block; }
-  .index-item.dimmed { opacity: 0.15; transition: opacity 0.4s, left 0.5s cubic-bezier(0.4,0,0.2,1), top 0.5s cubic-bezier(0.4,0,0.2,1); pointer-events: none; }
+  .index-thumb-wrap:hover { transform: scale(1.05); transition: transform 0.2s ease; }
+  .index-thumb-wrap:active { cursor: grabbing; }
+  .index-thumb-wrap img { width: 100%; height: 100%; object-fit: contain; object-position: bottom left; display: block; pointer-events: none; }
+  .index-item.dimmed { opacity: 0.15; transition: opacity 0.4s; pointer-events: none; }
+
+  /* ── RESIZE HANDLE ── */
+  .resize-handle {
+    position: absolute;
+    width: 14px; height: 14px;
+    cursor: default;
+    opacity: 0;
+    transition: opacity 0.15s;
+    z-index: 11;
+    transform: translate(50%, 50%);
+    border-radius: 50%;
+    background: #000;
+  }
+  .index-thumb-wrap:hover .resize-handle { opacity: 0.45; }
+  .resize-handle:hover { opacity: 1 !important; }
 
   /* ── GALLERY OVERLAY ── */
   #gallery-overlay {
@@ -135,7 +139,7 @@
   #lightbox-inner {
     position: relative;
     display: flex; align-items: center; justify-content: center;
-    width: 100%; max-width: min(500px, 90vw);
+    width: fit-content; max-width: min(500px, 90vw);
   }
   #lightbox-img {
     max-width: min(500px, 90vw); max-height: min(500px, 80vh);
@@ -147,30 +151,20 @@
     font-size: 13px; color: #000; cursor: pointer;
     padding: 8px; user-select: none; font-family: sans-serif;
   }
-  
   #lightbox-prev:hover, #lightbox-next:hover { opacity: 1; }
-  #lightbox-prev { left: -32px; }
-  #lightbox-next { right: -32px; }
+  #lightbox-prev { left: -100px; }
+  #lightbox-next { right: -100px; }
   #lightbox-meta {
-    font-size: 13px; font-weight: 400; color: #000;
+    font-size: 13px; font-weight: 400; color: #afafaf;
     text-align: center; line-height: 1.75; font-family: sans-serif;
   }
-
-  #lightbox-meta a {
-  color: inherit;
-  text-decoration: none;
-  }
-
-  #lightbox-meta a:hover {
-    font-weight: 700;
-  }
-
+  #lightbox-meta a { color: inherit; text-decoration: none; }
+  #lightbox-meta a:hover { font-weight: 700; }
   #lightbox-close {
     position: fixed; top: 16px; right: 24px;
     font-size: 13px; color: #000; cursor: pointer;
     opacity: 0.7; z-index: 301;
   }
-
   #lightbox-close:hover { opacity: 1; }
 
   /* mobile pinned title */
@@ -185,24 +179,16 @@
       padding-bottom: max(10px, env(safe-area-inset-bottom));
       z-index: 201;
     }
-
     #links-list { align-items: flex-end; }
     #site-name { z-index: 201; }
     #slide-panel { display: none !important; }
-    #gallery-close-btn { top: 16px; right: 16px;}
-    #lightbox-close { top: 16px; right: 16px; display: none;}
+    #gallery-close-btn { top: 16px; right: 16px; }
+    #lightbox-close { top: 16px; right: 16px; display: none; }
     #gallery-overlay { width: 100% !important; }
-    #lightbox-img {
-      max-width: 90vw; max-height: 70vh;
-    }
-
-    #lightbox-prev, #lightbox-next {
-      padding: 24px 16px;
-      font-size: 11px;
-    }
-    #lightbox-prev { left: -20px; display: none;}
-    #lightbox-next { right: -20px; display: none;}
-
+    #lightbox-img { max-width: 90vw; max-height: 70vh; }
+    #lightbox-prev, #lightbox-next { padding: 24px 16px; font-size: 11px; }
+    #lightbox-prev { left: -20px; display: none; }
+    #lightbox-next { right: -20px; display: none; }
     #mob-panel-title {
       display: block;
       z-index: 201;
@@ -210,7 +196,6 @@
       opacity: 0; pointer-events: none;
       transition: opacity 0.3s; flex-shrink: 0; line-height: 1;
     }
-
     #mob-panel-title.visible { opacity: 1; pointer-events: auto; }
     #mob-panel-title a { color: #000; text-decoration: none; }
     #mob-panel-title a:hover { font-weight: 700; }
@@ -224,12 +209,12 @@
 </span>
 
 <div id="canvas">
-  <div class="index-item" data-project="zines"><div class="index-thumb-wrap"><img src="" alt="zines"></div></div>
-  <div class="index-item" data-project="whatdoyousee"><div class="index-thumb-wrap"><img src="" alt="what do you see?"></div></div>
-  <div class="index-item" data-project="unlearning"><div class="index-thumb-wrap"><img src="" alt="unlearning library"></div></div>
-  <div class="index-item" data-project="bioephemera"><div class="index-thumb-wrap"><img src="" alt="things stashed in pages"></div></div>
-  <div class="index-item" data-project="unsubscribe"><div class="index-thumb-wrap"><img src="" alt="unsubscribe"></div></div>
-  <div class="index-item" data-project="headphones"><div class="index-thumb-wrap"><img src="" alt="untangling headphones"></div></div>
+  <div class="index-item" data-project="zines"><div class="index-thumb-wrap"><img src="" alt="zines"><div class="resize-handle"></div><div class="edge-n"></div><div class="edge-s"></div><div class="edge-e"></div><div class="edge-w"></div></div></div>
+  <div class="index-item" data-project="whatdoyousee"><div class="index-thumb-wrap"><img src="" alt="what do you see?"><div class="resize-handle"></div><div class="edge-n"></div><div class="edge-s"></div><div class="edge-e"></div><div class="edge-w"></div></div></div>
+  <div class="index-item" data-project="unlearning"><div class="index-thumb-wrap"><img src="" alt="unlearning library"><div class="resize-handle"></div><div class="edge-n"></div><div class="edge-s"></div><div class="edge-e"></div><div class="edge-w"></div></div></div>
+  <div class="index-item" data-project="bioephemera"><div class="index-thumb-wrap"><img src="" alt="things stashed in pages"><div class="resize-handle"></div><div class="edge-n"></div><div class="edge-s"></div><div class="edge-e"></div><div class="edge-w"></div></div></div>
+  <div class="index-item" data-project="unsubscribe"><div class="index-thumb-wrap"><img src="" alt="unsubscribe"><div class="resize-handle"></div><div class="edge-n"></div><div class="edge-s"></div><div class="edge-e"></div><div class="edge-w"></div></div></div>
+  <div class="index-item" data-project="headphones"><div class="index-thumb-wrap"><img src="" alt="untangling headphones"><div class="resize-handle"></div><div class="edge-n"></div><div class="edge-s"></div><div class="edge-e"></div><div class="edge-w"></div></div></div>
 </div>
 
 <span id="gallery-close-btn">✕</span>
@@ -270,14 +255,14 @@
 <script>
 // ── PROJECTS ──
 const projects = {
-  zines:       { title: 'zines',                link: null },
+  zines:       { title: 'zines' },
   whatdoyousee:{ title: 'whatdoyousee.nyc',     link: 'https://www.whatdoyousee.nyc' },
   unlearning:  { title: 'unlearning library',   link: 'https://www.unlearninglibrary.com' },
   bioephemera: { title: 'things stashed in pages' },
   headphones:  { title: 'untangling headphones' },
   unsubscribe: { title: 'unsubscribe' },
 };
-const galleryProjects = ['bioephemera', 'headphones', 'unsubscribe'];
+const galleryProjects = ['bioephemera', 'headphones', 'unsubscribe', 'zines'];
 
 // ── SUPABASE ──
 const SUPABASE_URL      = 'https://krkcskfledxweimduvvn.supabase.co';
@@ -319,9 +304,9 @@ async function fetchGalleryImages() {
           };
           const da = parse(a.scanned), db = parse(b.scanned);
           if (!da && !db) return 0;
-          if (!da) return 1;  // nulls to end
+          if (!da) return 1;
           if (!db) return -1;
-          return db - da;  // newest first
+          return db - da;
         });
       }
       projects[key].images = byProject[key];
@@ -351,7 +336,6 @@ const lightboxMeta    = document.getElementById('lightbox-meta');
 const lightboxClose   = document.getElementById('lightbox-close');
 const lightboxPrev    = document.getElementById('lightbox-prev');
 const lightboxNext    = document.getElementById('lightbox-next');
-const storedLayout    = {};
 
 // ── STATE ──
 let activeKey      = null;
@@ -359,7 +343,33 @@ let lightboxImages = [];
 let lightboxIndex  = 0;
 let poppingState   = false;
 
+// Per-item state: { left, top, size, pinned }
+// pinned = true means user has manually positioned/sized it
+const itemState = {};
+
+const STORAGE_KEY = 'mbr-item-state';
+
 function isMob() { return window.innerWidth < window.innerHeight; }
+
+function saveState() {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(itemState)); } catch(e) {}
+}
+
+function loadState() {
+  // Positions are session-only — layout reshuffles fresh on every page load.
+}
+
+function applyItemState(item, key, animate) {
+  const s = itemState[key];
+  if (!s) return;
+  const wrap = item.querySelector('.index-thumb-wrap');
+  if (animate) item.classList.add('layout-animating');
+  item.style.left = s.left + 'px';
+  item.style.top  = s.top  + 'px';
+  wrap.style.width  = s.size + 'px';
+  wrap.style.height = s.size + 'px';
+  if (animate) setTimeout(() => item.classList.remove('layout-animating'), 520);
+}
 
 // ── LAYOUTS ──
 const LAYOUTS_DESKTOP = [
@@ -388,17 +398,29 @@ const LAYOUTS_MOBILE = [
 ];
 let currentLayout = 0;
 
-function randomLayout() {
+function randomLayout(animate) {
   const iw = window.innerWidth, ih = window.innerHeight;
   const mob = isMob();
   const layouts = mob ? LAYOUTS_MOBILE : LAYOUTS_DESKTOP;
   const layout = layouts[currentLayout % layouts.length];
   currentLayout = Math.floor(Math.random() * layouts.length);
+
   Array.from(document.querySelectorAll('.index-item')).forEach((item, i) => {
+    const key = item.dataset.project;
+
+    // If user has pinned this item, restore their state instead
+    if (itemState[key] && itemState[key].pinned) {
+      applyItemState(item, key, animate);
+      return;
+    }
+
     const [xPct, yPct, wPct] = layout[i] || [10 + i*12, 30, 15];
     const sz = Math.round((wPct / 100) * iw);
-    item.querySelector('.index-thumb-wrap').style.width  = sz + 'px';
-    item.querySelector('.index-thumb-wrap').style.height = sz + 'px';
+    const wrap = item.querySelector('.index-thumb-wrap');
+
+    if (animate) item.classList.add('layout-animating');
+    wrap.style.width  = sz + 'px';
+    wrap.style.height = sz + 'px';
     const left = Math.round((xPct / 100) * iw);
     const topM = mob ? 60 : 0, botM = mob ? 60 : 0;
     const usableH = ih - topM - botM;
@@ -406,20 +428,365 @@ function randomLayout() {
     const top = Math.round(Math.max(topM, Math.min(ih - sz - botM, yR)));
     item.style.left = left + 'px';
     item.style.top  = top  + 'px';
-    storedLayout[item.dataset.project] = { left, top, size: sz };
+    if (animate) setTimeout(() => item.classList.remove('layout-animating'), 520);
+
+    // Store (not pinned — layout-assigned)
+    itemState[key] = { left, top, size: sz, pinned: false };
   });
+}
+
+// ── DRAG ──
+function initDrag(item) {
+  const key = item.dataset.project;
+  const wrap = item.querySelector('.index-thumb-wrap');
+
+  let dragging = false;
+  let startX, startY, origLeft, origTop;
+  let moved = false;
+
+  // Mouse drag
+  wrap.addEventListener('mousedown', e => {
+    const tgt = e.target;
+    if (tgt.classList.contains('resize-handle') ||
+        tgt.classList.contains('edge-n') ||
+        tgt.classList.contains('edge-s') ||
+        tgt.classList.contains('edge-e') ||
+        tgt.classList.contains('edge-w') ||
+        tgt.classList.contains('resize-corner')) return;
+    e.preventDefault();
+    dragging = true;
+    moved = false;
+    startX = e.clientX;
+    startY = e.clientY;
+    origLeft = parseInt(item.style.left) || 0;
+    origTop  = parseInt(item.style.top)  || 0;
+    item.style.zIndex = 100;
+    document.body.style.userSelect = 'none';
+  });
+
+  document.addEventListener('mousemove', e => {
+    if (!dragging) return;
+    const dx = e.clientX - startX;
+    const dy = e.clientY - startY;
+    if (Math.abs(dx) > 3 || Math.abs(dy) > 3) moved = true;
+    if (!moved) return;
+    const newLeft = origLeft + dx;
+    const newTop  = origTop  + dy;
+    item.style.left = newLeft + 'px';
+    item.style.top  = newTop  + 'px';
+  });
+
+  document.addEventListener('mouseup', e => {
+    if (!dragging) return;
+    dragging = false;
+    document.body.style.userSelect = '';
+    if (moved) {
+      // Keep this item visually on top of anything it was dragged over
+      item.style.zIndex = 10;
+      const s = itemState[key] || {};
+      itemState[key] = {
+        left:   parseInt(item.style.left),
+        top:    parseInt(item.style.top),
+        size:   s.size || parseInt(wrap.style.width) || 200,
+        pinned: true,
+      };
+      saveState();
+    } else {
+      item.style.zIndex = '';
+    }
+  });
+
+  // Click guard — suppress click if we dragged
+  wrap.addEventListener('click', e => {
+    if (moved) { e.stopImmediatePropagation(); moved = false; }
+  }, true);
+}
+
+// ── RESIZE (corner handle + edges, desktop) ──
+function initResize(item) {
+  const key = item.dataset.project;
+  const wrap = item.querySelector('.index-thumb-wrap');
+  const handle = wrap.querySelector('.resize-handle');
+  const img = wrap.querySelector('img');
+  const edgeN = wrap.querySelector('.edge-n');
+  const edgeS = wrap.querySelector('.edge-s');
+  const edgeE = wrap.querySelector('.edge-e');
+  const edgeW = wrap.querySelector('.edge-w');
+  const MIN_SIZE = 60;
+
+  // Place handle and edge zones based on actual image content area
+  function updateHandlePosition() {
+    const boxSize = parseInt(wrap.style.width) || wrap.offsetWidth || 200;
+    const nat = img.naturalWidth && img.naturalHeight
+      ? img.naturalWidth / img.naturalHeight
+      : 1;
+
+    // object-fit: contain with object-position: bottom left
+    // figure out rendered image dimensions inside the square box
+    let imgW, imgH;
+    if (nat >= 1) { imgW = boxSize; imgH = boxSize / nat; }
+    else          { imgH = boxSize; imgW = boxSize * nat; }
+
+    // object-position: bottom left — image sits at left=0, bottom=boxSize
+    const imgLeft = 0;
+    const imgTop  = boxSize - imgH;
+
+    // Place corner handle at bottom-right of actual image
+    handle.style.left   = (imgLeft + imgW) + 'px';
+    handle.style.top    = (imgTop  + imgH) + 'px';
+    handle.style.bottom = 'auto';
+    handle.style.right  = 'auto';
+
+    // Position edge zones along actual image edges
+    const EW = 10; // edge zone width in px
+    edgeN.style.cssText = `top:${imgTop}px; left:${imgLeft}px; width:${imgW}px; height:${EW}px; position:absolute;`;
+    edgeS.style.cssText = `top:${imgTop + imgH - EW}px; left:${imgLeft}px; width:${imgW}px; height:${EW}px; position:absolute;`;
+    edgeE.style.cssText = `top:${imgTop}px; left:${imgLeft + imgW - EW}px; width:${EW}px; height:${imgH}px; position:absolute;`;
+    edgeW.style.cssText = `top:${imgTop}px; left:${imgLeft}px; width:${EW}px; height:${imgH}px; position:absolute;`;
+  }
+
+  img.addEventListener('load', updateHandlePosition);
+  if (img.complete && img.naturalWidth) updateHandlePosition();
+
+  // Re-run whenever wrap size changes (after drag-resize)
+  const ro = new ResizeObserver(updateHandlePosition);
+  ro.observe(wrap);
+
+  let resizing = false;
+  let resizeDidFire = false;
+  let startX, startY, origSize, origLeft, origTop, resizeAxis;
+
+  // Suppress click on the wrap after any resize mousedown, even with no movement
+  wrap.addEventListener('click', e => {
+    if (resizeDidFire) { e.stopImmediatePropagation(); resizeDidFire = false; }
+  }, true);
+
+  // axis: 'n'|'s'|'e'|'w'|'se' — determines which corner is anchored
+  function startResize(e, axis) {
+    e.preventDefault();
+    e.stopPropagation();
+    resizing = true;
+    resizeDidFire = true;
+    resizeAxis = axis;
+    startX = e.clientX; startY = e.clientY;
+    origSize = parseInt(wrap.style.width) || wrap.offsetWidth || 200;
+    origLeft = parseInt(item.style.left) || 0;
+    origTop  = parseInt(item.style.top)  || 0;
+    item.style.zIndex = 100;
+    document.body.style.userSelect = 'none';
+  }
+
+  // Add corner handles: nw, ne, sw — se is the dot handle
+  const cornerNW = document.createElement('div');
+  const cornerNE = document.createElement('div');
+  const cornerSW = document.createElement('div');
+  [cornerNW, cornerNE, cornerSW].forEach(c => {
+    c.classList.add('resize-corner');
+    c.style.cssText = 'position:absolute;width:20px;height:20px;z-index:11;opacity:0;';
+    wrap.appendChild(c);
+  });
+
+  function updateCorners() {
+    const boxSize = parseInt(wrap.style.width) || wrap.offsetWidth || 200;
+    const nat = img.naturalWidth && img.naturalHeight ? img.naturalWidth / img.naturalHeight : 1;
+    let imgW, imgH;
+    if (nat >= 1) { imgW = boxSize; imgH = boxSize / nat; }
+    else          { imgH = boxSize; imgW = boxSize * nat; }
+    const imgTop = boxSize - imgH;
+    cornerNW.style.left = '-10px'; cornerNW.style.top  = (imgTop - 10) + 'px';
+    cornerNE.style.left = (imgW - 10) + 'px'; cornerNE.style.top = (imgTop - 10) + 'px';
+    cornerSW.style.left = '-10px'; cornerSW.style.top  = (imgTop + imgH - 10) + 'px';
+  }
+  img.addEventListener('load', updateCorners);
+  if (img.complete && img.naturalWidth) updateCorners();
+
+  handle.addEventListener('mousedown', e => startResize(e, 'se'));
+  cornerNW.addEventListener('mousedown', e => startResize(e, 'nw'));
+  cornerNE.addEventListener('mousedown', e => startResize(e, 'ne'));
+  cornerSW.addEventListener('mousedown', e => startResize(e, 'sw'));
+  edgeN.addEventListener('mousedown', e => startResize(e, 'n'));
+  edgeS.addEventListener('mousedown', e => startResize(e, 's'));
+  edgeE.addEventListener('mousedown', e => startResize(e, 'e'));
+  edgeW.addEventListener('mousedown', e => startResize(e, 'w'));
+
+  document.addEventListener('mousemove', e => {
+    if (!resizing) return;
+    const MAX_SIZE = Math.min(window.innerWidth, window.innerHeight) * 0.9;
+    const dx = e.clientX - startX;
+    const dy = e.clientY - startY;
+
+    // Compute delta based on which direction grows the image
+    let delta;
+    if      (resizeAxis === 'n')  delta = -dy;
+    else if (resizeAxis === 's')  delta = dy;
+    else if (resizeAxis === 'e')  delta = dx;
+    else if (resizeAxis === 'w')  delta = -dx;
+    else if (resizeAxis === 'nw') delta = (-dx + -dy) / 2;
+    else if (resizeAxis === 'ne') delta = (dx  + -dy) / 2;
+    else if (resizeAxis === 'sw') delta = (-dx + dy)  / 2;
+    else                          delta = (dx  + dy)  / 2; // se
+
+    const newSize = Math.max(MIN_SIZE, Math.min(MAX_SIZE, origSize + delta));
+    wrap.style.width  = newSize + 'px';
+    wrap.style.height = newSize + 'px';
+
+    // Anchor the opposite corner/edge so the far side stays put
+    const anchorsTop  = resizeAxis === 'n' || resizeAxis === 'nw' || resizeAxis === 'ne';
+    const anchorsLeft = resizeAxis === 'w' || resizeAxis === 'nw' || resizeAxis === 'sw';
+    if (anchorsTop)  item.style.top  = (origTop  + origSize - newSize) + 'px';
+    if (anchorsLeft) item.style.left = (origLeft + origSize - newSize) + 'px';
+
+    updateCorners();
+  });
+
+  document.addEventListener('mouseup', e => {
+    if (!resizing) return;
+    resizing = false;
+    item.style.zIndex = 10; // keep on top after resize
+    document.body.style.userSelect = '';
+    const newSize = parseInt(wrap.style.width);
+    const s = itemState[key] || {};
+    itemState[key] = {
+      left:   parseInt(item.style.left) || s.left || 0,
+      top:    parseInt(item.style.top)  || s.top  || 0,
+      size:   newSize,
+      pinned: true,
+    };
+    saveState();
+  });
+}
+
+// ── UNIFIED MOBILE TOUCH (drag + pinch) ──
+function initMobileTouch(item) {
+  const key = item.dataset.project;
+  const wrap = item.querySelector('.index-thumb-wrap');
+  const MIN_SIZE = 60;
+
+  // Gesture state
+  let mode = null; // null | 'drag' | 'pinch'
+  let dragId = null;
+  let dragStartX, dragStartY, dragOrigLeft, dragOrigTop;
+  let dragMoved = false;
+  let itemWasMoved = false; // true if item moved at all this gesture (drag OR pinch)
+  let pinchStartDist = 0, pinchOrigSize = 0;
+  let pinchMidOrigLeft, pinchMidOrigTop; // item position when pinch started
+
+  function touchDist(t1, t2) {
+    const dx = t1.clientX - t2.clientX, dy = t1.clientY - t2.clientY;
+    return Math.sqrt(dx*dx + dy*dy);
+  }
+
+  function touchMid(t1, t2) {
+    return { x: (t1.clientX + t2.clientX) / 2, y: (t1.clientY + t2.clientY) / 2 };
+  }
+
+  wrap.addEventListener('touchstart', e => {
+    item.style.zIndex = 100;
+
+    if (e.touches.length === 1 && mode === null) {
+      // Start drag
+      mode = 'drag';
+      dragMoved = false;
+      const t = e.touches[0];
+      dragId = t.identifier;
+      dragStartX = t.clientX;
+      dragStartY = t.clientY;
+      dragOrigLeft = parseInt(item.style.left) || 0;
+      dragOrigTop  = parseInt(item.style.top)  || 0;
+
+    } else if (e.touches.length === 2) {
+      // Switch to pinch — take snapshot of current state
+      mode = 'pinch';
+      pinchStartDist = touchDist(e.touches[0], e.touches[1]);
+      pinchOrigSize  = parseInt(wrap.style.width) || 200;
+      pinchMidOrigLeft = parseInt(item.style.left) || 0;
+      pinchMidOrigTop  = parseInt(item.style.top)  || 0;
+    }
+  }, { passive: true });
+
+  wrap.addEventListener('touchmove', e => {
+    e.preventDefault(); // prevent page scroll during any gesture
+
+    if (mode === 'drag' && e.touches.length === 1) {
+      const t = Array.from(e.touches).find(x => x.identifier === dragId);
+      if (!t) return;
+      const dx = t.clientX - dragStartX;
+      const dy = t.clientY - dragStartY;
+      if (Math.abs(dx) > 5 || Math.abs(dy) > 5) { dragMoved = true; itemWasMoved = true; }
+      if (!dragMoved) return;
+      item.style.left = (dragOrigLeft + dx) + 'px';
+      item.style.top  = (dragOrigTop  + dy) + 'px';
+
+    } else if (mode === 'pinch' && e.touches.length >= 2) {
+      const d = touchDist(e.touches[0], e.touches[1]);
+      const scale = d / pinchStartDist;
+      const maxSize = Math.min(window.innerWidth, window.innerHeight) * 0.9;
+      const newSize = Math.max(MIN_SIZE, Math.min(maxSize, pinchOrigSize * scale));
+      wrap.style.width  = newSize + 'px';
+      wrap.style.height = newSize + 'px';
+      itemWasMoved = true;
+      // Keep the image centered on the pinch midpoint
+      const mid = touchMid(e.touches[0], e.touches[1]);
+      item.style.left = (mid.x - newSize / 2) + 'px';
+      item.style.top  = (mid.y - newSize / 2) + 'px';
+    }
+  }, { passive: false });
+
+  wrap.addEventListener('touchend', e => {
+    if (e.touches.length === 0) {
+      // All fingers lifted — save and reset
+      const s = itemState[key] || {};
+      itemState[key] = {
+        left:   parseInt(item.style.left),
+        top:    parseInt(item.style.top),
+        size:   parseInt(wrap.style.width) || s.size || 200,
+        pinned: true,
+      };
+      saveState();
+      // Keep on top if item was moved at all this gesture
+      item.style.zIndex = itemWasMoved ? 10 : '';
+      mode = null;
+      dragId = null;
+      dragMoved = false;
+      itemWasMoved = false;
+
+    } else if (e.touches.length === 1 && mode === 'pinch') {
+      // One finger lifted during pinch — drop back to drag, preserve dragMoved
+      mode = 'drag';
+      const t = e.touches[0];
+      dragId = t.identifier;
+      dragStartX = t.clientX;
+      dragStartY = t.clientY;
+      dragOrigLeft = parseInt(item.style.left) || 0;
+      dragOrigTop  = parseInt(item.style.top)  || 0;
+    }
+  }, { passive: true });
+
+  // Suppress click after a drag
+  wrap.addEventListener('click', e => {
+    if (dragMoved) { e.stopImmediatePropagation(); dragMoved = false; }
+  }, true);
 }
 
 // ── INIT ──
 window.addEventListener('load', () => {
-  randomLayout();
+  loadState();
+  randomLayout(false);
+
+  // Init interactions on each item
+  document.querySelectorAll('.index-item').forEach(item => {
+    initDrag(item);       // mouse drag + click guard
+    initResize(item);     // corner handle (desktop)
+    initMobileTouch(item); // unified drag + pinch (mobile)
+  });
+
   fetchGalleryImages().then(() => {
     const imgs = Array.from(document.querySelectorAll('.index-thumb-wrap img'));
     let loaded = 0; let relaidOut = false;
     function checkDone() {
       loaded++;
       if (loaded >= imgs.length && !relaidOut) {
-        relaidOut = true; randomLayout(); startAllSlideshows();
+        relaidOut = true; randomLayout(true); startAllSlideshows();
       }
     }
     imgs.forEach(img => {
@@ -429,7 +796,7 @@ window.addEventListener('load', () => {
   });
 });
 
-window.addEventListener('resize', () => { closeGalleryUI(); randomLayout(); });
+window.addEventListener('resize', () => { closeGalleryUI(); randomLayout(false); });
 
 // ── SLIDESHOWS ──
 function startAllSlideshows() {
@@ -453,7 +820,13 @@ siteName.addEventListener('mouseenter', () => { if (activeKey) siteName.classLis
 siteName.addEventListener('mouseleave', () => siteName.classList.remove('active'));
 siteName.addEventListener('click', e => {
   e.stopPropagation();
-  if (activeKey) closeGallery();
+  if (activeKey) {
+    closeGallery();
+  } else {
+    // Clear all pinned states and reshuffle to a new random layout
+    Object.keys(itemState).forEach(k => { if (itemState[k]) itemState[k].pinned = false; });
+    randomLayout(true);
+  }
 });
 
 // ── LINKS TOGGLE ──
@@ -498,7 +871,7 @@ function openGalleryUI(key) {
     galleryGrid.appendChild(img);
   });
   galleryCloseBtn.style.display = 'block';
-  const cols = { bioephemera: 3, headphones: 4, unsubscribe: 4 }[key] ?? 3;
+  const cols = { bioephemera: 3, headphones: 4, unsubscribe: 4, zines: 1 }[key] ?? 3;
   galleryGrid.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
   galleryOverlay.style.width = '100%';
   galleryOverlay.style.transition = 'none';
@@ -522,10 +895,8 @@ function closeGalleryUI() {
   mobPanelTitle.classList.remove('visible');
   deskPanelTitle.classList.remove('visible');
   document.querySelectorAll('.index-item').forEach(el => el.classList.remove('dimmed'));
-
   galleryOverlay.style.transition = 'transform 0.45s cubic-bezier(0.4,0,0.2,1)';
   galleryOverlay.style.transform = 'translateX(-100%)';
-
   setTimeout(() => {
     galleryOverlay.style.display = 'none';
     galleryOverlay.style.transform = '';
@@ -553,52 +924,34 @@ galleryCloseBtn.addEventListener('click', e => { e.stopPropagation(); closeGalle
 // ── LIGHTBOX — UI only ──
 function formatMeta(imgData, key) {
   const lines = [];
-
   if (key === 'unsubscribe') {
     if (imgData.taken_at) {
       const d = new Date(imgData.taken_at);
-      lines.push(
-        `${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')}/${d.getFullYear()}`
-      );
+      lines.push(`${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')}/${d.getFullYear()}`);
     }
-
-  } else if (key === 'bioephemera') {
-
-    if (imgData.plant) {
-      lines.push(imgData.plant);
-    }
-
+  } else if (key === 'zines') {
+  if (imgData.question_1) lines.push(imgData.question_1);
+  if (imgData.question_2) lines.push(imgData.question_2);
+  if (imgData.scanned) lines.push(imgData.scanned);
+} else if (key === 'bioephemera') {
+    if (imgData.plant) lines.push(imgData.plant);
     if (imgData.book) {
       const bookHTML = imgData.book_link
         ? `<a href="${imgData.book_link}" target="_blank" rel="noopener"><em>${imgData.book}</em></a>`
         : `<em>${imgData.book}</em>`;
-
       lines.push(bookHTML);
     }
-
-    if (imgData.location) {
-      lines.push(imgData.location);
-    }
-
-    if (imgData.scanned) {
-      lines.push(imgData.scanned);
-    }
-
+    if (imgData.location) lines.push(imgData.location);
+    if (imgData.scanned) lines.push(imgData.scanned);
   } else if (key === 'headphones') {
     if (imgData.taken_at) {
       const d = new Date(imgData.taken_at);
-      lines.push(
-        `${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')}/${d.getFullYear()}`
-      );
+      lines.push(`${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')}/${d.getFullYear()}`);
     }
-
     if (imgData.lat != null && imgData.lng != null) {
-      lines.push(
-        `(${parseFloat(imgData.lat).toFixed(4)}, ${parseFloat(imgData.lng).toFixed(4)})`
-      );
+      lines.push(`(${parseFloat(imgData.lat).toFixed(4)}, ${parseFloat(imgData.lng).toFixed(4)})`);
     }
-  }
-
+  } 
   return lines.join('<br>');
 }
 
@@ -634,7 +987,6 @@ function closeLightbox() {
 
 function navigateLightbox(index) {
   showLightboxUI(index);
-  // replace state rather than push so navigating images doesn't stack up
   history.replaceState({ view: 'lightbox', key: activeKey, index: lightboxIndex }, '', `#${activeKey}/${lightboxIndex}`);
 }
 
@@ -648,33 +1000,26 @@ galleryGrid.addEventListener('click', e => {
 lightboxClose.addEventListener('click', e => { e.stopPropagation(); closeLightbox(); });
 lightboxPrev.addEventListener('click', e => { e.stopPropagation(); navigateLightbox(lightboxIndex - 1); });
 lightboxNext.addEventListener('click', e => { e.stopPropagation(); navigateLightbox(lightboxIndex + 1); });
-
 lightbox.addEventListener('click', e => { if (e.target === lightbox) closeLightbox(); });
 
 // ── LIGHTBOX SWIPE ──
 let touchStartX = null;
-lightbox.addEventListener('touchstart', e => {
-  touchStartX = e.touches[0].clientX;
-}, { passive: true });
-
+lightbox.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; }, { passive: true });
 lightbox.addEventListener('touchend', e => {
   if (touchStartX === null) return;
   const dx = e.changedTouches[0].clientX - touchStartX;
   touchStartX = null;
-  if (Math.abs(dx) < 40) return; // too small, ignore
-  if (dx < 0) navigateLightbox(lightboxIndex + 1); // swipe left → next
-  else         navigateLightbox(lightboxIndex - 1); // swipe right → prev
+  if (Math.abs(dx) < 40) return;
+  if (dx < 0) navigateLightbox(lightboxIndex + 1);
+  else        navigateLightbox(lightboxIndex - 1);
 }, { passive: true });
 
 // ── HISTORY ──
 window.addEventListener('popstate', e => {
   poppingState = true;
-  const state = e.state;
   if (lightbox.classList.contains('visible')) {
-    // going back from lightbox → just close lightbox, stay in gallery
     closeLightboxUI();
   } else if (activeKey) {
-    // going back from gallery → close gallery
     closeGalleryUI();
   }
   poppingState = false;

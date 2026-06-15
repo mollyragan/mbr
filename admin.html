@@ -341,16 +341,17 @@ async function loadExistingImages(project) {
   existingSection.classList.add('visible');
 
   // label hint for bioephemera
-  existingLabel.textContent = project === 'bioephemera'
-    ? 'current images — click to edit plant, book, date & location info'
-    : 'current images';
+  existingLabel.textContent = (project === 'bioephemera' || project === 'zines')
+  ? 'current images — click to edit metadata'
+  : 'current images';
 
   data.forEach((img, i) => {
     const wrap = document.createElement('div');
     wrap.className = 'existing-img-wrap';
 
-    const hasMeta = project === 'bioephemera' && (img.plant || img.book || img.scanned || img.location || img.book_link);
-    wrap.innerHTML = `
+const hasMeta = (project === 'bioephemera' && (img.plant || img.book || img.scanned || img.location || img.book_link)) ||
+                (project === 'zines' && (img.question_1 || img.question_2 || img.scanned));     
+   wrap.innerHTML = `
       <img src="${img.url}" loading="lazy">
       <span class="order-badge">${i + 1}</span>
       <button class="del-btn" data-id="${img.id}" data-path="${img.storage_path}">✕</button>
@@ -360,7 +361,7 @@ async function loadExistingImages(project) {
    // collect all rows for this project so lightbox can navigate
     const allRows = data;  // already fetched above
 
-    if (project === 'bioephemera') {
+    if (project === 'bioephemera' || project === 'zines') {
       wrap.querySelector('img').addEventListener('click', () => openEditLightbox(allRows, i));
     }
 
@@ -399,19 +400,30 @@ function loadEditRow() {
   const row = editRows[editIndex];
   editingRow = row;
   editImg.src = row.url;
-  editFields.innerHTML = `
-    <input id="editPlant" type="text" placeholder="plant" value="${row.plant || ''}">
-    <input id="editBook"  type="text" placeholder="book"  value="${row.book  || ''}">
-    <input id="editScanned"  type="text" placeholder="scanned"  value="${row.scanned  || ''}">
-    <input id="editLocation"  type="text" placeholder="location"  value="${row.location  || ''}">
-    <input id="editBook_link"  type="text" placeholder="book_link"  value="${row.book_link  || ''}">
-  `;
-  // auto-save on blur of any field
+
+  const project = projectSelect.value;
+
+  if (project === 'zines') {
+    editFields.innerHTML = `
+      <input id="editQuestion_1" type="text" placeholder="question 1" value="${row.question_1 || ''}">
+      <input id="editQuestion_2" type="text" placeholder="question 2" value="${row.question_2 || ''}">
+      <input id="editScanned" type="text" placeholder="scanned" value="${row.scanned || ''}">
+    `;
+    document.getElementById('editQuestion_1').focus();
+  } else {
+    editFields.innerHTML = `
+      <input id="editPlant" type="text" placeholder="plant" value="${row.plant || ''}">
+      <input id="editBook" type="text" placeholder="book" value="${row.book || ''}">
+      <input id="editScanned" type="text" placeholder="scanned" value="${row.scanned || ''}">
+      <input id="editLocation" type="text" placeholder="location" value="${row.location || ''}">
+      <input id="editBook_link" type="text" placeholder="book_link" value="${row.book_link || ''}">
+    `;
+    document.getElementById('editPlant').focus();
+  }
+
   editFields.querySelectorAll('input').forEach(input => {
     input.addEventListener('blur', () => saveCurrentRow());
   });
-
-  document.getElementById('editPlant').focus();
 }
 
 function closeEditLightbox() {
@@ -424,19 +436,28 @@ function closeEditLightbox() {
 
 async function saveCurrentRow() {
   if (!editingRow) return true;
-  const plant    = document.getElementById('editPlant')?.value.trim();
-  const book     = document.getElementById('editBook')?.value.trim();
-  const scanned  = document.getElementById('editScanned')?.value.trim();
-  const location = document.getElementById('editLocation')?.value.trim();
-  const book_link = document.getElementById('editBook_link')?.value.trim();
-  const { error } = await supabase
-    .from('images').update({ plant: plant || null, book: book || null, scanned: scanned || null, location: location || null, book_link: book_link || null }).eq('id', editingRow.id);
+  const project = projectSelect.value;
+
+  let updates = {};
+  if (project === 'zines') {
+    updates = {
+      question_1: document.getElementById('editQuestion_1')?.value.trim() || null,
+      question_2: document.getElementById('editQuestion_2')?.value.trim() || null,
+      scanned:    document.getElementById('editScanned')?.value.trim() || null,
+    };
+  } else {
+    updates = {
+      plant:     document.getElementById('editPlant')?.value.trim() || null,
+      book:      document.getElementById('editBook')?.value.trim() || null,
+      scanned:   document.getElementById('editScanned')?.value.trim() || null,
+      location:  document.getElementById('editLocation')?.value.trim() || null,
+      book_link: document.getElementById('editBook_link')?.value.trim() || null,
+    };
+  }
+
+  const { error } = await supabase.from('images').update(updates).eq('id', editingRow.id);
   if (error) { console.warn('Auto-save failed:', error.message); return false; }
-  editRows[editIndex].plant    = plant    || null;
-  editRows[editIndex].book     = book     || null;
-  editRows[editIndex].scanned  = scanned  || null;
-  editRows[editIndex].location = location || null;
-  editRows[editIndex].book_link = book_link || null;
+  Object.assign(editRows[editIndex], updates);
   return true;
 }
 
