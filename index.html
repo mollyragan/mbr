@@ -57,7 +57,10 @@
     font-size: 13px; font-weight: 400;
     cursor: pointer; user-select: none; z-index: 203; line-height: 1.6;
   }
-  #site-name-label { font-weight: 400; }
+ #site-name-label {
+  font-weight: 400;
+  transition: font-weight 0.15s ease;
+}
   #site-name.active #site-name-label,
   #site-name:hover #site-name-label { 
     font-weight: 700; 
@@ -81,7 +84,6 @@
   .index-thumb-wrap:hover { transform: scale(1.05); transition: transform 0.2s ease; }
   .index-thumb-wrap:active { cursor: grabbing; }
   .index-thumb-wrap img { width: 100%; height: 100%; object-fit: contain; object-position: bottom left; display: block; pointer-events: none; }
-  .index-item.dimmed { opacity: 0.15; transition: opacity 0.4s; pointer-events: none; }
 
   /* ── RESIZE HANDLE ── */
   .resize-handle {
@@ -184,6 +186,9 @@
     }
     #links-list { align-items: flex-end; }
     #site-name { z-index: 201; }
+    #site-name:hover #site-name-label {
+      font-weight: 400;
+    }
     #slide-panel { display: none !important; }
     #gallery-close-btn { top: 16px; right: 16px; }
     #lightbox-close { top: 16px; right: 16px; display: none; }
