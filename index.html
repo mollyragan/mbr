@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>molly baker ragan</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root { --sz: 300px; }
+
+  html, body { height: 100%; font-family: sans-serif; color: #000; background: #fff; overflow: hidden; }
+  a { color: inherit; text-decoration: none; }
+
+  #canvas { position: fixed; inset: 0; overflow: hidden; }
+
+  /* ── BOTTOM BAR ── */
+  #bottom-bar {
+    position: fixed; 
+    bottom: 16px; 
+    right: 22px;
+    font-size: 13px;
+    z-index: 201;
+    display: flex; 
+    flex-direction: column; 
+    align-items: flex-end;
+  }
+  #links-toggle { 
+    display: block; 
+    width: 13px; 
+    height: 13px; 
+  
+  }
+  #links-toggle img { 
+    width: 100%; 
+    height: 100%;
+   display: block; 
+   transition: transform 0.2s ease; 
+   transform-origin: center; 
+  }
+
+  #links-toggle:hover img, #links-toggle.active img { 
+    transform: scale(1.15); 
+  }
+
+  #links-list {
+    display: none; flex-direction: column; align-items: flex-end;
+    gap: 13px; margin-bottom: 13px;
+  }
+
+  #links-list.visible { 
+    display: flex; 
+  }
+
+  #links-list a { 
+    color: #000; 
+  }
+
+  #links-list a img {
+    width: 15px; 
+    height: 15px; 
+    display: block; 
+    object-fit: contain;
+    transition: transform 0.2s ease; 
+    transform-origin: center;
+  }
+
+  #links-list a:hover img { transform: scale(1.15); }
+
+  /* ── SITE NAME ── */
+  #site-name {
+    position: fixed; top: 16px; left: 22px;
+    font-size: 13px; font-weight: 400;
+    cursor: pointer; user-select: none; z-index: 203; line-height: 1.6;
+  }
+  #site-name-label { font-weight: 400; }
+  #site-name.active #site-name-label { font-weight: 700; }
+
+  /* ── INDEX ITEMS ── */
+  .index-item {
+    position: absolute;
+    display: flex; flex-direction: column; align-items: center;
+    transition: left 0.5s cubic-bezier(0.4,0,0.2,1), top 0.5s cubic-bezier(0.4,0,0.2,1),
+                width 0.5s cubic-bezier(0.4,0,0.2,1), height 0.5s cubic-bezier(0.4,0,0.2,1);
+  }
+  .index-thumb-wrap {
+    width: var(--sz); height: var(--sz);
+    background: transparent; overflow: hidden; cursor: pointer;
+    position: relative; transition: transform 0.2s ease;
+  }
+  .index-thumb-wrap:hover { transform: scale(1.2); }
+  .index-thumb-wrap img { width: 100%; height: 100%; object-fit: contain; object-position: bottom left; display: block; }
+  .index-item.dimmed { opacity: 0.15; transition: opacity 0.4s, left 0.5s cubic-bezier(0.4,0,0.2,1), top 0.5s cubic-bezier(0.4,0,0.2,1); pointer-events: none; }
+
+  /* ── GALLERY OVERLAY ── */
+  #gallery-overlay {
+    position: fixed; top: 0; bottom: 0; left: 0;
+    z-index: 150; background: #fff;
+    overflow-x: hidden; overflow-y: auto;
+    display: none;
+  }
+  #gallery-grid { display: grid; gap: 0; width: 100%; }
+  #gallery-grid img { width: 100%; object-fit: cover; display: block; cursor: pointer; }
+
+  /* ── SLIDE PANEL — hidden everywhere ── */
+  #slide-panel { display: none !important; }
+
+  /* desktop pinned project title */
+  #desk-panel-title {
+    position: fixed; bottom: 16px; left: 22px;
+    font-size: 13px; font-weight: 400; color: #000;
+    z-index: 203; line-height: 1;
+    opacity: 0; pointer-events: none; transition: opacity 0.3s;
+  }
+  #desk-panel-title.visible { opacity: 1; pointer-events: auto; }
+  #desk-panel-title a { color: #000; text-decoration: none; }
+  #desk-panel-title a:hover { font-weight: 700; }
+
+  /* ── CLOSE BTN ── */
+  #gallery-close-btn {
+    position: fixed; top: 16px; right: 24px;
+    font-size: 13px; color: #000; cursor: pointer;
+    opacity: 0.7; z-index: 202; display: none;
+  }
+  #gallery-close-btn:hover { opacity: 1; }
+
+  /* ── LIGHTBOX ── */
+  #lightbox {
+    position: fixed; inset: 0; z-index: 300;
+    display: none; flex-direction: column;
+    align-items: center; justify-content: center;
+    background: rgba(255,255,255,0.95);
+    gap: 14px;
+  }
+  #lightbox.visible { display: flex; }
+  #lightbox-inner {
+    position: relative;
+    display: flex; align-items: center; justify-content: center;
+    width: 100%; max-width: min(500px, 90vw);
+  }
+  #lightbox-img {
+    max-width: min(500px, 90vw); max-height: min(500px, 80vh);
+    width: auto; height: auto; object-fit: contain; display: block;
+  }
+  #lightbox-prev, #lightbox-next {
+    position: absolute; top: 50%; transform: translateY(-50%);
+    background: none; border: none;
+    font-size: 13px; color: #000; cursor: pointer;
+    padding: 8px; user-select: none; font-family: sans-serif;
+  }
+  
+  #lightbox-prev:hover, #lightbox-next:hover { opacity: 1; }
+  #lightbox-prev { left: -32px; }
+  #lightbox-next { right: -32px; }
+  #lightbox-meta {
+    font-size: 13px; font-weight: 400; color: #000;
+    text-align: center; line-height: 1.75; font-family: sans-serif;
+  }
+
+  #lightbox-meta a {
+  color: inherit;
+  text-decoration: none;
+  }
+
+  #lightbox-meta a:hover {
+    font-weight: 700;
+  }
+
+  #lightbox-close {
+    position: fixed; top: 16px; right: 24px;
+    font-size: 13px; color: #000; cursor: pointer;
+    opacity: 0.7; z-index: 301;
+  }
+
+  #lightbox-close:hover { opacity: 1; }
+
+  /* mobile pinned title */
+  #mob-panel-title { display: none; }
+
+  /* ── MOBILE ── */
+  @media (max-aspect-ratio: 1/1) {
+    #bottom-bar {
+      left: 0; right: 0; bottom: 0; width: 100%;
+      flex-direction: row; justify-content: space-between; align-items: flex-end;
+      padding: 10px 22px;
+      padding-bottom: max(10px, env(safe-area-inset-bottom));
+      z-index: 201;
+    }
+
+    #links-list { align-items: flex-end; }
+    #site-name { z-index: 201; }
+    #slide-panel { display: none !important; }
+    #gallery-close-btn { top: 16px; right: 16px;}
+    #lightbox-close { top: 16px; right: 16px; display: none;}
+    #gallery-overlay { width: 100% !important; }
+    #lightbox-img {
+      max-width: 90vw; max-height: 70vh;
+    }
+
+    #lightbox-prev, #lightbox-next {
+      padding: 24px 16px;
+      font-size: 11px;
+    }
+    #lightbox-prev { left: -20px; display: none;}
+    #lightbox-next { right: -20px; display: none;}
+
+    #mob-panel-title {
+      display: block;
+      z-index: 201;
+      font-size: 13px; font-weight: 400; color: #000;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.3s; flex-shrink: 0; line-height: 1;
+    }
+
+    #mob-panel-title.visible { opacity: 1; pointer-events: auto; }
+    #mob-panel-title a { color: #000; text-decoration: none; }
+    #mob-panel-title a:hover { font-weight: 700; }
+  }
+</style>
+</head>
+<body>
+
+<span id="site-name">
+  <span id="site-name-label">molly baker ragan</span>
+</span>
+
+<div id="canvas">
+  <div class="index-item" data-project="zines"><div class="index-thumb-wrap"><img src="" alt="zines"></div></div>
+  <div class="index-item" data-project="whatdoyousee"><div class="index-thumb-wrap"><img src="" alt="what do you see?"></div></div>
+  <div class="index-item" data-project="unlearning"><div class="index-thumb-wrap"><img src="" alt="unlearning library"></div></div>
+  <div class="index-item" data-project="bioephemera"><div class="index-thumb-wrap"><img src="" alt="things stashed in pages"></div></div>
+  <div class="index-item" data-project="unsubscribe"><div class="index-thumb-wrap"><img src="" alt="unsubscribe"></div></div>
+  <div class="index-item" data-project="headphones"><div class="index-thumb-wrap"><img src="" alt="untangling headphones"></div></div>
+</div>
+
+<span id="gallery-close-btn">✕</span>
+<span id="desk-panel-title"></span>
+
+<div id="gallery-overlay">
+  <div id="gallery-grid"></div>
+</div>
+
+<div id="slide-panel">
+  <p id="panel-title"></p>
+  <p id="panel-desc"></p>
+</div>
+
+<div id="lightbox">
+  <span id="lightbox-close">✕</span>
+  <div id="lightbox-inner">
+    <button id="lightbox-prev"><</button>
+    <img id="lightbox-img" src="" alt="">
+    <button id="lightbox-next">></button>
+  </div>
+  <div id="lightbox-meta"></div>
+</div>
+
+<div id="bottom-bar">
+  <span id="mob-panel-title"></span>
+  <div style="display:flex;flex-direction:column;align-items:flex-end;">
+    <div id="links-list">
+      <a href="mailto:mollybakerragan@gmail.com"><img src="/images/links/mail.png" alt="mail"></a>
+      <a href="https://www.are.na/molly-ragan/channels" target="_blank" rel="noopener"><img src="/images/links/arena.png" alt="arena"></a>
+      <a href="https://www.instagram.com/molly.baker.ragan/" target="_blank" rel="noopener"><img src="/images/links/instagram.png" alt="instagram"></a>
+      <a href="https://soundcloud.com/mollybakerragan/radio-mix-2" target="_blank" rel="noopener"><img src="/images/links/soundcloud.png" alt="soundcloud"></a>
+    </div>
+    <span id="links-toggle"><img src="/images/link.png" alt="links"></span>
+  </div>
+</div>
+
+<script>
+// ── PROJECTS ──
+const projects = {
+  zines:       { title: 'zines',                link: null },
+  whatdoyousee:{ title: 'whatdoyousee.nyc',     link: 'https://www.whatdoyousee.nyc' },
+  unlearning:  { title: 'unlearning library',   link: 'https://www.unlearninglibrary.com' },
+  bioephemera: { title: 'things stashed in pages' },
+  headphones:  { title: 'untangling headphones' },
+  unsubscribe: { title: 'unsubscribe' },
+};
+const galleryProjects = ['bioephemera', 'headphones', 'unsubscribe'];
+
+// ── SUPABASE ──
+const SUPABASE_URL      = 'https://krkcskfledxweimduvvn.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imtya2Nza2ZsZWR4d2VpbWR1dnZuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODExMjYzNzIsImV4cCI6MjA5NjcwMjM3Mn0.QIX2_UqDzATZ-NzhjFQUGIpsBxGn1D640viI9QG38rY';
+
+async function fetchGalleryImages() {
+  try {
+    const res = await fetch(
+      `${SUPABASE_URL}/rest/v1/images?select=project,url,sort_order,taken_at,location,lat,lng,plant,book,scanned,book_link&order=sort_order.desc`,
+      { headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` } }
+    );
+    const data = await res.json();
+    if (!Array.isArray(data)) return;
+    const byProject = {};
+    data.forEach(row => {
+      if (!byProject[row.project]) byProject[row.project] = [];
+      byProject[row.project].push({
+        url:      row.url,
+        taken_at: row.taken_at || null,
+        location: row.location || null,
+        lat:      row.lat ?? null,
+        lng:      row.lng ?? null,
+        plant:    row.plant || null,
+        book:     row.book  || null,
+        scanned:  row.scanned || null,
+        book_link:row.book_link || null,
+      });
+    });
+    Object.keys(byProject).forEach(key => {
+      if (!projects[key]) return;
+      if (key === 'bioephemera') {
+        const monthMap = { jan:0,feb:1,mar:2,apr:3,may:4,june:5,july:6,aug:7,sep:8,oct:9,nov:10,dec:11 };
+        byProject[key].sort((a, b) => {
+          const parse = s => {
+            if (!s) return null;
+            const [mon, yr] = s.trim().split(' ');
+            if (!mon || !yr) return null;
+            return new Date(parseInt(yr), monthMap[mon] ?? 0);
+          };
+          const da = parse(a.scanned), db = parse(b.scanned);
+          if (!da && !db) return 0;
+          if (!da) return 1;  // nulls to end
+          if (!db) return -1;
+          return db - da;  // newest first
+        });
+      }
+      projects[key].images = byProject[key];
+      const item = document.querySelector(`.index-item[data-project="${key}"]`);
+      if (item) {
+        const img = item.querySelector('.index-thumb-wrap img');
+        if (img) img.src = byProject[key][0].url;
+      }
+    });
+  } catch (e) { console.warn('Could not fetch gallery images:', e); }
+}
+
+// ── DOM REFS ──
+const canvas          = document.getElementById('canvas');
+const siteName        = document.getElementById('site-name');
+const linksToggle     = document.getElementById('links-toggle');
+const linksList       = document.getElementById('links-list');
+const bottomBar       = document.getElementById('bottom-bar');
+const mobPanelTitle   = document.getElementById('mob-panel-title');
+const galleryOverlay  = document.getElementById('gallery-overlay');
+const galleryGrid     = document.getElementById('gallery-grid');
+const galleryCloseBtn = document.getElementById('gallery-close-btn');
+const deskPanelTitle  = document.getElementById('desk-panel-title');
+const lightbox        = document.getElementById('lightbox');
+const lightboxImg     = document.getElementById('lightbox-img');
+const lightboxMeta    = document.getElementById('lightbox-meta');
+const lightboxClose   = document.getElementById('lightbox-close');
+const lightboxPrev    = document.getElementById('lightbox-prev');
+const lightboxNext    = document.getElementById('lightbox-next');
+const storedLayout    = {};
+
+// ── STATE ──
+let activeKey      = null;
+let lightboxImages = [];
+let lightboxIndex  = 0;
+let poppingState   = false;
+
+function isMob() { return window.innerWidth < window.innerHeight; }
+
+// ── LAYOUTS ──
+const LAYOUTS_DESKTOP = [
+  [[29.7,10.9,17.2],[63.3,12.4,17.2],[43.9,52.1,17.3],[81.3,65.3,15.8],[26.3,40.6,17.2],[5.0,60.0,15.8]],
+  [[76.2,7.3,17.1],[35.2,11.7,17.1],[80.1,49.1,17.3],[54.4,51.3,16.9],[5.4,12.9,16.9],[21.4,38.6,17.1]],
+  [[55.1,34.2,15.0],[77.9,7.0,15.0],[2.6,42.8,15.8],[40.0,69.5,14.1],[26.3,22.6,15.0],[5.0,7.0,14.1]],
+  [[58.9,6.5,13.6],[54.4,41.8,13.6],[43.3,17.7,14.2],[3.2,70.0,13.6],[9.3,42.7,13.6],[75.0,55.0,13.6]],
+  [[43.7,14.6,14.1],[69.6,14.4,14.1],[23.2,23.1,17.2],[7.8,55.0,14.1],[61.0,46.0,14.1],[5.0,8.0,14.1]],
+  [[52.4,11.0,15.5],[30.6,23.9,15.5],[72.7,15.0,13.5],[9.1,31.2,16.1],[32.1,66.8,15.5],[65.0,55.0,13.5]],
+  [[31.6,29.7,14.7],[52.7,26.4,14.7],[55.1,60.8,16.2],[30.4,61.5,15.2],[4.9,44.1,14.7],[75.0,28.0,14.7]],
+  [[22.1,23.1,15.6],[54.3,13.2,15.6],[1.7,53.4,14.5],[31.1,64.8,15.2],[58.1,63.9,15.6],[75.0,53.0,14.5]],
+  [[48.7,7.5,14.0],[26.2,26.0,14.0],[75.8,49.0,16.2],[40.6,62.4,15.6],[62.8,57.7,14.0],[5.0,7.0,14.0]],
+  [[67.1,16.8,15.6],[30.4,10.8,15.6],[12.1,35.3,16.6],[47.6,47.9,15.2],[50.5,15.3,15.6],[75.0,63.0,15.2]],
+];
+const LAYOUTS_MOBILE = [
+  [[28.5,8,28.1],[10.9,72,28.1],[63.7,30,32.0],[69.1,55,26.3],[58.0,8,28.1],[10.0,45,28.1]],
+  [[46.1,8,22.8],[15.3,20,22.8],[48.4,38,32.0],[52.4,65,30.0],[10.1,55,22.8],[65.0,65,22.8]],
+  [[31.2,15,28.7],[68.9,38,28.7],[5.7,52,32.0],[54.7,72,24.9],[26.7,72,28.7],[10.0,8,28.7]],
+  [[56.3,25,25.5],[22.5,8,25.5],[18.1,65,32.0],[62.9,72,26.0],[17.1,35,25.5],[55.7,48,25.5]],
+  [[15.1,8,26.8],[7.3,48,26.8],[56.5,8,32.0],[36.5,30,26.7],[70.0,65,26.8],[35.2,68,26.8]],
+  [[8.8,8,24.3],[30.9,32,24.3],[65.1,8,32.0],[42.8,68,26.3],[10.0,62,24.3],[65.0,60,24.3]],
+  [[58.8,8,25.7],[36.9,45,25.7],[23.6,22,32.0],[11.7,68,24.9],[74.8,72,25.7],[10.0,8,25.7]],
+  [[64.7,8,27.1],[43.9,68,27.1],[18.8,18,32.0],[53.3,42,22.8],[7.9,68,27.1],[65.0,8,27.1]],
+  [[25.7,8,26.5],[61.9,8,26.5],[25.7,65,32.0],[63.5,68,27.6],[12.1,32,26.5],[57.6,45,26.5]],
+  [[70.1,10,24.9],[19.9,28,24.9],[62.9,38,32.0],[14.1,50,23.7],[56.5,65,24.9],[10.0,8,24.9]],
+];
+let currentLayout = 0;
+
+function randomLayout() {
+  const iw = window.innerWidth, ih = window.innerHeight;
+  const mob = isMob();
+  const layouts = mob ? LAYOUTS_MOBILE : LAYOUTS_DESKTOP;
+  const layout = layouts[currentLayout % layouts.length];
+  currentLayout = Math.floor(Math.random() * layouts.length);
+  Array.from(document.querySelectorAll('.index-item')).forEach((item, i) => {
+    const [xPct, yPct, wPct] = layout[i] || [10 + i*12, 30, 15];
+    const sz = Math.round((wPct / 100) * iw);
+    item.querySelector('.index-thumb-wrap').style.width  = sz + 'px';
+    item.querySelector('.index-thumb-wrap').style.height = sz + 'px';
+    const left = Math.round((xPct / 100) * iw);
+    const topM = mob ? 60 : 0, botM = mob ? 60 : 0;
+    const usableH = ih - topM - botM;
+    const yR = mob ? topM + ((yPct - 6) / (91 - 6)) * usableH : (yPct / 100) * ih;
+    const top = Math.round(Math.max(topM, Math.min(ih - sz - botM, yR)));
+    item.style.left = left + 'px';
+    item.style.top  = top  + 'px';
+    storedLayout[item.dataset.project] = { left, top, size: sz };
+  });
+}
+
+// ── INIT ──
+window.addEventListener('load', () => {
+  randomLayout();
+  fetchGalleryImages().then(() => {
+    const imgs = Array.from(document.querySelectorAll('.index-thumb-wrap img'));
+    let loaded = 0; let relaidOut = false;
+    function checkDone() {
+      loaded++;
+      if (loaded >= imgs.length && !relaidOut) {
+        relaidOut = true; randomLayout(); startAllSlideshows();
+      }
+    }
+    imgs.forEach(img => {
+      if (img.complete && img.naturalHeight > 0) checkDone();
+      else { img.addEventListener('load', checkDone); img.addEventListener('error', checkDone); }
+    });
+  });
+});
+
+window.addEventListener('resize', () => { closeGalleryUI(); randomLayout(); });
+
+// ── SLIDESHOWS ──
+function startAllSlideshows() {
+  document.querySelectorAll('.index-item').forEach(item => {
+    const key = item.dataset.project; const p = projects[key];
+    if (!p || !p.images || p.images.length < 2 || item._indexInterval) return;
+    let idx = 0; const speed = 1000 + Math.random() * 3000;
+    const thumbImg = item.querySelector('.index-thumb-wrap img');
+    item._indexInterval = setInterval(() => { idx = (idx + 1) % p.images.length; thumbImg.src = p.images[idx].url; }, speed);
+  });
+}
+
+function stopAllSlideshows() {
+  document.querySelectorAll('.index-item').forEach(item => {
+    if (item._indexInterval) { clearInterval(item._indexInterval); item._indexInterval = null; }
+  });
+}
+
+// ── SITE NAME ──
+siteName.addEventListener('mouseenter', () => { if (activeKey) siteName.classList.add('active'); });
+siteName.addEventListener('mouseleave', () => siteName.classList.remove('active'));
+siteName.addEventListener('click', e => {
+  e.stopPropagation();
+  if (activeKey) closeGallery();
+});
+
+// ── LINKS TOGGLE ──
+let linksOpen = false;
+bottomBar.addEventListener('mouseenter', () => { if (!isMob()) linksList.classList.add('visible'); });
+bottomBar.addEventListener('mouseleave', () => { if (!isMob() && !linksOpen) linksList.classList.remove('visible'); });
+linksToggle.addEventListener('click', e => {
+  e.stopPropagation(); linksOpen = !linksOpen;
+  linksToggle.classList.toggle('active', linksOpen);
+  linksList.classList.toggle('visible', linksOpen);
+});
+document.addEventListener('click', e => {
+  if (linksOpen && !bottomBar.contains(e.target)) {
+    linksOpen = false; linksList.classList.remove('visible'); linksToggle.classList.remove('active');
+  }
+});
+
+// ── ITEM CLICKS ──
+document.querySelectorAll('.index-item').forEach(item => {
+  const key = item.dataset.project;
+  item.querySelector('.index-thumb-wrap').addEventListener('click', () => {
+    const p = projects[key]; if (!p) return;
+    if (activeKey === key) { closeGallery(); return; }
+    if (galleryProjects.includes(key)) {
+      activeKey = key;
+      stopAllSlideshows();
+      document.querySelectorAll('.index-item').forEach(el => el.classList.toggle('dimmed', el !== item));
+      openGallery(key);
+    } else {
+      if (p.link) window.open(p.link, '_blank', 'noopener');
+    }
+  });
+});
+
+// ── GALLERY — UI only (no history) ──
+function openGalleryUI(key) {
+  const p = projects[key]; if (!p || !p.images) return;
+  galleryGrid.innerHTML = '';
+  p.images.forEach((imgData, i) => {
+    const img = document.createElement('img');
+    img.src = imgData.url; img.loading = 'lazy'; img.dataset.index = i;
+    galleryGrid.appendChild(img);
+  });
+  galleryCloseBtn.style.display = 'block';
+  const cols = { bioephemera: 3, headphones: 4, unsubscribe: 4 }[key] ?? 3;
+  galleryGrid.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+  galleryOverlay.style.width = '100%';
+  galleryOverlay.style.transition = 'none';
+  galleryOverlay.style.transform = 'translateX(-100%)';
+  galleryOverlay.style.display = 'block';
+  const titleEl = isMob() ? mobPanelTitle : deskPanelTitle;
+  titleEl.innerHTML = p.link
+    ? `<a href="${p.link}" target="_blank" rel="noopener">${p.title}</a>`
+    : p.title;
+  titleEl.classList.add('visible');
+  requestAnimationFrame(() => {
+    galleryOverlay.style.transition = 'transform 0.45s cubic-bezier(0.4,0,0.2,1)';
+    galleryOverlay.style.transform = 'translateX(0)';
+  });
+  setTimeout(() => { galleryOverlay.scrollTop = 0; }, 50);
+}
+
+function closeGalleryUI() {
+  activeKey = null;
+  galleryCloseBtn.style.display = 'none';
+  mobPanelTitle.classList.remove('visible');
+  deskPanelTitle.classList.remove('visible');
+  document.querySelectorAll('.index-item').forEach(el => el.classList.remove('dimmed'));
+
+  galleryOverlay.style.transition = 'transform 0.45s cubic-bezier(0.4,0,0.2,1)';
+  galleryOverlay.style.transform = 'translateX(-100%)';
+
+  setTimeout(() => {
+    galleryOverlay.style.display = 'none';
+    galleryOverlay.style.transform = '';
+    galleryOverlay.style.transition = '';
+    galleryGrid.innerHTML = '';
+    mobPanelTitle.innerHTML = '';
+    deskPanelTitle.innerHTML = '';
+    startAllSlideshows();
+  }, 450);
+}
+
+// ── GALLERY — with history ──
+function openGallery(key) {
+  openGalleryUI(key);
+  history.pushState({ view: 'gallery', key }, '', `#${key}`);
+}
+
+function closeGallery() {
+  if (poppingState) { closeGalleryUI(); return; }
+  history.back();
+}
+
+galleryCloseBtn.addEventListener('click', e => { e.stopPropagation(); closeGallery(); });
+
+// ── LIGHTBOX — UI only ──
+function formatMeta(imgData, key) {
+  const lines = [];
+
+  if (key === 'unsubscribe') {
+    if (imgData.taken_at) {
+      const d = new Date(imgData.taken_at);
+      lines.push(
+        `${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')}/${d.getFullYear()}`
+      );
+    }
+
+  } else if (key === 'bioephemera') {
+
+    if (imgData.plant) {
+      lines.push(imgData.plant);
+    }
+
+    if (imgData.book) {
+      const bookHTML = imgData.book_link
+        ? `<a href="${imgData.book_link}" target="_blank" rel="noopener"><em>${imgData.book}</em></a>`
+        : `<em>${imgData.book}</em>`;
+
+      lines.push(bookHTML);
+    }
+
+    if (imgData.location) {
+      lines.push(imgData.location);
+    }
+
+    if (imgData.scanned) {
+      lines.push(imgData.scanned);
+    }
+
+  } else if (key === 'headphones') {
+    if (imgData.taken_at) {
+      const d = new Date(imgData.taken_at);
+      lines.push(
+        `${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')}/${d.getFullYear()}`
+      );
+    }
+
+    if (imgData.lat != null && imgData.lng != null) {
+      lines.push(
+        `(${parseFloat(imgData.lat).toFixed(4)}, ${parseFloat(imgData.lng).toFixed(4)})`
+      );
+    }
+  }
+
+  return lines.join('<br>');
+}
+
+function showLightboxUI(index) {
+  const p = projects[activeKey]; if (!p || !p.images) return;
+  lightboxImages = p.images;
+  lightboxIndex = ((index % lightboxImages.length) + lightboxImages.length) % lightboxImages.length;
+  const imgData = lightboxImages[lightboxIndex];
+  lightboxImg.src = imgData.url;
+  lightboxMeta.innerHTML = formatMeta(imgData, activeKey);
+  lightbox.classList.add('visible');
+}
+
+function closeLightboxUI() {
+  lightbox.classList.remove('visible');
+  lightboxImg.src = '';
+  lightboxMeta.textContent = '';
+  lightboxImages = [];
+}
+
+// ── LIGHTBOX — with history ──
+function showLightbox(index) {
+  showLightboxUI(index);
+  if (!poppingState) {
+    history.pushState({ view: 'lightbox', key: activeKey, index: lightboxIndex }, '', `#${activeKey}/${lightboxIndex}`);
+  }
+}
+
+function closeLightbox() {
+  if (poppingState) { closeLightboxUI(); return; }
+  history.back();
+}
+
+function navigateLightbox(index) {
+  showLightboxUI(index);
+  // replace state rather than push so navigating images doesn't stack up
+  history.replaceState({ view: 'lightbox', key: activeKey, index: lightboxIndex }, '', `#${activeKey}/${lightboxIndex}`);
+}
+
+galleryGrid.addEventListener('click', e => {
+  const img = e.target.closest('#gallery-grid img');
+  if (!img) return;
+  e.stopPropagation();
+  showLightbox(parseInt(img.dataset.index, 10));
+});
+
+lightboxClose.addEventListener('click', e => { e.stopPropagation(); closeLightbox(); });
+lightboxPrev.addEventListener('click', e => { e.stopPropagation(); navigateLightbox(lightboxIndex - 1); });
+lightboxNext.addEventListener('click', e => { e.stopPropagation(); navigateLightbox(lightboxIndex + 1); });
+
+lightbox.addEventListener('click', e => { if (e.target === lightbox) closeLightbox(); });
+
+// ── LIGHTBOX SWIPE ──
+let touchStartX = null;
+lightbox.addEventListener('touchstart', e => {
+  touchStartX = e.touches[0].clientX;
+}, { passive: true });
+
+lightbox.addEventListener('touchend', e => {
+  if (touchStartX === null) return;
+  const dx = e.changedTouches[0].clientX - touchStartX;
+  touchStartX = null;
+  if (Math.abs(dx) < 40) return; // too small, ignore
+  if (dx < 0) navigateLightbox(lightboxIndex + 1); // swipe left → next
+  else         navigateLightbox(lightboxIndex - 1); // swipe right → prev
+}, { passive: true });
+
+// ── HISTORY ──
+window.addEventListener('popstate', e => {
+  poppingState = true;
+  const state = e.state;
+  if (lightbox.classList.contains('visible')) {
+    // going back from lightbox → just close lightbox, stay in gallery
+    closeLightboxUI();
+  } else if (activeKey) {
+    // going back from gallery → close gallery
+    closeGalleryUI();
+  }
+  poppingState = false;
+});
+
+// ── KEYBOARD ──
+document.addEventListener('keydown', e => {
+  if (lightbox.classList.contains('visible')) {
+    if (e.key === 'ArrowLeft')  navigateLightbox(lightboxIndex - 1);
+    if (e.key === 'ArrowRight') navigateLightbox(lightboxIndex + 1);
+    if (e.key === 'Escape')     closeLightbox();
+  } else if (activeKey) {
+    if (e.key === 'Escape') closeGallery();
+  }
+});
+</script>
+</body>
+</html>

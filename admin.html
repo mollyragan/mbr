@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>admin — molly baker ragan</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+* { box-sizing: border-box; }
+
+body {
+  font-family: sans-serif;
+  margin: 0;
+  font-size: 14px;
+  color: black;
+  background: white;
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* --- LOGIN PANEL --- */
+#loginPanel {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 1000;
+  background: white;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.2s ease;
+}
+#loginPanel.expanded { border-color: rgba(0,0,0,0.1); }
+#loginBar { display: flex; align-items: center; gap: 10px; padding: 12px 16px; }
+#loginBtn { all: unset; font-size: 14px; color: black; cursor: pointer; transition: all 0.2s ease; }
+#loginBtn:hover, #loginBtn:active { font-weight: bold; }
+#status { font-size: 12px; opacity: 0.6; margin-left: 4px; }
+#loginInputs {
+  display: grid; grid-template-rows: 0fr;
+  transition: grid-template-rows 0.3s ease, padding 0.3s ease;
+  padding: 0 16px;
+}
+#loginInputs > .inner { overflow: hidden; display: flex; flex-direction: column; gap: 8px; }
+#loginPanel.expanded #loginInputs { grid-template-rows: 1fr; padding-bottom: 14px; }
+#loginInputs input {
+  width: 100%; border: none; background: #f0f0f0;
+  padding: 10px 12px; font-size: 16px; border-radius: 6px; font-family: inherit;
+}
+#loginInputs input:focus { outline: none; background: #e8e8e8; }
+#loginSubmit {
+  width: 100%; background: black; color: white; border: none;
+  padding: 11px; font-size: 14px; border-radius: 6px; cursor: pointer;
+  font-family: inherit; letter-spacing: 0.04em; margin-top: 2px;
+}
+#loginSubmit:active { background: #333; }
+
+/* --- MAIN LAYOUT --- */
+#adminWrapper {
+  flex: 1; display: flex; flex-direction: column;
+  padding: 16px; padding-top: calc(52px + 16px);
+  gap: 14px; min-height: 0; overflow-y: auto;
+}
+
+.field-label { font-size: 12px; opacity: 0.5; margin-bottom: 6px; display: block; }
+
+#projectSelect {
+  width: 100%; border: none; border-bottom: 1px solid rgba(0,0,0,0.2);
+  background: white; padding: 8px 0; font-size: 14px; font-family: inherit;
+  color: black; appearance: none; -webkit-appearance: none; cursor: pointer; outline: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23888'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 4px center;
+}
+#projectSelect:focus { border-bottom-color: black; }
+
+/* --- EXISTING IMAGES --- */
+#existingSection { display: none; }
+#existingSection.visible { display: block; }
+
+#existingGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+  gap: 6px; margin-top: 8px;
+}
+.existing-img-wrap { position: relative; cursor: pointer; }
+.existing-img-wrap img {
+  width: 100%; aspect-ratio: 1; object-fit: cover;
+  display: block; border-radius: 3px;
+}
+.existing-img-wrap .order-badge {
+  position: absolute; top: 3px; left: 3px;
+  background: rgba(0,0,0,0.6); color: white;
+  font-size: 10px; padding: 1px 4px; border-radius: 3px;
+}
+.existing-img-wrap .del-btn {
+  position: absolute; top: 3px; right: 3px;
+  background: rgba(0,0,0,0.6); color: white; border: none;
+  font-size: 12px; line-height: 1; padding: 2px 5px;
+  border-radius: 3px; cursor: pointer;
+}
+.existing-img-wrap .del-btn:hover { background: #c00; }
+.existing-img-wrap .meta-dot {
+  position: absolute; bottom: 3px; right: 3px;
+  width: 6px; height: 6px; border-radius: 50%;
+  background: rgba(0,0,0,0.3);
+}
+.existing-img-wrap .meta-dot.filled { background: #000; }
+
+/* --- DROPZONE --- */
+#dropZone {
+  flex: 1; min-height: 180px;
+  border: 1px dashed rgba(0,0,0,0.4);
+  display: flex; justify-content: center; align-items: center;
+  text-align: center; cursor: pointer; position: relative;
+  overflow: hidden; transition: border-color 0.2s ease;
+  background: #fafafa; border-radius: 6px;
+}
+#dropZone.active { border-color: black; }
+#dropZoneText { font-size: 14px; color: rgba(0,0,0,0.5); pointer-events: none; line-height: 1.7; }
+#previewGrid {
+  position: absolute; inset: 0;
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+  gap: 2px; overflow: hidden; align-content: start;
+}
+#previewGrid img { width: 100%; aspect-ratio: 1; object-fit: cover; display: block; }
+
+/* --- PROGRESS --- */
+#progressWrap { display: none; }
+#progressBar { width: 0%; height: 3px; background: black; transition: width 0.2s ease; border-radius: 2px; }
+#progressLabel { font-size: 12px; color: rgba(0,0,0,0.6); margin-top: 6px; text-align: center; }
+
+/* --- BUTTONS --- */
+#submit {
+  width: 100%; background: black; color: white; border: none;
+  padding: 16px; font-size: 16px; font-family: inherit;
+  letter-spacing: 0.05em; cursor: pointer; border-radius: 6px; flex-shrink: 0;
+}
+#submit:hover { background: #222; }
+#submit:active { background: #444; }
+#submit:disabled { background: #999; cursor: default; }
+
+/* --- EDIT LIGHTBOX --- */
+#editLightbox {
+  position: fixed; inset: 0; z-index: 2000;
+  background: rgba(255,255,255,0.97);
+  display: none; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 16px; padding: 24px;
+}
+#editLightbox.visible { display: flex; }
+#editLightbox img {
+  max-width: min(400px, 85vw);
+  max-height: min(400px, 55vh);
+  object-fit: contain; display: block;
+}
+#editFields { display: flex; flex-direction: column; gap: 10px; width: min(400px, 85vw); }
+#editFields input {
+  width: 100%; border: none; border-bottom: 1px solid rgba(0,0,0,0.2);
+  padding: 8px 0; font-size: 14px; font-family: inherit; outline: none; background: transparent;
+}
+#editFields input:focus { border-bottom-color: black; }
+#editFields input::placeholder { color: rgba(0,0,0,0.35); }
+#editActions { display: flex; gap: 10px; width: min(400px, 85vw); }
+#editSave {
+  flex: 1; background: black; color: white; border: none;
+  padding: 12px; font-size: 14px; font-family: inherit;
+  border-radius: 6px; cursor: pointer; letter-spacing: 0.04em;
+}
+#editSave:hover { background: #222; }
+#editCancel {
+  padding: 12px 18px; background: none; border: 1px solid rgba(0,0,0,0.2);
+  font-size: 14px; font-family: inherit; border-radius: 6px; cursor: pointer;
+}
+#editCancel:hover { border-color: black; }
+#editClose {
+  position: absolute; top: 16px; right: 20px;
+  font-size: 13px; cursor: pointer; opacity: 0.5;
+}
+#editClose:hover { opacity: 1; }
+  </style>
+</head>
+<body>
+
+<div id="loginPanel">
+  <div id="loginBar">
+    <button id="loginBtn">Log In</button>
+    <span id="status"></span>
+  </div>
+  <div id="loginInputs">
+    <div class="inner">
+      <input type="email" id="email" placeholder="Email" autocomplete="email" />
+      <input type="password" id="password" placeholder="Password" autocomplete="current-password" />
+      <button id="loginSubmit">Log In</button>
+    </div>
+  </div>
+</div>
+
+<div id="adminWrapper">
+
+  <div>
+    <span class="field-label">project</span>
+    <select id="projectSelect">
+      <option value="">— select a project —</option>
+      <option value="zines">zines</option>
+      <option value="whatdoyousee">what do you see?</option>
+      <option value="unlearning">unlearning library</option>
+      <option value="bioephemera">things stashed in pages</option>
+      <option value="unsubscribe">unsubscribe</option>
+      <option value="headphones">tangled headphones</option>
+    </select>
+  </div>
+
+  <div id="existingSection">
+    <span class="field-label" id="existingLabel">current images</span>
+    <div id="existingGrid"></div>
+  </div>
+
+  <div>
+    <span class="field-label">add images</span>
+    <div id="dropZone">
+      <div id="dropZoneText">
+        drag &amp; drop images<br>or tap to select<br><br>
+        <span style="font-size:12px;opacity:0.6;">bulk upload supported</span>
+      </div>
+      <div id="previewGrid"></div>
+    </div>
+  </div>
+
+  <input type="file" id="fileInput" accept="image/*" multiple style="display:none;" />
+
+  <div id="progressWrap">
+    <div id="progressBar"></div>
+    <div id="progressLabel"></div>
+  </div>
+
+  <button id="submit">upload to project</button>
+
+</div>
+
+<!-- EDIT LIGHTBOX -->
+<div id="editLightbox">
+  <span id="editClose">✕</span>
+  <div style="position:relative;display:flex;align-items:center;justify-content:center;width:100%;max-width:min(400px,85vw);">
+    <button id="editPrev" style="position:absolute;left:-32px;background:none;border:none;font-size:13px;cursor:pointer;opacity:0.4;font-family:sans-serif;padding:8px;">←</button>
+    <img id="editImg" src="" alt="">
+    <button id="editNext" style="position:absolute;right:-32px;background:none;border:none;font-size:13px;cursor:pointer;opacity:0.4;font-family:sans-serif;padding:8px;">→</button>
+  </div>
+  <div id="editFields"></div>
+  <div id="editActions">
+    <button id="editSave">save</button>
+    <button id="editCancel">cancel</button>
+  </div>
+</div>
+
+<script type="module">
+import exifr from 'https://cdn.jsdelivr.net/npm/exifr/dist/full.esm.js';
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+
+const SUPABASE_URL      = 'https://krkcskfledxweimduvvn.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imtya2Nza2ZsZWR4d2VpbWR1dnZuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODExMjYzNzIsImV4cCI6MjA5NjcwMjM3Mn0.QIX2_UqDzATZ-NzhjFQUGIpsBxGn1D640viI9QG38rY';
+const ADMIN_USER_ID     = '41002723-7c6b-4768-9931-7b3ffe532ebf';
+const STORAGE_BUCKET    = 'images';
+const IMAGE_MAX_W       = 1200;
+const JPEG_QUALITY      = 0.85;
+
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+let currentUser  = null;
+let currentFiles = [];
+let editingRow   = null;
+
+// ── LOGIN ──
+const loginPanel     = document.getElementById('loginPanel');
+const loginBtn       = document.getElementById('loginBtn');
+const loginSubmitBtn = document.getElementById('loginSubmit');
+const emailInput     = document.getElementById('email');
+const passwordInput  = document.getElementById('password');
+const status         = document.getElementById('status');
+
+function updateLoginButton() {
+  loginBtn.innerText = currentUser ? 'Log Out' : 'Log In';
+  status.innerText = currentUser ? currentUser.email : '';
+}
+
+loginBtn.onclick = async () => {
+  if (currentUser) {
+    await supabase.auth.signOut(); currentUser = null; updateLoginButton();
+  } else {
+    loginPanel.classList.toggle('expanded');
+    if (loginPanel.classList.contains('expanded')) emailInput.focus();
+  }
+};
+
+async function login() {
+  const email = emailInput.value.trim(), password = passwordInput.value;
+  if (!email || !password) return alert('Enter email and password');
+  loginSubmitBtn.disabled = true; loginSubmitBtn.innerText = 'Logging in…';
+  const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+  loginSubmitBtn.disabled = false; loginSubmitBtn.innerText = 'Log In';
+  if (error) { alert(`Error: ${error.message}`); }
+  else if (!data.user || data.user.id !== ADMIN_USER_ID) { alert('Not authorized'); await supabase.auth.signOut(); }
+  else {
+    currentUser = data.user;
+    loginPanel.classList.remove('expanded');
+    emailInput.value = ''; passwordInput.value = '';
+    updateLoginButton();
+  }
+}
+
+loginSubmitBtn.addEventListener('click', login);
+[emailInput, passwordInput].forEach(el => el.addEventListener('keydown', async e => { if (e.key === 'Enter') { e.preventDefault(); await login(); } }));
+async function checkUser() {
+  const { data } = await supabase.auth.getUser();
+  if (data.user && data.user.id === ADMIN_USER_ID) currentUser = data.user;
+  updateLoginButton();
+}
+checkUser();
+
+// ── PROJECT SELECT ──
+const projectSelect   = document.getElementById('projectSelect');
+const existingSection = document.getElementById('existingSection');
+const existingLabel   = document.getElementById('existingLabel');
+const existingGrid    = document.getElementById('existingGrid');
+
+// restore last selected project
+const savedProject = localStorage.getItem('adminProject');
+if (savedProject) {
+  projectSelect.value = savedProject;
+  loadExistingImages(savedProject);
+}
+
+projectSelect.addEventListener('change', () => {
+  localStorage.setItem('adminProject', projectSelect.value);
+  loadExistingImages(projectSelect.value);
+});
+
+async function loadExistingImages(project) {
+  existingGrid.innerHTML = '';
+  if (!project) { existingSection.classList.remove('visible'); return; }
+
+  const { data, error } = await supabase
+    .from('images').select('*').eq('project', project).order('sort_order', { ascending: true });
+
+  if (error || !data || data.length === 0) { existingSection.classList.remove('visible'); return; }
+
+  existingSection.classList.add('visible');
+
+  // label hint for bioephemera
+  existingLabel.textContent = project === 'bioephemera'
+    ? 'current images — click to edit plant, book, date & location info'
+    : 'current images';
+
+  data.forEach((img, i) => {
+    const wrap = document.createElement('div');
+    wrap.className = 'existing-img-wrap';
+
+    const hasMeta = project === 'bioephemera' && (img.plant || img.book || img.scanned || img.location || img.book_link);
+    wrap.innerHTML = `
+      <img src="${img.url}" loading="lazy">
+      <span class="order-badge">${i + 1}</span>
+      <button class="del-btn" data-id="${img.id}" data-path="${img.storage_path}">✕</button>
+      ${project === 'bioephemera' ? `<span class="meta-dot${hasMeta ? ' filled' : ''}"></span>` : ''}
+    `;
+
+   // collect all rows for this project so lightbox can navigate
+    const allRows = data;  // already fetched above
+
+    if (project === 'bioephemera') {
+      wrap.querySelector('img').addEventListener('click', () => openEditLightbox(allRows, i));
+    }
+
+    wrap.querySelector('.del-btn').addEventListener('click', async e => {
+      e.stopPropagation();
+      if (!confirm('Remove this image?')) return;
+      const id = e.target.dataset.id, path = e.target.dataset.path;
+      await supabase.storage.from(STORAGE_BUCKET).remove([path]);
+      await supabase.from('images').delete().eq('id', id);
+      loadExistingImages(project);
+    });
+
+    existingGrid.appendChild(wrap);
+  });
+}
+
+// ── EDIT LIGHTBOX ──
+const editLightbox = document.getElementById('editLightbox');
+const editImg      = document.getElementById('editImg');
+const editFields   = document.getElementById('editFields');
+const editSave     = document.getElementById('editSave');
+const editCancel   = document.getElementById('editCancel');
+const editClose    = document.getElementById('editClose');
+
+let editRows  = [];  // all rows for current project
+let editIndex = 0;   // current position
+
+function openEditLightbox(rows, index) {
+  editRows  = rows;
+  editIndex = index;
+  loadEditRow();
+  editLightbox.classList.add('visible');
+}
+
+function loadEditRow() {
+  const row = editRows[editIndex];
+  editingRow = row;
+  editImg.src = row.url;
+  editFields.innerHTML = `
+    <input id="editPlant" type="text" placeholder="plant" value="${row.plant || ''}">
+    <input id="editBook"  type="text" placeholder="book"  value="${row.book  || ''}">
+    <input id="editScanned"  type="text" placeholder="scanned"  value="${row.scanned  || ''}">
+    <input id="editLocation"  type="text" placeholder="location"  value="${row.location  || ''}">
+    <input id="editBook_link"  type="text" placeholder="book_link"  value="${row.book_link  || ''}">
+  `;
+  // auto-save on blur of any field
+  editFields.querySelectorAll('input').forEach(input => {
+    input.addEventListener('blur', () => saveCurrentRow());
+  });
+
+  document.getElementById('editPlant').focus();
+}
+
+function closeEditLightbox() {
+  editLightbox.classList.remove('visible');
+  editImg.src = '';
+  editFields.innerHTML = '';
+  editingRow = null;
+  editRows   = [];
+}
+
+async function saveCurrentRow() {
+  if (!editingRow) return true;
+  const plant    = document.getElementById('editPlant')?.value.trim();
+  const book     = document.getElementById('editBook')?.value.trim();
+  const scanned  = document.getElementById('editScanned')?.value.trim();
+  const location = document.getElementById('editLocation')?.value.trim();
+  const book_link = document.getElementById('editBook_link')?.value.trim();
+  const { error } = await supabase
+    .from('images').update({ plant: plant || null, book: book || null, scanned: scanned || null, location: location || null, book_link: book_link || null }).eq('id', editingRow.id);
+  if (error) { console.warn('Auto-save failed:', error.message); return false; }
+  editRows[editIndex].plant    = plant    || null;
+  editRows[editIndex].book     = book     || null;
+  editRows[editIndex].scanned  = scanned  || null;
+  editRows[editIndex].location = location || null;
+  editRows[editIndex].book_link = book_link || null;
+  return true;
+}
+
+editClose.addEventListener('click', closeEditLightbox);
+editCancel.addEventListener('click', closeEditLightbox);
+
+editSave.addEventListener('click', async () => {
+  const ok = await saveCurrentRow();
+  if (ok) { closeEditLightbox(); loadExistingImages(projectSelect.value); }
+});
+
+// prev / next — save current before moving
+document.getElementById('editPrev').addEventListener('click', async () => {
+  await saveCurrentRow();
+  editIndex = (editIndex - 1 + editRows.length) % editRows.length;
+  loadEditRow();
+});
+document.getElementById('editNext').addEventListener('click', async () => {
+  await saveCurrentRow();
+  editIndex = (editIndex + 1) % editRows.length;
+  loadEditRow();
+});
+
+document.addEventListener('keydown', e => {
+  if (!editLightbox.classList.contains('visible')) return;
+  if (e.key === 'Escape') closeEditLightbox();
+  if (e.key === 'Enter' && e.target.tagName === 'INPUT') editSave.click();
+  if (e.key === 'ArrowLeft')  document.getElementById('editPrev').click();
+  if (e.key === 'ArrowRight') document.getElementById('editNext').click();
+});
+
+// ── DROPZONE ──
+const dropZone     = document.getElementById('dropZone');
+const dropZoneText = document.getElementById('dropZoneText');
+const previewGrid  = document.getElementById('previewGrid');
+const fileInput    = document.getElementById('fileInput');
+
+dropZone.addEventListener('dragover',  e => { e.preventDefault(); dropZone.classList.add('active'); });
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('active'));
+dropZone.addEventListener('drop', e => { e.preventDefault(); dropZone.classList.remove('active'); if (e.dataTransfer.files.length) handleFiles(e.dataTransfer.files); });
+dropZone.addEventListener('click', () => fileInput.click());
+fileInput.addEventListener('change', () => handleFiles(fileInput.files));
+
+function handleFiles(files) {
+  currentFiles = Array.from(files).filter(f => f.type.startsWith('image/'));
+  if (!currentFiles.length) return;
+  previewGrid.innerHTML = '';
+  dropZoneText.style.display = 'none';
+  currentFiles.forEach(file => {
+    const reader = new FileReader();
+    reader.onload = e => { const img = document.createElement('img'); img.src = e.target.result; previewGrid.appendChild(img); };
+    reader.readAsDataURL(file);
+  });
+}
+
+// ── IMAGE PROCESSING ──
+function resizeImage(file, maxW, quality) {
+  return new Promise(resolve => {
+    const img = new Image(), url = URL.createObjectURL(file);
+    img.onload = () => {
+      const scale = Math.min(1, maxW / img.naturalWidth);
+      const w = Math.round(img.naturalWidth * scale), h = Math.round(img.naturalHeight * scale);
+      const canvas = document.createElement('canvas');
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      canvas.toBlob(blob => { URL.revokeObjectURL(url); resolve(blob); }, 'image/jpeg', quality);
+    };
+    img.src = url;
+  });
+}
+
+// ── UPLOAD ──
+const submitBtn     = document.getElementById('submit');
+const progressWrap  = document.getElementById('progressWrap');
+const progressBar   = document.getElementById('progressBar');
+const progressLabel = document.getElementById('progressLabel');
+
+function setProgress(done, total) {
+  progressBar.style.width = Math.round((done / total) * 100) + '%';
+  progressLabel.innerText = `${done} / ${total} uploaded`;
+}
+
+submitBtn.addEventListener('click', async () => {
+  if (!currentUser)         return alert('You must be logged in to upload.');
+  if (!projectSelect.value) return alert('Please select a project first.');
+  if (!currentFiles.length) return alert('Please select at least one image.');
+
+  const project = projectSelect.value;
+  const { data: existing } = await supabase.from('images').select('sort_order')
+    .eq('project', project).order('sort_order', { ascending: false }).limit(1);
+  let sortStart = existing && existing.length > 0 ? existing[0].sort_order + 1 : 0;
+
+  submitBtn.disabled = true;
+  progressWrap.style.display = 'block';
+  setProgress(0, currentFiles.length);
+
+  let successCount = 0, failCount = 0;
+
+  for (let i = 0; i < currentFiles.length; i++) {
+    const file = currentFiles[i];
+    progressLabel.innerText = `Processing ${i + 1} / ${currentFiles.length}: ${file.name}`;
+
+    try {
+      const ext      = file.name.split('.').pop() || 'jpg';
+      const baseName = file.name.replace(/\.[^.]+$/, '');
+      const ts       = Date.now();
+      const origPath   = `${project}/originals/${baseName}_${ts}.${ext}`;
+      const masterPath = `${project}/edit/${baseName}_${ts}.jpg`;
+
+      const { error: origErr } = await supabase.storage.from(STORAGE_BUCKET).upload(origPath, file, { contentType: file.type });
+      if (origErr) throw origErr;
+
+      const blob = await resizeImage(file, IMAGE_MAX_W, JPEG_QUALITY);
+      const { error: uploadErr } = await supabase.storage.from(STORAGE_BUCKET).upload(masterPath, blob, { contentType: 'image/jpeg' });
+      if (uploadErr) throw uploadErr;
+
+      const { data: urlData } = supabase.storage.from(STORAGE_BUCKET).getPublicUrl(masterPath);
+
+      let takenAt = null, lat = null, lng = null;
+      try {
+        const exif = await exifr.parse(file, { tiff: true, gps: true });
+        if (exif?.DateTimeOriginal) takenAt = exif.DateTimeOriginal.toISOString();
+        if (exif?.latitude)  lat = exif.latitude;
+        if (exif?.longitude) lng = exif.longitude;
+      } catch (exifErr) { console.warn('EXIF read failed:', exifErr); }
+      if (!takenAt && file.lastModified) takenAt = new Date(file.lastModified).toISOString();
+
+      const { error: dbErr } = await supabase.from('images').insert([{
+        project, filename: file.name, url: urlData.publicUrl,
+        storage_path: masterPath, sort_order: sortStart + i,
+        taken_at: takenAt, lat, lng,
+      }]);
+      if (dbErr) throw dbErr;
+
+      successCount++;
+    } catch (err) {
+      console.error(`Failed: ${file.name}`, err);
+      failCount++;
+    }
+
+    setProgress(i + 1, currentFiles.length);
+  }
+
+  submitBtn.disabled = false;
+  progressLabel.innerText = failCount === 0
+    ? `✓ ${successCount} image${successCount !== 1 ? 's' : ''} uploaded.`
+    : `Done. ${successCount} succeeded, ${failCount} failed.`;
+
+  currentFiles = [];
+  previewGrid.innerHTML = '';
+  dropZoneText.style.display = '';
+  progressBar.style.width = '0%';
+  fileInput.value = '';
+  loadExistingImages(project);
+});
+</script>
+</body>
+</html>
