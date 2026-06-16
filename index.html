@@ -70,6 +70,8 @@
   .index-item {
     position: absolute;
     display: flex; flex-direction: column; align-items: center;
+    opacity: 0;
+    transition: opacity 0.4s ease;
   }
   .index-item.layout-animating {
     transition: left 0.5s cubic-bezier(0.4,0,0.2,1), top 0.5s cubic-bezier(0.4,0,0.2,1),
@@ -232,12 +234,13 @@
 </span>
 
 <div id="canvas">
-  <div class="index-item" data-project="zines"><div class="index-thumb-wrap"><img src="" alt="zines"><div class="resize-handle"></div><div class="edge-n"></div><div class="edge-s"></div><div class="edge-e"></div><div class="edge-w"></div></div></div>
-  <div class="index-item" data-project="whatdoyousee"><div class="index-thumb-wrap"><img src="" alt="what do you see?"><div class="resize-handle"></div><div class="edge-n"></div><div class="edge-s"></div><div class="edge-e"></div><div class="edge-w"></div></div></div>
-  <div class="index-item" data-project="unlearning"><div class="index-thumb-wrap"><img src="" alt="unlearning library"><div class="resize-handle"></div><div class="edge-n"></div><div class="edge-s"></div><div class="edge-e"></div><div class="edge-w"></div></div></div>
-  <div class="index-item" data-project="bioephemera"><div class="index-thumb-wrap"><img src="" alt="things stashed in pages"><div class="resize-handle"></div><div class="edge-n"></div><div class="edge-s"></div><div class="edge-e"></div><div class="edge-w"></div></div></div>
-  <div class="index-item" data-project="unsubscribe"><div class="index-thumb-wrap"><img src="" alt="unsubscribe"><div class="resize-handle"></div><div class="edge-n"></div><div class="edge-s"></div><div class="edge-e"></div><div class="edge-w"></div></div></div>
-  <div class="index-item" data-project="headphones"><div class="index-thumb-wrap"><img src="" alt="untangling headphones"><div class="resize-handle"></div><div class="edge-n"></div><div class="edge-s"></div><div class="edge-e"></div><div class="edge-w"></div></div></div>
+  <div class="index-item" data-project="zines"><div class="index-thumb-wrap"><img alt="zines"><div class="resize-handle"></div><div class="edge-n"></div><div class="edge-s"></div><div class="edge-e"></div><div class="edge-w"></div></div></div>
+  <div class="index-item" data-project="whatdoyousee"><div class="index-thumb-wrap"><img alt="what do you see?"><div class="resize-handle"></div><div class="edge-n"></div><div class="edge-s"></div><div class="edge-e"></div><div class="edge-w"></div></div></div>
+  <div class="index-item" data-project="unlearning"><div class="index-thumb-wrap"><img alt="unlearning library"><div class="resize-handle"></div><div class="edge-n"></div><div class="edge-s"></div><div class="edge-e"></div><div class="edge-w"></div></div></div>
+  <div class="index-item" data-project="bioephemera"><div class="index-thumb-wrap"><img alt="things stashed in pages"><div class="resize-handle"></div><div class="edge-n"></div><div class="edge-s"></div><div class="edge-e"></div><div class="edge-w"></div></div></div>
+  <div class="index-item" data-project="unsubscribe"><div class="index-thumb-wrap"><img alt="unsubscribe"><div class="resize-handle"></div><div class="edge-n"></div><div class="edge-s"></div><div class="edge-e"></div><div class="edge-w"></div></div></div>
+  <div class="index-item" data-project="headphones"><div class="index-thumb-wrap"><img alt="untangling headphones"><div class="resize-handle"></div><div class="edge-n"></div><div class="edge-s"></div><div class="edge-e"></div><div class="edge-w"></div></div></div>
+  <div class="index-item" data-project="trees"><div class="index-thumb-wrap"><img alt="trees"><div class="resize-handle"></div><div class="edge-n"></div><div class="edge-s"></div><div class="edge-e"></div><div class="edge-w"></div></div></div>
 </div>
 
 <span id="gallery-close-btn">✕</span>
@@ -272,12 +275,13 @@
 <script>
 // ── PROJECTS ──
 const projects = {
-  zines:        { title: 'all my zines',                                          gallery: true  },
+  zines:        { title: 'all the zine ive made',                                          gallery: true  },
   whatdoyousee: { title: 'whatdoyousee.nyc', link: 'https://www.whatdoyousee.nyc' },
   unlearning:   { title: 'unlearning library', link: 'https://www.unlearninglibrary.com' },
-  bioephemera:  { title: 'all the leaves n things i stash in my books',           gallery: true  },
-  unsubscribe:  { title: 'every time i unsubscribe from an email list',           gallery: true  },
-  headphones:   { title: 'every time i have to untangle my headphones',           gallery: true  },
+  bioephemera:  { title: 'all the leaves n things ive stashed in my books',           gallery: true  },
+  unsubscribe:  { title: 'all the newsletters ive unsubscribed from',           gallery: true  },
+  headphones:   { title: 'all the times ive untangled my headphones',           gallery: true  },
+  trees:        { title: 'all the street trees ive met', gallery: true }
 };
 
 // ── SUPABASE ──
@@ -329,6 +333,14 @@ async function fetchGalleryImages() {
           if (!da) return 1;
           if (!db) return -1;
           return db - da;
+        });
+      }
+      if (key === 'trees') {
+        byProject[key].sort((a, b) => {
+          if (!a.taken_at && !b.taken_at) return 0;
+          if (!a.taken_at) return 1;
+          if (!b.taken_at) return -1;
+          return new Date(b.taken_at) - new Date(a.taken_at);
         });
       }
 
@@ -401,28 +413,28 @@ function applyItemState(item, key, animate) {
 
 // ── LAYOUTS ──
 const LAYOUTS_DESKTOP = [
-  [[29.7,10.9,17.2],[63.3,12.4,17.2],[43.9,52.1,17.3],[81.3,65.3,15.8],[26.3,40.6,17.2],[5.0,60.0,15.8]],
-  [[76.2,7.3,17.1],[35.2,11.7,17.1],[80.1,49.1,17.3],[54.4,51.3,16.9],[5.4,12.9,16.9],[21.4,38.6,17.1]],
-  [[55.1,34.2,15.0],[77.9,7.0,15.0],[2.6,42.8,15.8],[40.0,69.5,14.1],[26.3,22.6,15.0],[5.0,7.0,14.1]],
-  [[58.9,6.5,13.6],[54.4,41.8,13.6],[43.3,17.7,14.2],[3.2,70.0,13.6],[9.3,42.7,13.6],[75.0,55.0,13.6]],
-  [[43.7,14.6,14.1],[69.6,14.4,14.1],[23.2,23.1,17.2],[7.8,55.0,14.1],[61.0,46.0,14.1],[5.0,8.0,14.1]],
-  [[52.4,11.0,15.5],[30.6,23.9,15.5],[72.7,15.0,13.5],[9.1,31.2,16.1],[32.1,66.8,15.5],[65.0,55.0,13.5]],
-  [[31.6,29.7,14.7],[52.7,26.4,14.7],[55.1,60.8,16.2],[30.4,61.5,15.2],[4.9,44.1,14.7],[75.0,28.0,14.7]],
-  [[22.1,23.1,15.6],[54.3,13.2,15.6],[1.7,53.4,14.5],[31.1,64.8,15.2],[58.1,63.9,15.6],[75.0,53.0,14.5]],
-  [[48.7,7.5,14.0],[26.2,26.0,14.0],[75.8,49.0,16.2],[40.6,62.4,15.6],[62.8,57.7,14.0],[5.0,7.0,14.0]],
-  [[67.1,16.8,15.6],[30.4,10.8,15.6],[12.1,35.3,16.6],[47.6,47.9,15.2],[50.5,15.3,15.6],[75.0,63.0,15.2]],
+  [[29.7,10.9,17.2],[63.3,12.4,17.2],[43.9,52.1,17.3],[81.3,65.3,15.8],[26.3,40.6,17.2],[5.0,60.0,15.8],[72.0,38.0,15.8]],
+  [[76.2,7.3,17.1],[35.2,11.7,17.1],[80.1,49.1,17.3],[54.4,51.3,16.9],[5.4,12.9,16.9],[21.4,38.6,17.1],[60.0,28.0,16.9]],
+  [[55.1,34.2,15.0],[77.9,7.0,15.0],[2.6,42.8,15.8],[40.0,69.5,14.1],[26.3,22.6,15.0],[5.0,7.0,14.1],[68.0,62.0,14.1]],
+  [[58.9,6.5,13.6],[54.4,41.8,13.6],[43.3,17.7,14.2],[3.2,70.0,13.6],[9.3,42.7,13.6],[75.0,55.0,13.6],[30.0,55.0,13.6]],
+  [[43.7,14.6,14.1],[69.6,14.4,14.1],[23.2,23.1,17.2],[7.8,55.0,14.1],[61.0,46.0,14.1],[5.0,8.0,14.1],[80.0,40.0,14.1]],
+  [[52.4,11.0,15.5],[30.6,23.9,15.5],[72.7,15.0,13.5],[9.1,31.2,16.1],[32.1,66.8,15.5],[65.0,55.0,13.5],[18.0,62.0,13.5]],
+  [[31.6,29.7,14.7],[52.7,26.4,14.7],[55.1,60.8,16.2],[30.4,61.5,15.2],[4.9,44.1,14.7],[75.0,28.0,14.7],[68.0,52.0,15.2]],
+  [[22.1,23.1,15.6],[54.3,13.2,15.6],[1.7,53.4,14.5],[31.1,64.8,15.2],[58.1,63.9,15.6],[75.0,53.0,14.5],[70.0,8.0,15.6]],
+  [[48.7,7.5,14.0],[26.2,26.0,14.0],[75.8,49.0,16.2],[40.6,62.4,15.6],[62.8,57.7,14.0],[5.0,7.0,14.0],[15.0,55.0,14.0]],
+  [[67.1,16.8,15.6],[30.4,10.8,15.6],[12.1,35.3,16.6],[47.6,47.9,15.2],[50.5,15.3,15.6],[75.0,63.0,15.2],[8.0,62.0,15.2]],
 ];
 const LAYOUTS_MOBILE = [
-  [[28.5,8,28.1],[10.9,72,28.1],[63.7,30,32.0],[69.1,55,26.3],[58.0,8,28.1],[10.0,45,28.1]],
-  [[46.1,8,22.8],[15.3,20,22.8],[48.4,38,32.0],[52.4,65,30.0],[10.1,55,22.8],[65.0,65,22.8]],
-  [[31.2,15,28.7],[68.9,38,28.7],[5.7,52,32.0],[54.7,72,24.9],[26.7,72,28.7],[10.0,8,28.7]],
-  [[56.3,25,25.5],[22.5,8,25.5],[18.1,65,32.0],[62.9,72,26.0],[17.1,35,25.5],[55.7,48,25.5]],
-  [[15.1,8,26.8],[7.3,48,26.8],[56.5,8,32.0],[36.5,30,26.7],[70.0,65,26.8],[35.2,68,26.8]],
-  [[8.8,8,24.3],[30.9,32,24.3],[65.1,8,32.0],[42.8,68,26.3],[10.0,62,24.3],[65.0,60,24.3]],
-  [[58.8,8,25.7],[36.9,45,25.7],[23.6,22,32.0],[11.7,68,24.9],[74.8,72,25.7],[10.0,8,25.7]],
-  [[64.7,8,27.1],[43.9,68,27.1],[18.8,18,32.0],[53.3,42,22.8],[7.9,68,27.1],[65.0,8,27.1]],
-  [[25.7,8,26.5],[61.9,8,26.5],[25.7,65,32.0],[63.5,68,27.6],[12.1,32,26.5],[57.6,45,26.5]],
-  [[70.1,10,24.9],[19.9,28,24.9],[62.9,38,32.0],[14.1,50,23.7],[56.5,65,24.9],[10.0,8,24.9]],
+  [[28.5,8,28.1],[10.9,72,28.1],[63.7,30,32.0],[69.1,55,26.3],[58.0,8,28.1],[10.0,45,28.1],[40.0,20,26.3]],
+  [[46.1,8,22.8],[15.3,20,22.8],[48.4,38,32.0],[52.4,65,30.0],[10.1,55,22.8],[65.0,65,22.8],[30.0,50,22.8]],
+  [[31.2,15,28.7],[68.9,38,28.7],[5.7,52,32.0],[54.7,72,24.9],[26.7,72,28.7],[10.0,8,28.7],[55.0,20,24.9]],
+  [[56.3,25,25.5],[22.5,8,25.5],[18.1,65,32.0],[62.9,72,26.0],[17.1,35,25.5],[55.7,48,25.5],[38.0,15,26.0]],
+  [[15.1,8,26.8],[7.3,48,26.8],[56.5,8,32.0],[36.5,30,26.7],[70.0,65,26.8],[35.2,68,26.8],[60.0,40,26.7]],
+  [[8.8,8,24.3],[30.9,32,24.3],[65.1,8,32.0],[42.8,68,26.3],[10.0,62,24.3],[65.0,60,24.3],[45.0,45,24.3]],
+  [[58.8,8,25.7],[36.9,45,25.7],[23.6,22,32.0],[11.7,68,24.9],[74.8,72,25.7],[10.0,8,25.7],[48.0,60,24.9]],
+  [[64.7,8,27.1],[43.9,68,27.1],[18.8,18,32.0],[53.3,42,22.8],[7.9,68,27.1],[65.0,8,27.1],[30.0,30,22.8]],
+  [[25.7,8,26.5],[61.9,8,26.5],[25.7,65,32.0],[63.5,68,27.6],[12.1,32,26.5],[57.6,45,26.5],[42.0,50,27.6]],
+  [[70.1,10,24.9],[19.9,28,24.9],[62.9,38,32.0],[14.1,50,23.7],[56.5,65,24.9],[10.0,8,24.9],[38.0,70,23.7]],
 ];
 let currentLayout = 0;
 
@@ -782,10 +794,12 @@ window.addEventListener('load', () => {
         relaidOut = true;
         randomLayout(true);
         startAllSlideshows();
+        document.querySelectorAll('.index-item').forEach(el => el.style.opacity = '1');
       }
     }
     imgs.forEach(img => {
       if (img.complete && img.naturalHeight > 0) checkDone();
+      else if (!img.src || img.src === window.location.href) checkDone(); // no src set
       else {
         img.addEventListener('load',  checkDone);
         img.addEventListener('error', checkDone);
@@ -886,8 +900,7 @@ function openGalleryUI(key) {
     }
   });
 
-  const cols = { bioephemera: 3, headphones: 4, unsubscribe: 4, zines: 1 }[key] ?? 3;
-  galleryGrid.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+  const cols = { bioephemera: 3, headphones: 4, unsubscribe: 4, zines: 1, trees: 3 }[key] ?? 3;  galleryGrid.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
 
   galleryCloseBtn.style.display = 'block';
   document.body.classList.toggle('zines-open', key === 'zines');
@@ -1009,13 +1022,18 @@ function formatMeta(imgData, key) {
       const d = new Date(imgData.taken_at);
       lines.push(`${String(d.getMonth() + 1).padStart(2, '0')}/${String(d.getDate()).padStart(2, '0')}/${d.getFullYear()}`);
     }
-    if (key === 'headphones' && imgData.lat != null && imgData.lng != null) {
+  if (key === 'headphones' && imgData.lat != null && imgData.lng != null) {
       lines.push(`(${parseFloat(imgData.lat).toFixed(4)}, ${parseFloat(imgData.lng).toFixed(4)})`);
     }
   } else if (key === 'zines') {
     if (imgData.question_1) lines.push(imgData.question_1);
     if (imgData.question_2) lines.push(imgData.question_2);
     if (imgData.scanned)    lines.push(imgData.scanned);
+  } else if (key === 'trees') {
+  if (imgData.taken_at) {
+    const d = new Date(imgData.taken_at);
+    lines.push(`${String(d.getMonth() + 1).padStart(2, '0')}/${String(d.getDate()).padStart(2, '0')}/${d.getFullYear()}`);
+  }
   } else if (key === 'bioephemera') {
     if (imgData.plant) lines.push(imgData.plant);
     if (imgData.book) {
