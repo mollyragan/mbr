@@ -237,10 +237,11 @@
   <div class="index-item" data-project="zines"><div class="index-thumb-wrap"><img alt="zines"><div class="resize-handle"></div><div class="edge-n"></div><div class="edge-s"></div><div class="edge-e"></div><div class="edge-w"></div></div></div>
   <div class="index-item" data-project="whatdoyousee"><div class="index-thumb-wrap"><img alt="what do you see?"><div class="resize-handle"></div><div class="edge-n"></div><div class="edge-s"></div><div class="edge-e"></div><div class="edge-w"></div></div></div>
   <div class="index-item" data-project="unlearning"><div class="index-thumb-wrap"><img alt="unlearning library"><div class="resize-handle"></div><div class="edge-n"></div><div class="edge-s"></div><div class="edge-e"></div><div class="edge-w"></div></div></div>
-  <div class="index-item" data-project="bioephemera"><div class="index-thumb-wrap"><img alt="things stashed in pages"><div class="resize-handle"></div><div class="edge-n"></div><div class="edge-s"></div><div class="edge-e"></div><div class="edge-w"></div></div></div>
+  <div class="index-item" data-project="bioephemera"><div class="index-thumb-wrap"><img alt="bioephemera"><div class="resize-handle"></div><div class="edge-n"></div><div class="edge-s"></div><div class="edge-e"></div><div class="edge-w"></div></div></div>
   <div class="index-item" data-project="unsubscribe"><div class="index-thumb-wrap"><img alt="unsubscribe"><div class="resize-handle"></div><div class="edge-n"></div><div class="edge-s"></div><div class="edge-e"></div><div class="edge-w"></div></div></div>
   <div class="index-item" data-project="headphones"><div class="index-thumb-wrap"><img alt="untangling headphones"><div class="resize-handle"></div><div class="edge-n"></div><div class="edge-s"></div><div class="edge-e"></div><div class="edge-w"></div></div></div>
   <div class="index-item" data-project="trees"><div class="index-thumb-wrap"><img alt="trees"><div class="resize-handle"></div><div class="edge-n"></div><div class="edge-s"></div><div class="edge-e"></div><div class="edge-w"></div></div></div>
+  <div class="index-item" data-project="memes"><div class="index-thumb-wrap"><img alt="memes"><div class="resize-handle"></div><div class="edge-n"></div><div class="edge-s"></div><div class="edge-e"></div><div class="edge-w"></div></div></div>
 </div>
 
 <span id="gallery-close-btn">✕</span>
@@ -281,7 +282,8 @@ const projects = {
   bioephemera:  { title: 'leaves n things ive stashed in my books',           gallery: true  },
   unsubscribe:  { title: 'newsletters ive unsubscribed from',           gallery: true  },
   headphones:   { title: 'times ive untangled my headphones',           gallery: true  },
-  trees:        { title: 'street trees ive met', gallery: true }
+  trees:        { title: 'street trees ive met', gallery: true },
+  memes:        { title: 'memes',           gallery: true  }
 };
 
 // ── SUPABASE ──
@@ -900,7 +902,7 @@ function openGalleryUI(key) {
     }
   });
 
-  const cols = { bioephemera: 3, headphones: 4, unsubscribe: 4, zines: 1, trees: 3 }[key] ?? 3;  galleryGrid.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+  const cols = { bioephemera: 3, headphones: 4, unsubscribe: 4, zines: 1, trees: 3, memes: 3 }[key] ?? 3;  galleryGrid.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
 
   galleryCloseBtn.style.display = 'block';
   document.body.classList.toggle('zines-open', key === 'zines');
