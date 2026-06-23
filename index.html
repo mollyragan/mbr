@@ -209,7 +209,7 @@
     #lightbox-close { top: 16px; right: 16px; display: none; }
     #gallery-overlay { width: 100% !important; overscroll-behavior: auto; }
     #gallery-grid.memes {
-      column-count: 2;
+      column-count: 3;
     }
     #lightbox-img { max-width: 90vw; max-height: 70vh; }
     #lightbox-prev, #lightbox-next { padding: 24px 16px; font-size: 11px; }
@@ -300,7 +300,7 @@ const projects = {
   unsubscribe:  { title: 'newsletters ive unsubscribed from',           gallery: true  },
   headphones:   { title: 'times ive untangled my headphones',           gallery: true  },
   trees:        { title: 'street trees ive met', gallery: true },
-  memes:        { title: 'memes',           gallery: true  }
+  memes:        { title: 'memes ive saved',           gallery: true  }
 };
 
 // ── SUPABASE ──
@@ -378,6 +378,7 @@ async function fetchGalleryImages() {
     console.warn('Could not fetch gallery images:', e);
   }
 }
+
 
 // ── DOM REFS ──
 const canvas          = document.getElementById('canvas');
@@ -843,6 +844,7 @@ window.addEventListener('load', () => {
         randomLayout(true);
         startAllSlideshows();
         document.querySelectorAll('.index-item').forEach(el => el.style.opacity = '1');
+        openFromHash();
       }
     }
     imgs.forEach(img => {
@@ -857,6 +859,7 @@ window.addEventListener('load', () => {
 });
 
 window.addEventListener('resize', () => { closeGalleryUI(); randomLayout(false); });
+
 
 // ── SLIDESHOWS ──
 function startAllSlideshows() {
@@ -1013,6 +1016,29 @@ function closeGallery() {
 }
 
 galleryCloseBtn.addEventListener('click', e => { e.stopPropagation(); closeGallery(); });
+
+// ── OPEN FROM URL HASH (deep linking) ──
+function openFromHash() {
+  const hash = window.location.hash.slice(1); // e.g. "memes" or "memes/3"
+  if (!hash) return;
+  const [key, idxStr] = hash.split('/');
+  const p = projects[key];
+  if (!p || !p.gallery || !p.images) return;
+
+  activeKey = key;
+  stopAllSlideshows();
+  openGalleryUI(key);
+
+  if (idxStr !== undefined && !isNaN(parseInt(idxStr, 10))) {
+    showLightboxUI(parseInt(idxStr, 10));
+  }
+
+  // Sync history state without adding a duplicate entry
+  const state = idxStr !== undefined
+    ? { view: 'lightbox', key, index: lightboxIndex }
+    : { view: 'gallery', key };
+  history.replaceState(state, '', window.location.hash);
+}
 
 // ── GALLERY SWIPE-TO-CLOSE (mobile) ──
 function initGallerySwipe() {
