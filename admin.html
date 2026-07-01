@@ -27,6 +27,7 @@ body {
   border-bottom: 1px solid transparent;
   transition: border-color 0.2s ease;
 }
+
 #loginPanel.expanded { border-color: rgba(0,0,0,0.1); }
 #loginBar { display: flex; align-items: center; gap: 10px; padding: 12px 16px; }
 #loginBtn { all: unset; font-size: 14px; color: black; cursor: pointer; transition: all 0.2s ease; }
@@ -54,7 +55,7 @@ body {
 /* --- MAIN LAYOUT --- */
 #adminWrapper {
   flex: 1; display: flex; flex-direction: column;
-  padding: 16px; padding-top: calc(52px + 16px);
+  padding: 16px; padding-top: 16px;
   gap: 14px; min-height: 0; overflow-y: auto;
 }
 
@@ -173,7 +174,223 @@ body {
   font-size: 13px; cursor: pointer; opacity: 0.5;
 }
 #editClose:hover { opacity: 1; }
-  </style>
+
+#viewToggle { display: flex; gap: 16px; padding: 64px 16px 0; flex-shrink: 0; }
+.view-tab {
+  all: unset; font-size: 13px; padding-bottom: 4px; cursor: pointer;
+  opacity: 0.5; border-bottom: 2px solid transparent;
+}
+.view-tab.active { opacity: 1; font-weight: 600; border-bottom-color: black; }
+
+#newsletterView {
+  display: none; flex: 1; flex-direction: column;
+  padding: 16px; gap: 0; min-height: 0; overflow-y: auto;
+}
+#newsletterView textarea {
+  width: 100%; border: none; border-bottom: 1px solid rgba(0,0,0,0.2);
+  padding: 8px 0; font-size: 14px; font-family: inherit; outline: none;
+  resize: vertical; min-height: 50px;
+}
+#newsletterView input[type="text"] {
+  width: 100%; border: none; border-bottom: 1px solid rgba(0,0,0,0.2);
+  padding: 8px 0; font-size: 14px; font-family: inherit; outline: none;
+}
+#newsletterView input:focus, #newsletterView textarea:focus { border-bottom-color: black; }
+
+#pendingToolbar{
+  display:flex;
+  gap:10px;
+  margin:10px 0 14px;
+}
+
+#pendingToolbar button{
+  border:none;
+  background:#f2f2f2;
+  padding:6px 10px;
+  border-radius:5px;
+  cursor:pointer;
+  font:inherit;
+  font-size:13px;
+}
+
+#pendingToolbar button:hover{
+  background:#e8e8e8;
+}
+
+#pendingList details{
+    border-bottom:1px solid rgba(0,0,0,.08);
+    margin-bottom:8px;
+}
+
+#pendingList summary{
+    cursor:pointer;
+    list-style:none;
+    font-weight:600;
+    padding:10px 0;
+}
+
+#pendingList summary::-webkit-details-marker{
+    display:none;
+}
+
+#pendingList summary::before{
+    content:"▶";
+    display:inline-block;
+    width:18px;
+    transition:.15s;
+}
+
+#pendingList details[open] summary::before{
+    transform:rotate(90deg);
+}
+
+.pending-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  max-height: 340px;
+  overflow-y: auto;
+  padding: 6px 2px;
+}
+
+.pending-thumb-wrap {
+  position: relative;
+  width: 90px;
+  height: 90px;
+  cursor: pointer;
+  border-radius: 4px;
+  overflow: hidden;
+  border: 2px solid transparent;
+  flex-shrink: 0;
+}
+.pending-thumb-wrap.selected { border-color: black; }
+.pending-thumb-wrap.has-caption::after {
+  content: "";
+  position: absolute;
+  bottom: 4px; right: 4px;
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: #000;
+}
+
+.pending-thumb { width: 100%; height: 100%; object-fit: cover; display: block; }
+.pending-thumb.pdf {
+  display: flex; align-items: center; justify-content: center;
+  background: #f0f0f0; font-size: 9px; text-align: center; padding: 4px; color: #666;
+}
+
+.pending-thumb-wrap .excludeBox {
+  position: absolute;
+  top: 4px; left: 4px;
+  z-index: 2;
+}
+
+.pending-thumb-wrap .dismissBtn {
+  position: absolute;
+  top: 4px; right: 4px;
+  z-index: 2;
+  width: 16px; height: 16px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(0,0,0,0.6);
+  color: white;
+  font-size: 10px;
+  line-height: 16px;
+  text-align: center;
+  cursor: pointer;
+  padding: 0;
+}
+.pending-thumb-wrap .dismissBtn:hover { background: #c00; }
+
+.summary-actions .projDismissAllBtn:hover { background: #c00; color: white; }
+
+.pending-caption-row {
+  flex-basis: 100%;
+  width: 100%;
+  display: none;
+  padding: 2px 0 8px;
+}
+.pending-caption-row.visible { display: block; }
+
+.captionInput {
+  width: 100%;
+  border: none; border-bottom: 1px solid rgba(0,0,0,0.15);
+  font-size: 13px; padding: 6px 0; font-family: inherit; outline: none;
+  box-sizing: border-box;
+}
+.captionInput:focus { border-bottom-color: black; }
+
+#pendingList summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.summary-title { flex-shrink: 0; }
+
+.summary-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.summary-actions button {
+  border: none;
+  background: #f2f2f2;
+  padding: 3px 8px;
+  border-radius: 5px;
+  cursor: pointer;
+  font: inherit;
+  font-size: 11px;
+  opacity: 0.8;
+}
+.summary-actions button:hover {
+  background: #e8e8e8;
+  opacity: 1;
+}
+
+#newsletterActions { display: flex; gap: 10px; margin-top: 18px; flex-shrink: 0; }
+#previewBtn {
+  flex: 1; padding: 12px; border: 1px solid rgba(0,0,0,0.2);
+  background: none; border-radius: 6px; font-family: inherit; font-size: 14px; cursor: pointer;
+}
+#previewBtn:hover { border-color: black; }
+#sendBtn {
+  flex: 1; padding: 12px; background: black; color: white;
+  border: none; border-radius: 6px; font-family: inherit; font-size: 14px; cursor: pointer;
+}
+#sendBtn:hover { background: #222; }
+#sendBtn:disabled { background: #999; cursor: default; }
+
+#previewLightbox {
+  position: fixed; inset: 0; z-index: 2000; background: rgba(0,0,0,0.6);
+  display: none; align-items: center; justify-content: center;
+}
+#previewLightbox.visible { display: flex; }
+#previewCard {
+  background: white; width: min(520px, 92vw); max-height: 85vh;
+  border-radius: 8px; position: relative; display: flex; flex-direction: column;
+}
+#previewClose {
+  position: absolute; top: 10px; right: 14px; cursor: pointer;
+  font-size: 14px; opacity: 0.6; z-index: 1;
+}
+#previewClose:hover { opacity: 1; }
+#previewFrame { width: 100%; height: 600px; border: none; border-radius: 8px; }
+
+#historyView {
+  display: none; flex: 1; flex-direction: column;
+  padding: 16px; min-height: 0; overflow-y: auto;
+}
+.history-entry {
+  border-bottom: 1px solid rgba(0,0,0,.08);
+  padding: 12px 0;
+}
+.history-subject { font-weight: 600; font-size: 14px; }
+.history-meta { font-size: 12px; opacity: 0.6; margin-top: 2px; }
+.history-intro { font-size: 13px; opacity: 0.8; margin-top: 6px; white-space: pre-wrap; }
+
+</style>
 </head>
 <body>
 
@@ -191,6 +408,12 @@ body {
   </div>
 </div>
 
+<div id="viewToggle">
+  <button id="viewUploadBtn" class="view-tab active">upload</button>
+  <button id="viewNewsletterBtn" class="view-tab">newsletter</button>
+  <button id="viewHistoryBtn" class="view-tab">history</button>
+</div>
+
 <div id="adminWrapper">
 
   <div>
@@ -205,6 +428,8 @@ body {
       <option value="headphones">tangled headphones</option>
       <option value="trees">trees</option>
       <option value="memes">memes</option>
+      <option value="cables">cables</option>
+      <option value="selfies">selfies</option>
     </select>
   </div>
 
@@ -232,6 +457,44 @@ body {
     <div id="existingGrid"></div>
   </div>
 
+    <button id="retroCropSelfiesBtn" style="margin-top:10px; display:none;">re-crop existing selfies to 3:4</button>
+
+</div>
+
+<div id="newsletterView">
+  <div>
+    <span class="field-label">subject</span>
+    <input type="text" id="digestSubject" placeholder="a little update">
+  </div>
+  <div style="margin-top:14px;">
+    <span class="field-label">intro (optional)</span>
+    <textarea id="digestIntro" placeholder="a few words before the images…"></textarea>
+  </div>
+  <div style="margin-top:18px;">
+  <span class="field-label">pending images — uncheck to exclude, write a caption</span>
+
+  <div id="pendingToolbar">
+    <button id="selectAllBtn" type="button">select all</button>
+    <button id="deselectAllBtn" type="button">deselect all</button>
+  </div>
+
+  <div id="pendingList"></div>
+</div>
+  <div id="newsletterActions">
+    <button id="previewBtn">preview</button>
+    <button id="sendBtn">send newsletter</button>
+  </div>
+</div>
+
+<div id="historyView">
+  <div id="historyList"></div>
+</div>
+
+<div id="previewLightbox">
+  <div id="previewCard">
+    <span id="previewClose">✕</span>
+    <iframe id="previewFrame"></iframe>
+  </div>
 </div>
   
 
@@ -262,6 +525,11 @@ const IMAGE_MAX_W       = 1200;
 const JPEG_QUALITY      = 0.85;
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+const WDYS_URL      = 'https://fyogbaeayboxjhleaqoj.supabase.co';
+const WDYS_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ5b2diYWVheWJveGpobGVhcW9qIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjczOTMxNDcsImV4cCI6MjA4Mjk2OTE0N30.JGa6qT6IkcNCJRxV5FYDFUiH1QWSKHABJ_Qu7BNV5m8';
+const wdysClient = createClient(WDYS_URL, WDYS_ANON_KEY);
+
 let currentUser  = null;
 let currentFiles = [];
 let editingRow   = null;
@@ -313,11 +581,498 @@ async function checkUser() {
 }
 checkUser();
 
+// ── VIEW TOGGLE ──
+const viewUploadBtn     = document.getElementById('viewUploadBtn');
+const viewNewsletterBtn = document.getElementById('viewNewsletterBtn');
+const uploadView        = document.getElementById('adminWrapper');
+const newsletterView    = document.getElementById('newsletterView');
+const historyView       = document.getElementById('historyView');
+const historyList       = document.getElementById('historyList');
+const pendingList       = document.getElementById('pendingList');
+const digestSubject     = document.getElementById('digestSubject');
+const digestIntro       = document.getElementById('digestIntro');
+const previewBtn        = document.getElementById('previewBtn');
+const sendBtn           = document.getElementById('sendBtn');
+const previewLightbox   = document.getElementById('previewLightbox');
+const previewFrame      = document.getElementById('previewFrame');
+const previewClose      = document.getElementById('previewClose');
+
+let pendingImages = [];
+
+// Mirrors index.html's formatMeta(), but returns plain text for use as
+// an auto-generated newsletter caption when no manual caption exists.
+function deriveCaption(img) {
+  const project = img.project;
+  if (project !== 'zines' && project !== 'bioephemera' && project !== 'cables') return null;
+
+  const lines = [];
+
+  if (project === 'zines') {
+    if (img.question_1) lines.push(img.question_1);
+    if (img.question_2) lines.push(img.question_2);
+    if (img.scanned) lines.push(img.scanned);
+  } else if (project === 'bioephemera') {
+    if (img.plant) lines.push(img.plant);
+    if (img.book) lines.push(img.book);
+    if (img.location) lines.push(img.location);
+    if (img.scanned) lines.push(img.scanned);
+  } else if (project === 'cables') {
+  if (img.plant) lines.push(img.plant);
+  if (img.cable) lines.push(img.cable);
+}
+  return lines.length ? lines.join('\n') : null;
+}
+
+viewUploadBtn.addEventListener('click', () => switchView('upload'));
+viewNewsletterBtn.addEventListener('click', () => switchView('newsletter'));
+viewHistoryBtn.addEventListener('click', () => switchView('history'));
+
+function switchView(view) {
+  uploadView.style.display     = view === 'upload'     ? '' : 'none';
+  newsletterView.style.display = view === 'newsletter' ? 'flex' : 'none';
+  historyView.style.display    = view === 'history'    ? 'flex' : 'none';
+  viewUploadBtn.classList.toggle('active', view === 'upload');
+  viewNewsletterBtn.classList.toggle('active', view === 'newsletter');
+  viewHistoryBtn.classList.toggle('active', view === 'history');
+  if (view === 'newsletter') loadPendingImages();
+  if (view === 'history') loadHistory();
+}
+
+async function loadHistory() {
+  historyList.innerHTML = '<p style="opacity:0.5;font-size:13px;">loading…</p>';
+
+  const { data: digests, error } = await supabase
+    .from('digests')
+    .select('*');
+
+  if (error) {
+    historyList.innerHTML = `<p style="opacity:0.5;font-size:13px;">Failed to load: ${error.message}</p>`;
+    return;
+  }
+  if (!digests || !digests.length) {
+    historyList.innerHTML = '<p style="opacity:0.5;font-size:13px;">No newsletters sent yet.</p>';
+    return;
+  }
+
+  // Sort by sent_at, falling back to created_at, newest first
+  digests.sort((a, b) => {
+    const ta = new Date(a.sent_at || a.created_at).getTime();
+    const tb = new Date(b.sent_at || b.created_at).getTime();
+    return tb - ta;
+  });
+
+  // Get image counts for each digest in one query
+  const { data: imageCounts } = await supabase
+    .from('images')
+    .select('digest_id')
+    .not('digest_id', 'is', null);
+
+  const { data: externalCounts } = await supabase
+    .from('external_images')
+    .select('digest_id')
+    .not('digest_id', 'is', null);
+
+  const countMap = {};
+  (imageCounts || []).forEach(row => {
+    countMap[row.digest_id] = (countMap[row.digest_id] || 0) + 1;
+  });
+  (externalCounts || []).forEach(row => {
+    countMap[row.digest_id] = (countMap[row.digest_id] || 0) + 1;
+  });
+
+  historyList.innerHTML = '';
+  digests.forEach(d => {
+    const when = d.sent_at || d.created_at;
+    const dateStr = when
+      ? new Date(when).toLocaleString(undefined, {
+          year: 'numeric', month: 'short', day: 'numeric',
+          hour: 'numeric', minute: '2-digit',
+        })
+      : 'unknown date';
+    const count = countMap[d.id] || 0;
+
+    const entry = document.createElement('div');
+    entry.className = 'history-entry';
+    entry.innerHTML = `
+      <div class="history-subject">${d.subject || '(no subject)'}</div>
+      <div class="history-meta">${dateStr} · ${count} image${count !== 1 ? 's' : ''}</div>
+      ${d.intro ? `<div class="history-intro">${d.intro}</div>` : ''}
+    `;
+    historyList.appendChild(entry);
+  });
+}
+
+async function loadPendingImages() {
+  pendingList.innerHTML = '';
+
+  const { data: mainData } = await supabase
+    .from('images')
+    .select('*')
+    .is('digest_id', null)
+    .eq('dismissed', false)
+    .order('created_at', { ascending: false });
+
+  const { data: wdysData } = await wdysClient
+    .from('images')
+    .select('id, filename, url, created_at')
+    .order('created_at', { ascending: false });
+
+  const { data: shadowData } = await supabase
+    .from('external_images')
+    .select('*')
+    .eq('source', 'whatdoyousee');
+
+  const shadowByExternalId = new Map((shadowData || []).map(r => [r.external_id, r]));
+
+  const mainItems = (mainData || []).map(img => {
+    const finalCaption = img.caption || deriveCaption(img);
+    return {
+      key: img.id,
+      id: img.id,
+      external_id: null,
+      external_source: null,
+      project: img.project,
+      url: img.url,
+      filename: img.filename,
+      caption: finalCaption,
+      digest_exclude: img.digest_exclude,
+      taken_at: img.taken_at,
+      _needsCaptionSave: !img.caption && !!finalCaption,
+    };
+  });
+
+  const toAutoSave = mainItems.filter(i => i._needsCaptionSave);
+  if (toAutoSave.length) {
+    await Promise.all(
+      toAutoSave.map(i => supabase.from('images').update({ caption: i.caption }).eq('id', i.id))
+    );
+  }
+
+  const wdysItems = (wdysData || [])
+    .filter(img => {
+      const shadow = shadowByExternalId.get(String(img.id));
+      return !shadow || (!shadow.digest_id && !shadow.dismissed);
+    })
+
+    .map(img => {
+      const shadow = shadowByExternalId.get(String(img.id));
+      return {
+        key: `wdys:${img.id}`,
+        id: shadow ? shadow.id : null,
+        external_id: String(img.id),
+        external_source: 'whatdoyousee',
+        project: 'whatdoyousee',
+        url: img.url,
+        filename: img.filename,
+        caption: shadow ? shadow.caption : null,
+        digest_exclude: shadow ? shadow.digest_exclude : true,
+      };
+    });
+
+  pendingImages = [...mainItems, ...wdysItems];
+
+  if (!pendingImages.length) {
+    pendingList.innerHTML = '<p style="opacity:0.5;font-size:13px;padding:8px 0;">nothing new to send yet.</p>';
+    return;
+  }
+
+  const grouped = {};
+  pendingImages.forEach(img => {
+    if (!grouped[img.project]) grouped[img.project] = [];
+    grouped[img.project].push(img);
+  });
+
+  // Selfies were uploaded out of order — sort by taken_at (newest first)
+  // instead of upload/created_at order.
+  if (grouped.selfies) {
+    grouped.selfies.sort((a, b) => {
+      if (!a.taken_at && !b.taken_at) return 0;
+      if (!a.taken_at) return 1;
+      if (!b.taken_at) return -1;
+      return new Date(b.taken_at) - new Date(a.taken_at);
+    });
+  }
+
+  const selectAllBtn = document.getElementById("selectAllBtn");
+  const deselectAllBtn = document.getElementById("deselectAllBtn");
+
+ async function setProjectImages(items, selected) {
+    items.forEach(img => {
+      img.digest_exclude = !selected;
+      const box = pendingList.querySelector(`.excludeBox[data-key="${img.key}"]`);
+      if (box) box.checked = selected;
+    });
+    await Promise.all(items.map(img => saveExclude(img.key, !selected)));
+  }
+  
+  async function setAllImages(selected) {
+    document.querySelectorAll(".excludeBox").forEach(box => { box.checked = selected; });
+    pendingImages.forEach(img => { img.digest_exclude = !selected; });
+    await Promise.all(pendingImages.map(img => saveExclude(img.key, !selected)));
+  }
+
+  selectAllBtn.onclick = () => setAllImages(true);
+  deselectAllBtn.onclick = () => setAllImages(false);
+
+  Object.entries(grouped).forEach(([project, items]) => {
+    const section = document.createElement("details");
+    section.open = true;
+
+    const summary = document.createElement("summary");
+    summary.innerHTML = `
+      <span class="summary-title">${project} (${items.length})</span>
+      <span class="summary-actions">
+        <button type="button" class="projSelectAllBtn">select all</button>
+        <button type="button" class="projDeselectAllBtn">deselect all</button>
+        <button type="button" class="projDismissAllBtn">dismiss all</button>
+      </span>
+    `;
+    section.appendChild(summary);
+
+    summary.querySelector('.projSelectAllBtn').addEventListener('click', async (e) => {
+      e.preventDefault();
+      await setProjectImages(items, true);
+    });
+    summary.querySelector('.projDeselectAllBtn').addEventListener('click', async (e) => {
+      e.preventDefault();
+      await setProjectImages(items, false);
+    });
+    summary.querySelector('.projDismissAllBtn').addEventListener('click', async (e) => {
+      e.preventDefault();
+      if (!confirm(`Never send any of these ${items.length} images in "${project}"? This can't be undone from here.`)) return;
+      await Promise.all(items.map(img => saveDismissed(img.key)));
+      loadPendingImages();
+    });
+
+    const container = document.createElement("div");
+    container.className = "pending-grid";
+
+    items.forEach(img => {
+      const isPdf = img.url.endsWith(".pdf");
+
+      const thumbWrap = document.createElement("div");
+      thumbWrap.className = "pending-thumb-wrap" + (img.caption ? " has-caption" : "");
+      thumbWrap.dataset.key = img.key;
+      thumbWrap.innerHTML = `
+        <input type="checkbox" class="excludeBox" data-key="${img.key}" ${img.digest_exclude ? "" : "checked"}>
+        <button type="button" class="dismissBtn" title="never send this">✕</button>
+        ${isPdf
+          ? `<div class="pending-thumb pdf">${img.filename || "PDF"}</div>`
+          : `<img class="pending-thumb" src="${img.url}" loading="lazy">`}
+      `;
+
+      thumbWrap.querySelector('.dismissBtn').addEventListener('click', async (e) => {
+        e.stopPropagation();
+        if (!confirm('Never send this image? It will be hidden from all future newsletters.')) return;
+        await saveDismissed(img.key);
+        loadPendingImages();
+      });
+
+      const captionRow = document.createElement("div");
+      captionRow.className = "pending-caption-row";
+      captionRow.dataset.key = img.key;
+      captionRow.innerHTML = `
+        <input type="text" class="captionInput" data-key="${img.key}" placeholder="caption…" value="${img.caption || ""}">
+      `;
+
+      thumbWrap.addEventListener("click", async (e) => {
+        if (e.target.classList.contains("excludeBox")) return;
+        if (e.target.closest(".dismissBtn")) return;
+
+        // Clicking the image toggles selection (same as clicking the checkbox).
+        const checkbox = thumbWrap.querySelector(".excludeBox");
+        checkbox.checked = !checkbox.checked;
+        await saveExclude(img.key, !checkbox.checked);
+      });
+
+      container.appendChild(thumbWrap);
+      container.appendChild(captionRow);
+    });
+
+    section.appendChild(container);
+    pendingList.appendChild(section);
+  });
+
+  pendingList.querySelectorAll('.captionInput').forEach(input => {
+    input.addEventListener('blur', async () => {
+      const value = input.value.trim() || null;
+      await saveCaption(input.dataset.key, value);
+      const thumbWrap = pendingList.querySelector(`.pending-thumb-wrap[data-key="${input.dataset.key}"]`);
+      if (thumbWrap) thumbWrap.classList.toggle('has-caption', !!value);
+    });
+  });
+
+  pendingList.querySelectorAll('.excludeBox').forEach(box => {
+    box.addEventListener('change', async () => {
+      await saveExclude(box.dataset.key, !box.checked);
+    });
+  });
+}
+
+async function saveCaption(key, caption) {
+  const row = pendingImages.find(r => r.key === key);
+  if (!row) return;
+  row.caption = caption;
+
+  if (row.external_source === 'whatdoyousee') {
+    const { data, error } = await supabase
+      .from('external_images')
+      .upsert({
+        source: 'whatdoyousee',
+        external_id: row.external_id,
+        url: row.url,
+        caption,
+        digest_exclude: row.digest_exclude,
+      }, { onConflict: 'source,external_id' })
+      .select().single();
+    if (!error) row.id = data.id;
+  } else {
+    await supabase.from('images').update({ caption }).eq('id', row.id);
+  }
+}
+
+async function saveExclude(key, excluded) {
+  const row = pendingImages.find(r => r.key === key);
+  if (!row) return;
+  row.digest_exclude = excluded;
+
+  if (row.external_source === 'whatdoyousee') {
+    const { data, error } = await supabase
+      .from('external_images')
+      .upsert({
+        source: 'whatdoyousee',
+        external_id: row.external_id,
+        url: row.url,
+        caption: row.caption,
+        digest_exclude: excluded,
+      }, { onConflict: 'source,external_id' })
+      .select().single();
+    if (!error) row.id = data.id;
+  } else {
+    await supabase.from('images').update({ digest_exclude: excluded }).eq('id', row.id);
+  }
+}
+
+async function saveDismissed(key) {
+  const row = pendingImages.find(r => r.key === key);
+  if (!row) return;
+
+  if (row.external_source === 'whatdoyousee') {
+    await supabase
+      .from('external_images')
+      .upsert({
+        source: 'whatdoyousee',
+        external_id: row.external_id,
+        url: row.url,
+        caption: row.caption,
+        digest_exclude: row.digest_exclude,
+        dismissed: true,
+      }, { onConflict: 'source,external_id' });
+  } else {
+    await supabase.from('images').update({ dismissed: true }).eq('id', row.id);
+  }
+}
+
+async function collectIncluded() {
+  const image_ids = [];
+  const external_ids = [];
+
+  for (const img of pendingImages) {
+    if (img.digest_exclude || img.url.endsWith('.pdf')) continue;
+
+    if (img.external_source === 'whatdoyousee') {
+      let shadowId = img.id;
+      if (!shadowId) {
+        const { data, error } = await supabase
+          .from('external_images')
+          .upsert({
+            source: 'whatdoyousee',
+            external_id: img.external_id,
+            url: img.url,
+            caption: img.caption,
+            digest_exclude: false,
+          }, { onConflict: 'source,external_id' })
+          .select().single();
+        if (error) { console.error('Failed to create shadow row:', error); continue; }
+        shadowId = data.id;
+        img.id = shadowId;
+      }
+      external_ids.push(shadowId);
+    } else {
+      image_ids.push(img.id);
+    }
+  }
+
+  return { image_ids, external_ids };
+}
+
+previewBtn.addEventListener('click', async () => {
+  const subject = digestSubject.value.trim() || 'a little update';
+  const intro = digestIntro.value.trim();
+
+  previewBtn.disabled = true;
+  previewBtn.textContent = 'loading…';
+
+  try {
+    const { image_ids, external_ids } = await collectIncluded();
+    if (!image_ids.length && !external_ids.length) {
+      alert('No images selected to preview.');
+    } else {
+      const { data, error } = await supabase.functions.invoke('send-digest', {
+        body: { subject, intro, image_ids, external_ids, preview: true }
+      });
+      if (error) throw error;
+      previewFrame.srcdoc = data.html;
+      previewLightbox.classList.add('visible');
+    }
+  } catch (err) {
+    alert('Preview failed: ' + err.message);
+  }
+
+  previewBtn.disabled = false;
+  previewBtn.textContent = 'preview';
+});
+
+previewClose.addEventListener('click', () => previewLightbox.classList.remove('visible'));
+
+sendBtn.addEventListener('click', async () => {
+  const subject = digestSubject.value.trim() || 'a little update';
+  const intro = digestIntro.value.trim();
+
+  const { image_ids, external_ids } = await collectIncluded();
+  const total = image_ids.length + external_ids.length;
+
+  if (!total) return alert('No images selected to send.');
+  if (!confirm(`Send this newsletter to all subscribers? (${total} images)`)) return;
+
+  sendBtn.disabled = true;
+  sendBtn.textContent = 'sending…';
+
+  try {
+    const { error } = await supabase.functions.invoke('send-digest', {
+      body: { subject, intro, image_ids, external_ids }
+    });
+    if (error) throw error;
+
+    alert('Newsletter sent!');
+    digestSubject.value = '';
+    digestIntro.value = '';
+    loadPendingImages();
+  } catch (err) {
+    console.error(err);
+    alert('Send failed: ' + err.message);
+  }
+
+  sendBtn.disabled = false;
+  sendBtn.textContent = 'send newsletter';
+});
+
 // ── PROJECT SELECT ──
 const projectSelect   = document.getElementById('projectSelect');
 const existingSection = document.getElementById('existingSection');
 const existingLabel   = document.getElementById('existingLabel');
 const existingGrid    = document.getElementById('existingGrid');
+retroCropSelfiesBtn.addEventListener('click', retroCropExistingSelfies);
 
 // restore last selected project
 const savedProject = localStorage.getItem('adminProject');
@@ -325,10 +1080,12 @@ if (savedProject) {
   projectSelect.value = savedProject;
   loadExistingImages(savedProject);
 }
+retroCropSelfiesBtn.style.display = projectSelect.value === 'selfies' ? 'block' : 'none'; // ADD THIS
 
 projectSelect.addEventListener('change', () => {
   localStorage.setItem('adminProject', projectSelect.value);
   loadExistingImages(projectSelect.value);
+  retroCropSelfiesBtn.style.display = projectSelect.value === 'selfies' ? 'block' : 'none'; // ADD THIS LINE
 });
 
 async function loadExistingImages(project) {
@@ -336,14 +1093,14 @@ async function loadExistingImages(project) {
   if (!project) { existingSection.classList.remove('visible'); return; }
 
   const { data, error } = await supabase
-    .from('images').select('*').eq('project', project).order('sort_order', { ascending: true });
+    .from('images').select('*').eq('project', project).order('sort_order', { ascending: false });
 
   if (error || !data || data.length === 0) { existingSection.classList.remove('visible'); return; }
 
   existingSection.classList.add('visible');
 
   // label hint for bioephemera
-  existingLabel.textContent = (project === 'bioephemera' || project === 'zines')
+  existingLabel.textContent = (project === 'bioephemera' || project === 'zines' || project === 'cables')
   ? 'current images — click to edit metadata'
   : 'current images';
 
@@ -352,7 +1109,9 @@ async function loadExistingImages(project) {
     wrap.className = 'existing-img-wrap';
 
 const hasMeta = (project === 'bioephemera' && (img.plant || img.book || img.scanned || img.location || img.book_link)) ||
-                (project === 'zines' && (img.question_1 || img.question_2 || img.scanned));     
+                (project === 'zines' && (img.question_1 || img.question_2 || img.scanned)) ||
+                (project === 'cables' && (img.plant || img.cable));
+
   const isPdf = img.url.endsWith('.pdf');
   wrap.innerHTML = `
   ${isPdf
@@ -361,12 +1120,12 @@ const hasMeta = (project === 'bioephemera' && (img.plant || img.book || img.scan
   }
   <span class="order-badge">${i + 1}</span>
   <button class="del-btn" data-id="${img.id}" data-path="${img.storage_path}">✕</button>
-  ${project === 'bioephemera' ? `<span class="meta-dot${hasMeta ? ' filled' : ''}"></span>` : ''}
+  ${(project === 'bioephemera' || project === 'cables') ? `<span class="meta-dot${hasMeta ? ' filled' : ''}"></span>` : ''}
 `;
    // collect all rows for this project so lightbox can navigate
     const allRows = data;  // already fetched above
 
-    if (project === 'bioephemera' || project === 'zines') {
+    if (project === 'bioephemera' || project === 'zines' || project === 'cables') {
       wrap.querySelector('img').addEventListener('click', () => openEditLightbox(allRows, i));
     }
 
@@ -415,7 +1174,7 @@ function loadEditRow() {
       <input id="editScanned" type="text" placeholder="scanned" value="${row.scanned || ''}">
     `;
     document.getElementById('editQuestion_1').focus();
-  } else {
+  } else if (project === 'bioephemera') {
     editFields.innerHTML = `
       <input id="editPlant" type="text" placeholder="plant" value="${row.plant || ''}">
       <input id="editBook" type="text" placeholder="book" value="${row.book || ''}">
@@ -424,6 +1183,12 @@ function loadEditRow() {
       <input id="editBook_link" type="text" placeholder="book_link" value="${row.book_link || ''}">
     `;
     document.getElementById('editPlant').focus();
+  } else if (project === 'cables') {
+    editFields.innerHTML = `
+    <input id="editPlant" type="text" placeholder="plant" value="${row.plant || ''}">
+    <input id="editCable" type="text" placeholder="cable" value="${row.cable || ''}">
+  `;
+  document.getElementById('editPlant').focus();
   }
 
   editFields.querySelectorAll('input').forEach(input => {
@@ -449,6 +1214,11 @@ async function saveCurrentRow() {
       question_1: document.getElementById('editQuestion_1')?.value.trim() || null,
       question_2: document.getElementById('editQuestion_2')?.value.trim() || null,
       scanned:    document.getElementById('editScanned')?.value.trim() || null,
+    };
+  } else if (project === 'cables') {
+    updates = {
+      plant: document.getElementById('editPlant')?.value.trim() || null,
+      cable: document.getElementById('editCable')?.value.trim() || null,
     };
   } else {
     updates = {
@@ -540,6 +1310,91 @@ function resizeImage(file, maxW, quality) {
   });
 }
 
+function cropAndResizeImage(file, maxW, quality, aspectRatio) {
+  // aspectRatio = width / height (e.g. 3/4 for a 3:4 portrait crop)
+  return new Promise(resolve => {
+    const img = new Image(), url = URL.createObjectURL(file);
+    img.onload = () => {
+      const srcW = img.naturalWidth, srcH = img.naturalHeight;
+      const srcAspect = srcW / srcH;
+
+      let cropW, cropH, cropX, cropY;
+      if (srcAspect > aspectRatio) {
+        // source is wider than target — crop the sides
+        cropH = srcH;
+        cropW = srcH * aspectRatio;
+        cropX = (srcW - cropW) / 2;
+        cropY = 0;
+      } else {
+        // source is taller than target — crop top/bottom
+        cropW = srcW;
+        cropH = srcW / aspectRatio;
+        cropX = 0;
+        cropY = (srcH - cropH) / 2;
+      }
+
+      const outW = Math.min(maxW, cropW);
+      const outH = outW / aspectRatio;
+
+      const canvas = document.createElement('canvas');
+      canvas.width  = Math.round(outW);
+      canvas.height = Math.round(outH);
+      canvas.getContext('2d').drawImage(img, cropX, cropY, cropW, cropH, 0, 0, canvas.width, canvas.height);
+      canvas.toBlob(blob => { URL.revokeObjectURL(url); resolve(blob); }, 'image/jpeg', quality);
+    };
+    img.src = url;
+  });
+}
+
+async function retroCropExistingSelfies() {
+  const { data, error } = await supabase
+    .from('images')
+    .select('*')
+    .eq('project', 'selfies');
+
+  if (error) { alert('Lookup failed: ' + error.message); return; }
+
+  const targets = (data || []).filter(img => !img.url.endsWith('.pdf'));
+  if (!targets.length) { alert('No selfies found.'); return; }
+
+  if (!confirm(`Re-crop ${targets.length} existing selfie(s) to 3:4? This overwrites the stored images (originals are untouched).`)) return;
+
+  let done = 0, failed = 0;
+
+  for (const img of targets) {
+    try {
+      const res = await fetch(img.url);
+      if (!res.ok) throw new Error(`fetch failed: ${res.status}`);
+      const blob = await res.blob();
+
+      const croppedBlob = await cropAndResizeImage(blob, IMAGE_MAX_W, JPEG_QUALITY, 3 / 4);
+
+      const { error: upErr } = await supabase.storage
+        .from(STORAGE_BUCKET)
+        .upload(img.storage_path, croppedBlob, { contentType: 'image/jpeg', upsert: true });
+      if (upErr) throw upErr;
+
+      // Bust the cache: give the row a fresh URL so the CDN and browsers
+      // fetch the newly-cropped bytes instead of serving the stale cached ones.
+      const baseUrl = img.url.split('?')[0];
+      const bustedUrl = `${baseUrl}?v=${Date.now()}`;
+      const { error: dbErr } = await supabase
+        .from('images')
+        .update({ url: bustedUrl })
+        .eq('id', img.id);
+      if (dbErr) throw dbErr;
+
+      done++;
+    } catch (err) {
+      console.error(`Failed to crop ${img.filename}:`, err);
+      failed++;
+    }
+  }
+
+  alert(`Done. ${done} cropped, ${failed} failed.`);
+  loadExistingImages('selfies');
+}
+
 // ── UPLOAD ──
 const submitBtn     = document.getElementById('submit');
 const progressWrap  = document.getElementById('progressWrap');
@@ -587,6 +1442,9 @@ submitBtn.addEventListener('click', async () => {
       } else if (project === 'zines') {
         masterPath = `${project}/edit/${baseName}_${ts}.jpg`;
         blob = await resizeImage(file, file.naturalWidth || 99999, JPEG_QUALITY);
+      } else if (project === 'selfies') {
+        masterPath = `${project}/edit/${baseName}_${ts}.jpg`;
+        blob = await cropAndResizeImage(file, IMAGE_MAX_W, JPEG_QUALITY, 3 / 4);
       } else {
         masterPath = `${project}/edit/${baseName}_${ts}.jpg`;
         blob = await resizeImage(file, IMAGE_MAX_W, JPEG_QUALITY);

@@ -16,19 +16,28 @@
   /* ── BOTTOM BAR ── */
   #bottom-bar {
     position: fixed;
+    left: 0;
+    right: 0;
     bottom: 16px;
-    right: 22px;
+    padding: 0 22px;
     font-size: 13px;
     z-index: 201;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+  }
+  #bottom-bar-left {
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+  }
+  #links-box {
+    position: relative;
     display: flex;
     flex-direction: column;
     align-items: flex-end;
   }
-  #links-toggle {
-    display: block;
-    width: 13px;
-    height: 13px;
-  }
+  #links-toggle { display: block; width: 13px; height: 13px; }
   #links-toggle img {
     width: 100%;
     height: 100%;
@@ -49,7 +58,81 @@
     width: 15px; height: 15px; display: block; object-fit: contain;
     transition: transform 0.2s ease; transform-origin: center;
   }
+
   #links-list a:hover img { transform: scale(1.15); }
+
+  /* ── NOTIFY / SUBSCRIBE ── */
+#notify-box {
+  position: relative;
+  height: 13px;
+  display: flex;
+  align-items: center;
+}
+#notify-icon {
+  width: 13px;
+  height: 13px;
+  display: block;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+}
+#notify-icon:hover, #notify-box.open #notify-icon {
+  transform: scale(1.15);
+}
+#subscribe-form {
+  position: absolute;
+  left: 18px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  max-width: 0;
+  opacity: 0;
+  transition: max-width 0.35s cubic-bezier(0.4,0,0.2,1), opacity 0.25s ease;
+}
+#notify-box.open #subscribe-form {
+  max-width: 210px;
+  opacity: 1;
+  border: none;
+}
+#subscribe-email {
+  font-size: 13px;
+  padding: 4px 6px;
+  border: none;
+  border-bottom: 1px solid #000;
+  outline: none;
+  background: #ffffff00;
+  width: 260px;
+  margin-left: 4px;
+  font-family: sans-serif;
+  box-sizing: border-box;
+  -webkit-appearance: none;
+  appearance: none;
+  border-radius: 0;
+}
+  #subscribe-msg {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin-top: 4px;
+  margin-left: 4px;
+  font-size: 13px;
+  opacity: 0.7;
+  white-space: nowrap;
+}
+#subscribe-msg.success {
+  top: 50%;
+  left: 18px;
+  margin-top: 0;
+  transform: translateY(-50%);
+  opacity: 1;
+  transition: transform 0.4s cubic-bezier(0.4,0,0.2,1), opacity 0.4s ease;
+}
+#subscribe-msg.success.collapsing {
+  transform: translate(-18px, -50%);
+  opacity: 0;
+}
 
   /* ── SITE NAME ── */
   #site-name {
@@ -201,6 +284,8 @@
       padding: 10px 22px;
       padding-bottom: max(10px, env(safe-area-inset-bottom));
       z-index: 201;
+    }#subscribe-email {
+      margin-left: 5px;
     }
     #links-list { align-items: flex-end; }
     #site-name { z-index: 201; }
@@ -259,6 +344,8 @@
   <div class="index-item" data-project="headphones"><div class="index-thumb-wrap"><img alt="untangling headphones"><div class="resize-handle"></div><div class="edge-n"></div><div class="edge-s"></div><div class="edge-e"></div><div class="edge-w"></div></div></div>
   <div class="index-item" data-project="trees"><div class="index-thumb-wrap"><img alt="trees"><div class="resize-handle"></div><div class="edge-n"></div><div class="edge-s"></div><div class="edge-e"></div><div class="edge-w"></div></div></div>
   <div class="index-item" data-project="memes"><div class="index-thumb-wrap"><img alt="memes"><div class="resize-handle"></div><div class="edge-n"></div><div class="edge-s"></div><div class="edge-e"></div><div class="edge-w"></div></div></div>
+  <div class="index-item" data-project="cables"><div class="index-thumb-wrap"><img alt="cables"><div class="resize-handle"></div><div class="edge-n"></div><div class="edge-s"></div><div class="edge-e"></div><div class="edge-w"></div></div></div>
+  <div class="index-item" data-project="selfies"><div class="index-thumb-wrap"><img alt="selfies"><div class="resize-handle"></div><div class="edge-n"></div><div class="edge-s"></div><div class="edge-e"></div><div class="edge-w"></div></div></div>
 </div>
 
 <span id="gallery-close-btn">✕</span>
@@ -279,12 +366,22 @@
 </div>
 
 <div id="bottom-bar">
-  <span id="mob-panel-title"></span>
-  <div style="display:flex;flex-direction:column;align-items:flex-end;">
+  <div id="bottom-bar-left">
+    <div id="notify-box">
+      <img id="notify-icon" src="/images/notification.png" alt="subscribe">
+      <form id="subscribe-form">
+        <input type="email" id="subscribe-email" placeholder="subscribe for irregular updates" required>
+      </form>
+      <div id="subscribe-msg"></div>
+    </div>
+    <span id="mob-panel-title"></span>
+  </div>
+
+  <div id="links-box">
     <div id="links-list">
       <a href="mailto:mollybakerragan@gmail.com"><img src="/images/links/mail.png" alt="mail"></a>
       <a href="https://www.are.na/molly-ragan/channels" target="_blank" rel="noopener"><img src="/images/links/arena.png" alt="arena"></a>
-      <a href="https://www.instagram.com/molly.baker.ragan/" target="_blank" rel="noopener"><img src="/images/links/instagram.png" alt="instagram"></a>
+      <a href="https://www.instagram.com/mollybakerragan/" target="_blank" rel="noopener"><img src="/images/links/instagram.png" alt="instagram"></a>
     </div>
     <span id="links-toggle"><img src="/images/link.png" alt="links"></span>
   </div>
@@ -293,19 +390,48 @@
 <script>
 // ── PROJECTS ──
 const projects = {
-  zines:        { title: 'zines ive made',                                          gallery: true  },
+  zines:        { title: 'zines ive made', gallery: true  },
   whatdoyousee: { title: 'whatdoyousee.nyc', link: 'https://www.whatdoyousee.nyc' },
   unlearning:   { title: 'unlearning library', link: 'https://www.unlearninglibrary.com' },
-  bioephemera:  { title: 'leaves n things ive stashed in my books',           gallery: true  },
-  unsubscribe:  { title: 'newsletters ive unsubscribed from',           gallery: true  },
-  headphones:   { title: 'times ive untangled my headphones',           gallery: true  },
+  bioephemera:  { title: 'leaves n things ive stashed in my books', gallery: true  },
+  unsubscribe:  { title: 'newsletters ive unsubscribed from', gallery: true  },
+  headphones:   { title: 'times ive untangled my headphones', gallery: true  },
   trees:        { title: 'street trees ive met', gallery: true },
-  memes:        { title: 'memes ive saved',           gallery: true  }
+  memes:        { title: 'memes ive saved', gallery: true  },
+  cables:       { title: 'dead internet cables ive cut out of street trees', gallery: true  },
+  selfies:      { title: 'self-reflection', gallery: true  }
 };
 
 // ── SUPABASE ──
 const SUPABASE_URL      = 'https://krkcskfledxweimduvvn.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imtya2Nza2ZsZWR4d2VpbWR1dnZuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODExMjYzNzIsImV4cCI6MjA5NjcwMjM3Mn0.QIX2_UqDzATZ-NzhjFQUGIpsBxGn1D640viI9QG38rY';
+
+const WDYS_URL      = 'https://fyogbaeayboxjhleaqoj.supabase.co';
+const WDYS_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ5b2diYWVheWJveGpobGVhcW9qIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjczOTMxNDcsImV4cCI6MjA4Mjk2OTE0N30.JGa6qT6IkcNCJRxV5FYDFUiH1QWSKHABJ_Qu7BNV5m8';
+
+async function fetchWdysImages() {
+  try {
+    const res = await fetch(
+      `${WDYS_URL}/rest/v1/images?select=url,created_at&order=created_at.desc`,
+      { headers: { 'apikey': WDYS_ANON_KEY, 'Authorization': `Bearer ${WDYS_ANON_KEY}` } }
+    );
+    const data = await res.json();
+    if (!Array.isArray(data) || !data.length) return;
+
+    projects.whatdoyousee.images = data.map(row => ({ url: row.url }));
+
+    const item = document.querySelector('.index-item[data-project="whatdoyousee"]');
+    if (item) {
+      const img = item.querySelector('.index-thumb-wrap img');
+      const firstUrl = data[0].url;
+      if (img && firstUrl && !firstUrl.endsWith('.pdf')) {
+        img.src = firstUrl;
+      }
+    }
+  } catch (e) {
+    console.warn('Could not fetch whatdoyousee images:', e);
+  }
+}
 
 async function fetchGalleryImages() {
   try {
@@ -331,6 +457,7 @@ async function fetchGalleryImages() {
         book_link: row.book_link || null,
         question_1:row.question_1 || null,
         question_2:row.question_2 || null,
+        cable:     row.cable || null,
       });
     });
 
@@ -354,7 +481,7 @@ async function fetchGalleryImages() {
           return db - da;
         });
       }
-      if (key === 'trees') {
+      if (key === 'trees' || key === 'cables') {
         byProject[key].sort((a, b) => {
           if (!a.taken_at && !b.taken_at) return 0;
           if (!a.taken_at) return 1;
@@ -397,6 +524,11 @@ const lightboxMeta    = document.getElementById('lightbox-meta');
 const lightboxClose   = document.getElementById('lightbox-close');
 const lightboxPrev    = document.getElementById('lightbox-prev');
 const lightboxNext    = document.getElementById('lightbox-next');
+const notifyBox  = document.getElementById('notify-box');
+const notifyIcon = document.getElementById('notify-icon');
+const subscribeForm = document.getElementById('subscribe-form');
+const linksBox = document.getElementById('links-box'); // add this DOM ref
+
 
 // ── STATE ──
 let activeKey         = null;
@@ -416,7 +548,19 @@ function bringToFront(item) {
   item.style.zIndex = ++highestZ;
 }
 
-// Per-item layout state: { left, top, size, pinned }
+// ── ASPECT-RATIO HELPERS (for responsive image wrapper sizing) ──
+function computeWrapSize(sz, aspect) {
+  if (!aspect || !isFinite(aspect) || aspect <= 0) aspect = 1;
+  return aspect >= 1 ? { w: sz, h: sz / aspect } : { w: sz * aspect, h: sz };
+}
+
+function getItemAspect(item) {
+  const img = item.querySelector('.index-thumb-wrap img');
+  if (img && img.naturalWidth && img.naturalHeight) return img.naturalWidth / img.naturalHeight;
+  return 1; // fallback before image loads
+}
+
+// Per-item layout state: { left, top, w, h, pinned }
 const itemState = {};
 
 function applyItemState(item, key, animate) {
@@ -426,35 +570,35 @@ function applyItemState(item, key, animate) {
   if (animate) item.classList.add('layout-animating');
   item.style.left = s.left + 'px';
   item.style.top  = s.top  + 'px';
-  wrap.style.width  = s.size + 'px';
-  wrap.style.height = s.size + 'px';
+  wrap.style.width  = s.w + 'px';
+  wrap.style.height = s.h + 'px';
   if (animate) setTimeout(() => item.classList.remove('layout-animating'), 520);
 }
 
 // ── LAYOUTS ──
 const LAYOUTS_DESKTOP = [
-  [[29.7,10.9,17.2],[63.3,12.4,17.2],[43.9,52.1,17.3],[81.3,65.3,15.8],[26.3,40.6,17.2],[5.0,60.0,15.8],[72.0,38.0,15.8],[6.0,6.0,14.0]],
-  [[76.2,7.3,17.1],[35.2,11.7,17.1],[80.1,49.1,17.3],[54.4,51.3,16.9],[5.4,12.9,16.9],[21.4,38.6,17.1],[60.0,28.0,16.9],[8.0,65.0,15.0]],
-  [[55.1,34.2,15.0],[77.9,7.0,15.0],[2.6,42.8,15.8],[40.0,69.5,14.1],[26.3,22.6,15.0],[5.0,7.0,14.1],[68.0,62.0,14.1],[75.0,78.0,15.0]],
-  [[58.9,6.5,13.6],[54.4,41.8,13.6],[43.3,17.7,14.2],[3.2,70.0,13.6],[9.3,42.7,13.6],[75.0,55.0,13.6],[30.0,55.0,13.6],[80.0,8.0,14.0]],
-  [[43.7,14.6,14.1],[69.6,14.4,14.1],[23.2,23.1,17.2],[7.8,55.0,14.1],[61.0,46.0,14.1],[5.0,8.0,14.1],[80.0,40.0,14.1],[35.0,65.0,15.0]],
-  [[52.4,11.0,15.5],[30.6,23.9,15.5],[72.7,15.0,13.5],[9.1,31.2,16.1],[32.1,66.8,15.5],[65.0,55.0,13.5],[18.0,62.0,13.5],[6.0,5.0,14.0]],
-  [[31.6,29.7,14.7],[52.7,26.4,14.7],[55.1,60.8,16.2],[30.4,61.5,15.2],[4.9,44.1,14.7],[75.0,28.0,14.7],[68.0,52.0,15.2],[10.0,6.0,14.0]],
-  [[22.1,23.1,15.6],[54.3,13.2,15.6],[1.7,53.4,14.5],[31.1,64.8,15.2],[58.1,63.9,15.6],[75.0,53.0,14.5],[70.0,8.0,15.6],[4.0,4.0,14.0]],
-  [[48.7,7.5,14.0],[26.2,26.0,14.0],[75.8,49.0,16.2],[40.6,62.4,15.6],[62.8,57.7,14.0],[5.0,7.0,14.0],[15.0,55.0,14.0],[5.0,75.0,14.0]],
-  [[67.1,16.8,15.6],[30.4,10.8,15.6],[12.1,35.3,16.6],[47.6,47.9,15.2],[50.5,15.3,15.6],[75.0,63.0,15.2],[8.0,62.0,15.2],[32.0,68.0,15.0]],
+  [[29.7,10.9,17.2],[63.3,12.4,17.2],[43.9,52.1,17.3],[81.3,65.3,15.8],[26.3,40.6,17.2],[5.0,60.0,15.8],[72.0,38.0,15.8],[6.0,6.0,14.0],[90.0,25.0,14.0],[15.0,85.0,14.0]],
+  [[76.2,7.3,17.1],[35.2,11.7,17.1],[80.1,49.1,17.3],[54.4,51.3,16.9],[5.4,12.9,16.9],[21.4,38.6,17.1],[60.0,28.0,16.9],[8.0,65.0,15.0],[88.0,75.0,14.0],[40.0,85.0,14.0]],
+  [[55.1,34.2,15.0],[77.9,7.0,15.0],[2.6,42.8,15.8],[40.0,69.5,14.1],[26.3,22.6,15.0],[5.0,7.0,14.1],[68.0,62.0,14.1],[75.0,78.0,15.0],[90.0,45.0,14.0],[15.0,60.0,14.0]],
+  [[58.9,6.5,13.6],[54.4,41.8,13.6],[43.3,17.7,14.2],[3.2,70.0,13.6],[9.3,42.7,13.6],[75.0,55.0,13.6],[30.0,55.0,13.6],[80.0,8.0,14.0],[88.0,30.0,14.0],[20.0,80.0,14.0]],
+  [[43.7,14.6,14.1],[69.6,14.4,14.1],[23.2,23.1,17.2],[7.8,55.0,14.1],[61.0,46.0,14.1],[5.0,8.0,14.1],[80.0,40.0,14.1],[35.0,65.0,15.0],[90.0,70.0,14.0],[50.0,85.0,14.0]],
+  [[52.4,11.0,15.5],[30.6,23.9,15.5],[72.7,15.0,13.5],[9.1,31.2,16.1],[32.1,66.8,15.5],[65.0,55.0,13.5],[18.0,62.0,13.5],[6.0,5.0,14.0],[85.0,40.0,14.0],[45.0,80.0,14.0]],
+  [[31.6,29.7,14.7],[52.7,26.4,14.7],[55.1,60.8,16.2],[30.4,61.5,15.2],[4.9,44.1,14.7],[75.0,28.0,14.7],[68.0,52.0,15.2],[10.0,6.0,14.0],[88.0,10.0,14.0],[85.0,75.0,14.0]],
+  [[22.1,23.1,15.6],[54.3,13.2,15.6],[1.7,53.4,14.5],[31.1,64.8,15.2],[58.1,63.9,15.6],[75.0,53.0,14.5],[70.0,8.0,15.6],[4.0,4.0,14.0],[90.0,35.0,14.0],[45.0,85.0,14.0]],
+  [[48.7,7.5,14.0],[26.2,26.0,14.0],[75.8,49.0,16.2],[40.6,62.4,15.6],[62.8,57.7,14.0],[5.0,7.0,14.0],[15.0,55.0,14.0],[5.0,75.0,14.0],[85.0,15.0,14.0],[75.0,80.0,14.0]],
+  [[67.1,16.8,15.6],[30.4,10.8,15.6],[12.1,35.3,16.6],[47.6,47.9,15.2],[50.5,15.3,15.6],[75.0,63.0,15.2],[8.0,62.0,15.2],[32.0,68.0,15.0],[88.0,50.0,14.0],[10.0,10.0,14.0]],
 ];
 const LAYOUTS_MOBILE = [
-  [[28.5,8,28.1],[10.9,72,28.1],[63.7,30,32.0],[69.1,55,26.3],[58.0,8,28.1],[10.0,45,28.1],[40.0,20,26.3],[8.0,8,26.0]],
-  [[46.1,8,22.8],[15.3,20,22.8],[48.4,38,32.0],[52.4,65,30.0],[10.1,55,22.8],[65.0,65,22.8],[30.0,50,22.8],[72.0,8,24.0]],
-  [[31.2,15,28.7],[68.9,38,28.7],[5.7,52,32.0],[54.7,72,24.9],[26.7,72,28.7],[10.0,8,28.7],[55.0,20,24.9],[78.0,6,20.0]],
-  [[56.3,25,25.5],[22.5,8,25.5],[18.1,65,32.0],[62.9,72,26.0],[17.1,35,25.5],[55.7,48,25.5],[38.0,15,26.0],[83.0,6,20.0]],
-  [[15.1,8,26.8],[7.3,48,26.8],[56.5,8,32.0],[36.5,30,26.7],[70.0,65,26.8],[35.2,68,26.8],[60.0,40,26.7],[3.0,3,18.0]],
-  [[8.8,8,24.3],[30.9,32,24.3],[65.1,8,32.0],[42.8,68,26.3],[10.0,62,24.3],[65.0,60,24.3],[45.0,45,24.3],[38.0,4,24.0]],
-  [[58.8,8,25.7],[36.9,45,25.7],[23.6,22,32.0],[11.7,68,24.9],[74.8,72,25.7],[10.0,8,25.7],[48.0,60,24.9],[86.0,4,16.0]],
-  [[64.7,8,27.1],[43.9,68,27.1],[18.8,18,32.0],[53.3,42,22.8],[7.9,68,27.1],[65.0,8,27.1],[30.0,30,22.8],[2.0,2,20.0]],
-  [[25.7,8,26.5],[61.9,8,26.5],[25.7,65,32.0],[63.5,68,27.6],[12.1,32,26.5],[57.6,45,26.5],[42.0,50,27.6],[2.0,2,16.0]],
-  [[70.1,10,24.9],[19.9,28,24.9],[62.9,38,32.0],[14.1,50,23.7],[56.5,65,24.9],[10.0,8,24.9],[38.0,70,23.7],[45.0,2,22.0]],
+  [[28.5,8,26.3],[10.9,72,26.3],[63.7,30,28.0],[69.1,55,25.3],[58.0,8,26.3],[10.0,45,26.3],[40.0,20,25.3],[8.0,8,25.1],[85.0,60,21.8],[45.0,75,20.7]],
+  [[46.1,8,23.3],[15.3,20,23.3],[48.4,38,28.0],[52.4,65,27.3],[10.1,55,23.3],[65.0,65,23.3],[30.0,50,23.3],[72.0,8,24.0],[85.0,30,20.7],[20.0,80,20.7]],
+  [[31.2,15,26.6],[68.9,38,26.6],[5.7,52,28.0],[54.7,72,24.5],[26.7,72,26.6],[10.0,8,26.6],[55.0,20,24.5],[78.0,6,21.8],[85.0,65,19.6],[45.0,45,20.7]],
+  [[56.3,25,24.8],[22.5,8,24.8],[18.1,65,28.0],[62.9,72,25.1],[17.1,35,24.8],[55.7,48,24.8],[38.0,15,25.1],[83.0,6,21.8],[80.0,50,19.6],[10.0,80,19.6]],
+  [[15.1,8,25.5],[7.3,48,25.5],[56.5,8,28.0],[36.5,30,25.5],[70.0,65,25.5],[35.2,68,25.5],[60.0,40,25.5],[3.0,3,20.7],[85.0,20,19.6],[80.0,80,19.6]],
+  [[8.8,8,24.2],[30.9,32,24.2],[65.1,8,28.0],[42.8,68,25.3],[10.0,62,24.2],[65.0,60,24.2],[45.0,45,24.2],[38.0,4,24.0],[85.0,45,19.6],[15.0,80,19.6]],
+  [[58.8,8,24.9],[36.9,45,24.9],[23.6,22,28.0],[11.7,68,24.5],[74.8,72,24.9],[10.0,8,24.9],[48.0,60,24.5],[86.0,4,19.6],[80.0,30,19.6],[55.0,80,19.6]],
+  [[64.7,8,25.7],[43.9,68,25.7],[18.8,18,28.0],[53.3,42,23.3],[7.9,68,25.7],[65.0,8,25.7],[30.0,30,23.3],[2.0,2,21.8],[85.0,55,19.6],[45.0,15,19.6]],
+  [[25.7,8,25.4],[61.9,8,25.4],[25.7,65,28.0],[63.5,68,26.0],[12.1,32,25.4],[57.6,45,25.4],[42.0,50,26.0],[2.0,2,19.6],[85.0,35,19.6],[15.0,75,19.6]],
+  [[70.1,10,24.5],[19.9,28,24.5],[62.9,38,28.0],[14.1,50,23.8],[56.5,65,24.5],[10.0,8,24.5],[38.0,70,23.8],[45.0,2,22.9],[80.0,45,19.6],[25.0,80,19.6]],
 ];
 let currentLayout = 0;
 
@@ -474,17 +618,19 @@ function randomLayout(animate) {
     }
 
     const [xPct, yPct, wPct] = layout[i] || [10 + i * 12, 30, 15];
-    const sz   = Math.round((wPct / 100) * iw);
-    const wrap = item.querySelector('.index-thumb-wrap');
+    const sz     = Math.round((wPct / 100) * iw);
+    const wrap   = item.querySelector('.index-thumb-wrap');
+    const aspect = getItemAspect(item);
+    const { w: wrapW, h: wrapH } = computeWrapSize(sz, aspect);
 
     if (animate) item.classList.add('layout-animating');
-    wrap.style.width  = sz + 'px';
-    wrap.style.height = sz + 'px';
+    wrap.style.width  = wrapW + 'px';
+    wrap.style.height = wrapH + 'px';
 
     const left = Math.round(
       Math.max(
         0,
-        Math.min(iw - sz, (xPct / 100) * iw)
+        Math.min(iw - wrapW, (xPct / 100) * iw)
       )
     );
     const topMargin = mob ? 60 : 0, botMargin = mob ? 60 : 0;
@@ -492,25 +638,26 @@ function randomLayout(animate) {
     const yRaw    = mob
       ? topMargin + ((yPct - 6) / (91 - 6)) * usableH
       : (yPct / 100) * ih;
-    const top = Math.round(Math.max(topMargin, Math.min(ih - sz - botMargin, yRaw)));
+    const top = Math.round(Math.max(topMargin, Math.min(ih - wrapH - botMargin, yRaw)));
 
     item.style.left = left + 'px';
     item.style.top  = top  + 'px';
     if (animate) setTimeout(() => item.classList.remove('layout-animating'), 520);
 
-    itemState[key] = { left, top, size: sz, pinned: false };
+    itemState[key] = { left, top, w: wrapW, h: wrapH, pinned: false };
   });
 }
 
 function constrainItemToViewport(item) {
   const wrap = item.querySelector('.index-thumb-wrap');
 
-  const size = parseInt(wrap.style.width) || wrap.offsetWidth;
+  const w = parseInt(wrap.style.width)  || wrap.offsetWidth;
+  const h = parseInt(wrap.style.height) || wrap.offsetHeight;
   let left = parseInt(item.style.left) || 0;
   let top  = parseInt(item.style.top) || 0;
 
-  left = Math.max(0, Math.min(window.innerWidth  - size, left));
-  top  = Math.max(0, Math.min(window.innerHeight - size, top));
+  left = Math.max(0, Math.min(window.innerWidth  - w, left));
+  top  = Math.max(0, Math.min(window.innerHeight - h, top));
 
   item.style.left = left + 'px';
   item.style.top  = top + 'px';
@@ -568,7 +715,8 @@ function initDrag(item) {
       itemState[key] = {
         left:   parseInt(item.style.left),
         top:    parseInt(item.style.top),
-        size:   s.size || parseInt(wrap.style.width) || 200,
+        w: s.w || parseInt(wrap.style.width)  || 200,
+        h: s.h || parseInt(wrap.style.height) || 200,
         pinned: true,
       };
     } else {
@@ -587,42 +735,33 @@ function initResize(item) {
   const key    = item.dataset.project;
   const wrap   = item.querySelector('.index-thumb-wrap');
   const handle = wrap.querySelector('.resize-handle');
-  const img    = wrap.querySelector('img');
   const edgeN  = wrap.querySelector('.edge-n');
   const edgeS  = wrap.querySelector('.edge-s');
   const edgeE  = wrap.querySelector('.edge-e');
   const edgeW  = wrap.querySelector('.edge-w');
   const MIN_SIZE = 60;
 
-  function getImageBounds() {
-    const boxSize = parseInt(wrap.style.width) || wrap.offsetWidth || 200;
-    const nat = img.naturalWidth && img.naturalHeight
-      ? img.naturalWidth / img.naturalHeight : 1;
-    let imgW, imgH;
-    if (nat >= 1) { imgW = boxSize; imgH = boxSize / nat; }
-    else          { imgH = boxSize; imgW = boxSize * nat; }
-    return { imgW, imgH, imgTop: boxSize - imgH, imgLeft: 0 };
-  }
-
   function updateHandleAndEdges() {
-    const { imgW, imgH, imgTop, imgLeft } = getImageBounds();
+    const w = parseInt(wrap.style.width)  || wrap.offsetWidth  || 200;
+    const h = parseInt(wrap.style.height) || wrap.offsetHeight || 200;
     const EW = 10;
 
-    handle.style.left   = (imgLeft + imgW) + 'px';
-    handle.style.top    = (imgTop  + imgH) + 'px';
+    handle.style.left   = w + 'px';
+    handle.style.top    = h + 'px';
     handle.style.bottom = 'auto';
     handle.style.right  = 'auto';
 
-    edgeN.style.cssText = `top:${imgTop}px; left:${imgLeft}px; width:${imgW}px; height:${EW}px; position:absolute;`;
-    edgeS.style.cssText = `top:${imgTop + imgH - EW}px; left:${imgLeft}px; width:${imgW}px; height:${EW}px; position:absolute;`;
-    edgeE.style.cssText = `top:${imgTop}px; left:${imgLeft + imgW - EW}px; width:${EW}px; height:${imgH}px; position:absolute;`;
-    edgeW.style.cssText = `top:${imgTop}px; left:${imgLeft}px; width:${EW}px; height:${imgH}px; position:absolute;`;
+    edgeN.style.cssText = `top:0px; left:0px; width:${w}px; height:${EW}px; position:absolute;`;
+    edgeS.style.cssText = `top:${h - EW}px; left:0px; width:${w}px; height:${EW}px; position:absolute;`;
+    edgeE.style.cssText = `top:0px; left:${w - EW}px; width:${EW}px; height:${h}px; position:absolute;`;
+    edgeW.style.cssText = `top:0px; left:0px; width:${EW}px; height:${h}px; position:absolute;`;
 
-    cornerNW.style.left = '-10px';        cornerNW.style.top = (imgTop - 10) + 'px';
-    cornerNE.style.left = (imgW - 10) + 'px'; cornerNE.style.top = (imgTop - 10) + 'px';
-    cornerSW.style.left = '-10px';        cornerSW.style.top = (imgTop + imgH - 10) + 'px';
+    cornerNW.style.left = '-10px';        cornerNW.style.top = '-10px';
+    cornerNE.style.left = (w - 10) + 'px'; cornerNE.style.top = '-10px';
+    cornerSW.style.left = '-10px';        cornerSW.style.top = (h - 10) + 'px';
   }
 
+  const img = wrap.querySelector('img');
   img.addEventListener('load', updateHandleAndEdges);
   if (img.complete && img.naturalWidth) updateHandleAndEdges();
   new ResizeObserver(updateHandleAndEdges).observe(wrap);
@@ -638,7 +777,7 @@ function initResize(item) {
   });
 
   let resizing = false, resizeDidFire = false;
-  let startX, startY, origSize, origLeft, origTop, resizeAxis;
+  let startX, startY, origW, origH, origLeft, origTop, resizeAxis, aspect;
 
   wrap.addEventListener('click', e => {
     if (resizeDidFire) { e.stopImmediatePropagation(); resizeDidFire = false; }
@@ -651,7 +790,9 @@ function initResize(item) {
     resizeDidFire = true;
     resizeAxis    = axis;
     startX    = e.clientX; startY = e.clientY;
-    origSize  = parseInt(wrap.style.width) || wrap.offsetWidth || 200;
+    origW  = parseInt(wrap.style.width)  || wrap.offsetWidth  || 200;
+    origH  = parseInt(wrap.style.height) || wrap.offsetHeight || 200;
+    aspect = origW / origH;
     origLeft  = parseInt(item.style.left) || 0;
     origTop   = parseInt(item.style.top)  || 0;
     bringToFront(item);
@@ -683,14 +824,16 @@ function initResize(item) {
     else if (resizeAxis === 'sw') delta = (-dx +  dy) / 2;
     else                          delta = ( dx +  dy) / 2; // se
 
-    const newSize = Math.max(MIN_SIZE, Math.min(MAX_SIZE, origSize + delta));
-    wrap.style.width  = newSize + 'px';
-    wrap.style.height = newSize + 'px';
+    let newW = Math.max(MIN_SIZE, Math.min(MAX_SIZE, origW + delta));
+    let newH = newW / aspect;
+
+    wrap.style.width  = newW + 'px';
+    wrap.style.height = newH + 'px';
 
     if (resizeAxis === 'n' || resizeAxis === 'nw' || resizeAxis === 'ne')
-      item.style.top  = (origTop  + origSize - newSize) + 'px';
+      item.style.top  = (origTop  + origH - newH) + 'px';
     if (resizeAxis === 'w' || resizeAxis === 'nw' || resizeAxis === 'sw')
-      item.style.left = (origLeft + origSize - newSize) + 'px';
+      item.style.left = (origLeft + origW - newW) + 'px';
 
     constrainItemToViewport(item);
     updateHandleAndEdges();
@@ -700,12 +843,12 @@ function initResize(item) {
     if (!resizing) return;
     resizing = false;
     document.body.style.userSelect = '';
-    const newSize = parseInt(wrap.style.width);
     const s = itemState[key] || {};
     itemState[key] = {
       left:   parseInt(item.style.left) || s.left || 0,
       top:    parseInt(item.style.top)  || s.top  || 0,
-      size:   newSize,
+      w: parseInt(wrap.style.width),
+      h: parseInt(wrap.style.height),
       pinned: true,
     };
   });
@@ -720,7 +863,7 @@ function initMobileTouch(item) {
   let mode = null, dragId = null;
   let dragStartX, dragStartY, dragOrigLeft, dragOrigTop;
   let dragMoved = false, itemWasMoved = false;
-  let pinchStartDist = 0, pinchOrigSize = 0;
+  let pinchStartDist = 0, pinchOrigW = 0, pinchOrigH = 0;
 
   function touchDist(t1, t2) {
     const dx = t1.clientX - t2.clientX, dy = t1.clientY - t2.clientY;
@@ -744,7 +887,8 @@ function initMobileTouch(item) {
     } else if (e.touches.length === 2) {
       mode           = 'pinch';
       pinchStartDist = touchDist(e.touches[0], e.touches[1]);
-      pinchOrigSize  = parseInt(wrap.style.width) || 200;
+      pinchOrigW = parseInt(wrap.style.width)  || 200;
+      pinchOrigH = parseInt(wrap.style.height) || 200;
     }
   }, { passive: true });
 
@@ -765,17 +909,19 @@ function initMobileTouch(item) {
 
       constrainItemToViewport(item);    
     } else if (mode === 'pinch' && e.touches.length >= 2) {
-      const d       = touchDist(e.touches[0], e.touches[1]);
-      const scale   = d / pinchStartDist;
-      const maxSize = Math.min(window.innerWidth, window.innerHeight) * 0.9;
-      const newSize = Math.max(MIN_SIZE, Math.min(maxSize, pinchOrigSize * scale));
-      wrap.style.width  = newSize + 'px';
-      wrap.style.height = newSize + 'px';
+      const d      = touchDist(e.touches[0], e.touches[1]);
+      const scale  = d / pinchStartDist;
+      const aspect = pinchOrigW / pinchOrigH;
+      const maxW   = window.innerWidth * 0.9;
+      let newW = Math.max(MIN_SIZE, Math.min(maxW, pinchOrigW * scale));
+      let newH = newW / aspect;
+      wrap.style.width  = newW + 'px';
+      wrap.style.height = newH + 'px';
       itemWasMoved = true;
       bringToFront(item);
       const mid = touchMid(e.touches[0], e.touches[1]);
-      item.style.left = (mid.x - newSize / 2) + 'px';
-      item.style.top  = (mid.y - newSize / 2) + 'px';
+      item.style.left = (mid.x - newW / 2) + 'px';
+      item.style.top  = (mid.y - newH / 2) + 'px';
     }
   }, { passive: false });
 
@@ -786,7 +932,8 @@ function initMobileTouch(item) {
       itemState[key] = {
         left:   parseInt(item.style.left),
         top:    parseInt(item.style.top),
-        size:   parseInt(wrap.style.width) || s.size || 200,
+        w: parseInt(wrap.style.width)  || s.w || 200,
+        h: parseInt(wrap.style.height) || s.h || 200,
         pinned: !wasTap,
       };
       mode = null; dragId = null; dragMoved = false; itemWasMoved = false;
@@ -834,7 +981,7 @@ window.addEventListener('load', () => {
     initMobileTouch(item);
   });
 
-  fetchGalleryImages().then(() => {
+  Promise.all([fetchGalleryImages(), fetchWdysImages()]).then(() => {
     const imgs = Array.from(document.querySelectorAll('.index-thumb-wrap img'));
     let loaded = 0, relaidOut = false;
     function checkDone() {
@@ -902,8 +1049,8 @@ siteName.addEventListener('click', e => {
 
 // ── LINKS TOGGLE ──
 let linksOpen = false;
-bottomBar.addEventListener('mouseenter', () => { if (!isMob()) linksList.classList.add('visible'); });
-bottomBar.addEventListener('mouseleave', () => { if (!isMob() && !linksOpen) linksList.classList.remove('visible'); });
+linksBox.addEventListener('mouseenter', () => { if (!isMob()) linksList.classList.add('visible'); });
+linksBox.addEventListener('mouseleave', () => { if (!isMob() && !linksOpen) linksList.classList.remove('visible'); });
 linksToggle.addEventListener('click', e => {
   e.stopPropagation();
   linksOpen = !linksOpen;
@@ -911,10 +1058,41 @@ linksToggle.addEventListener('click', e => {
   linksList.classList.toggle('visible', linksOpen);
 });
 document.addEventListener('click', e => {
-  if (linksOpen && !bottomBar.contains(e.target)) {
+  if (linksOpen && !linksBox.contains(e.target)) {
     linksOpen = false;
     linksList.classList.remove('visible');
     linksToggle.classList.remove('active');
+  }
+});
+
+// ── NOTIFY TOGGLE ──
+let notifyOpen = false;
+
+notifyBox.addEventListener('mouseenter', () => { if (!isMob()) notifyBox.classList.add('open'); });
+notifyBox.addEventListener('mouseleave', () => { if (!isMob() && !notifyOpen) notifyBox.classList.remove('open'); });
+
+notifyIcon.addEventListener('click', e => {
+  e.stopPropagation();
+  notifyOpen = !notifyOpen;
+  notifyBox.classList.toggle('open', notifyOpen);
+  if (!notifyOpen) {
+    clearTimeout(subscribeCollapseTimer);
+    setTimeout(resetSubscribeForm, 50);
+  }
+});
+
+subscribeForm.addEventListener('transitionend', e => {
+  if (e.propertyName === 'max-width' && notifyBox.classList.contains('open')) {
+    document.getElementById('subscribe-email').focus();
+  }
+});
+
+document.addEventListener('click', e => {
+  if (notifyOpen && !notifyBox.contains(e.target)) {
+    notifyOpen = false;
+    notifyBox.classList.remove('open');
+    clearTimeout(subscribeCollapseTimer);
+    setTimeout(resetSubscribeForm, 50);
   }
 });
 
@@ -931,8 +1109,13 @@ function openGalleryUI(key) {
   const p = projects[key];
   if (!p || !p.images) return;
 
-  galleryGrid.classList.toggle('memes', key === 'memes');
+  const isMemes = key === 'memes';
+  galleryGrid.classList.toggle('memes', isMemes);
   galleryGrid.innerHTML = '';
+  galleryGrid.style.transition = 'none';
+  galleryGrid.style.opacity = isMemes ? '0' : '';
+
+  const memeImgs = [];
   p.images.forEach((imgData, i) => {
     if (imgData.url.endsWith('.pdf')) {
       const wrap = document.createElement('div');
@@ -946,16 +1129,42 @@ function openGalleryUI(key) {
     } else {
       const img       = document.createElement('img');
       img.src         = imgData.url;
-      img.loading     = 'lazy';
+      img.loading     = isMemes ? 'eager' : 'lazy';
       img.dataset.index = i;
       galleryGrid.appendChild(img);
+      if (isMemes) memeImgs.push(img);
     }
   });
 
-  const cols = { bioephemera: 3, headphones: 4, unsubscribe: 4, zines: 1, trees: 3, memes: 4 }[key] ?? 3;  galleryGrid.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+  if (isMemes) {
+    const total = memeImgs.length;
+    if (total === 0) {
+      galleryGrid.style.transition = 'opacity 0.25s ease';
+      galleryGrid.style.opacity = '1';
+    } else {
+      let loaded = 0;
+      const done = () => {
+        loaded++;
+        if (loaded >= total) {
+          galleryGrid.style.transition = 'opacity 0.25s ease';
+          galleryGrid.style.opacity = '1';
+        }
+      };
+      memeImgs.forEach(img => {
+        if (img.complete) done();
+        else {
+          img.addEventListener('load', done);
+          img.addEventListener('error', done);
+        }
+      });
+    }
+  }
+
+  const cols = { bioephemera: 3, headphones: 4, unsubscribe: 4, zines: 1, trees: 3, memes: 4, cables: 2, selfies: 4 }[key] ?? 3;  galleryGrid.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
   galleryGrid.style.gridTemplateColumns = key === 'memes' ? '' : `repeat(${cols}, 1fr)`;
 
   galleryCloseBtn.style.display = 'block';
+  notifyBox.style.display = 'none';
   document.body.classList.toggle('zines-open', key === 'zines');
 
   const titleEl = isMob() ? mobPanelTitle : deskPanelTitle;
@@ -983,6 +1192,7 @@ function closeGalleryUI() {
   if (closeGalleryTimer) { clearTimeout(closeGalleryTimer); closeGalleryTimer = null; }
   activeKey = null;
   galleryCloseBtn.style.display = 'none';
+  notifyBox.style.display = '';
   document.body.classList.remove('zines-open');
 
  requestAnimationFrame(() => {
@@ -1093,7 +1303,7 @@ initGallerySwipe();
 // ── LIGHTBOX META ──
 function formatMeta(imgData, key) {
   const lines = [];
-  if (key === 'unsubscribe' || key === 'headphones' || key === 'memes' || key === 'trees') {
+  if (key === 'selfies' || key === 'unsubscribe' || key === 'headphones' || key === 'memes' || key === 'trees') {
     if (imgData.taken_at) {
       const d = new Date(imgData.taken_at);
       lines.push(`${String(d.getMonth() + 1).padStart(2, '0')}/${String(d.getDate()).padStart(2, '0')}/${d.getFullYear()}`);
@@ -1105,6 +1315,13 @@ function formatMeta(imgData, key) {
     if (imgData.question_1) lines.push(imgData.question_1);
     if (imgData.question_2) lines.push(imgData.question_2);
     if (imgData.scanned)    lines.push(imgData.scanned);
+  } else if (key === 'cables') {
+    if (imgData.plant) lines.push(img.Data.plant);
+    if (imgData.cable) lines.push(img.Data.cable);
+    if (imgData.taken_at) {
+      const d = new Date(imgData.taken_at);
+      lines.push(`${String(d.getMonth() + 1).padStart(2, '0')}/${String(d.getDate()).padStart(2, '0')}/${d.getFullYear()}`);
+    }
   } else if (key === 'bioephemera') {
     if (imgData.plant) lines.push(imgData.plant);
     if (imgData.book) {
@@ -1237,6 +1454,65 @@ window.addEventListener('wheel', e => {
     setTimeout(() => { wheelGestureLock = false; }, 500);
   }
 }, { passive: true });
+
+// ── SUBSCRIBE FORM ──
+let subscribeCollapseTimer = null;
+
+document.getElementById('subscribe-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const emailInput = document.getElementById('subscribe-email');
+  const msg = document.getElementById('subscribe-msg');
+  const email = emailInput.value.trim();
+
+  emailInput.style.display = 'none';
+  msg.classList.add('success'); // just means "inline position" now
+
+  try {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/subscribers`, {
+      method: 'POST',
+      headers: {
+        'apikey': SUPABASE_ANON_KEY,
+        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+        'Content-Type': 'application/json',
+        'Prefer': 'return=minimal'
+      },
+      body: JSON.stringify({ email })
+    });
+
+    if (res.ok) {
+      msg.textContent = "thanks :)";
+    } else if (res.status === 409) {
+      msg.textContent = 'already subscribed';
+    } else {
+      msg.textContent = 'something went wrong';
+    }
+  } catch (err) {
+    msg.textContent = 'something went wrong';
+  }
+
+  scheduleSubscribeCollapse();
+});
+
+function scheduleSubscribeCollapse() {
+  const msg = document.getElementById('subscribe-msg');
+  subscribeCollapseTimer = setTimeout(() => {
+    msg.classList.add('collapsing');
+    setTimeout(() => {
+      notifyOpen = false;
+      notifyBox.classList.remove('open');
+      setTimeout(resetSubscribeForm, 350);
+    }, 400);
+  }, 2200);
+}
+
+function resetSubscribeForm() {
+  const emailInput = document.getElementById('subscribe-email');
+  const msg = document.getElementById('subscribe-msg');
+  emailInput.style.display = '';
+  emailInput.value = '';
+  msg.classList.remove('success', 'collapsing');
+  msg.textContent = '';
+}
 
 </script>
 </body>
