@@ -481,7 +481,7 @@ async function fetchGalleryImages() {
           return db - da;
         });
       }
-      if (key === 'trees' || key === 'cables') {
+      if (key === 'trees' || key === 'cables' || key === 'selfies') {
         byProject[key].sort((a, b) => {
           if (!a.taken_at && !b.taken_at) return 0;
           if (!a.taken_at) return 1;
