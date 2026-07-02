@@ -263,6 +263,7 @@
   #lightbox-meta {
     font-size: 13px; font-weight: 400; color: #000000;
     text-align: center; line-height: 1.75; font-family: sans-serif;
+    max-width: min(500px, 90vw);
   }
   #lightbox-meta a { color: inherit; text-decoration: none; }
   #lightbox-meta a:hover { font-weight: 700; }
@@ -380,8 +381,9 @@
   <div id="links-box">
     <div id="links-list">
       <a href="mailto:mollybakerragan@gmail.com"><img src="/images/links/mail.png" alt="mail"></a>
-      <a href="https://www.are.na/molly-ragan/channels" target="_blank" rel="noopener"><img src="/images/links/arena.png" alt="arena"></a>
       <a href="https://www.instagram.com/mollybakerragan/" target="_blank" rel="noopener"><img src="/images/links/instagram.png" alt="instagram"></a>
+      <a href="https://www.are.na/molly-ragan/channels" target="_blank" rel="noopener"><img src="/images/links/arena.png" alt="arena"></a>
+      <a href="https://soundcloud.com/mollybakerragan/" target="_blank" rel="noopener"><img src="/images/links/soundcloud.png" alt="soundcloud"></a>
     </div>
     <span id="links-toggle"><img src="/images/link.png" alt="links"></span>
   </div>
@@ -436,7 +438,7 @@ async function fetchWdysImages() {
 async function fetchGalleryImages() {
   try {
     const res = await fetch(
-      `${SUPABASE_URL}/rest/v1/images?select=project,url,sort_order,taken_at,location,lat,lng,plant,book,scanned,book_link,question_1,question_2&order=sort_order.desc`,
+      `${SUPABASE_URL}/rest/v1/images?select=project,url,sort_order,taken_at,location,lat,lng,plant,book,scanned,book_link,question_1,question_2,cable&order=sort_order.desc`,
       { headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` } }
     );
     const data = await res.json();
@@ -1160,7 +1162,7 @@ function openGalleryUI(key) {
     }
   }
 
-  const cols = { bioephemera: 3, headphones: 4, unsubscribe: 4, zines: 1, trees: 3, memes: 4, cables: 2, selfies: 4 }[key] ?? 3;  galleryGrid.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+  const cols = { bioephemera: 3, headphones: 4, unsubscribe: 4, zines: 1, trees: 3, memes: 4, cables: 3, selfies: 4 }[key] ?? 3;  galleryGrid.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
   galleryGrid.style.gridTemplateColumns = key === 'memes' ? '' : `repeat(${cols}, 1fr)`;
 
   galleryCloseBtn.style.display = 'block';
@@ -1306,7 +1308,8 @@ function formatMeta(imgData, key) {
   if (key === 'selfies' || key === 'unsubscribe' || key === 'headphones' || key === 'memes' || key === 'trees') {
     if (imgData.taken_at) {
       const d = new Date(imgData.taken_at);
-      lines.push(`${String(d.getMonth() + 1).padStart(2, '0')}/${String(d.getDate()).padStart(2, '0')}/${d.getFullYear()}`);
+      const monthNames = ['january','february','march','april','may','june','july','august','september','october','november','december'];
+      lines.push(`${monthNames[d.getMonth()]} ${d.getFullYear()}`);
     }
   if (key === 'headphones' && imgData.lat != null && imgData.lng != null) {
       lines.push(`(${parseFloat(imgData.lat).toFixed(4)}, ${parseFloat(imgData.lng).toFixed(4)})`);
@@ -1315,23 +1318,28 @@ function formatMeta(imgData, key) {
     if (imgData.question_1) lines.push(imgData.question_1);
     if (imgData.question_2) lines.push(imgData.question_2);
     if (imgData.scanned)    lines.push(imgData.scanned);
-  } else if (key === 'cables') {
-    if (imgData.plant) lines.push(img.Data.plant);
-    if (imgData.cable) lines.push(img.Data.cable);
+ } else if (key === 'cables') {
+    const parts = [];
+    if (imgData.cable) parts.push(imgData.cable);
+    if (imgData.plant) parts.push(`cut out of ${imgData.plant}`);
     if (imgData.taken_at) {
       const d = new Date(imgData.taken_at);
-      lines.push(`${String(d.getMonth() + 1).padStart(2, '0')}/${String(d.getDate()).padStart(2, '0')}/${d.getFullYear()}`);
+      const monthNames = ['january','february','march','april','may','june','july','august','september','october','november','december'];
+      parts.push(`in ${monthNames[d.getMonth()]} ${d.getFullYear()}`);
     }
+    if (parts.length) lines.push(parts.join(' '));
   } else if (key === 'bioephemera') {
-    if (imgData.plant) lines.push(imgData.plant);
+    const parts = [];
+    if (imgData.plant) parts.push(imgData.plant);
+    if (imgData.location) parts.push(`from ${imgData.location}`);
     if (imgData.book) {
       const bookHTML = imgData.book_link
         ? `<a href="${imgData.book_link}" target="_blank" rel="noopener"><em>${imgData.book}</em></a>`
         : `<em>${imgData.book}</em>`;
-      lines.push(bookHTML);
+      parts.push(`stashed in ${bookHTML}`);
     }
-    if (imgData.location) lines.push(imgData.location);
-    if (imgData.scanned)  lines.push(imgData.scanned);
+    if (imgData.scanned) parts.push(`in ${imgData.scanned}`);
+    if (parts.length) lines.push(parts.join(' '));
   }
   return lines.join('<br>');
 }

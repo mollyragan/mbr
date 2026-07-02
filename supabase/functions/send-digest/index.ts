@@ -16,7 +16,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 const RESEND_API_KEY   = Deno.env.get("RESEND_API_KEY")!;
 const SUPABASE_URL     = Deno.env.get("SUPABASE_URL")!;
 const SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-const FROM_ADDRESS      = "mollybakerragan@gmail.com"; // ← update once your domain is verified in Resend
+const FROM_ADDRESS      = "molly <hi@mollybakerragan.com>"; // ← update once your domain is verified in Resend
 const SITE_BASE_URL     = "https://mollybakerragan.com";   // ← update to your real domain
 
 const corsHeaders = {
@@ -73,7 +73,7 @@ const images = [...mainImages, ...externalImages];
     // admin panel's Preview button and the real send call this exact code.
     const PROJECT_TITLES: Record<string, string> = {
   zines: "zines ive made",
-  whatdoyousee: "whatdoyousee.nyc",
+  whatdoyousee: "what do you see?",
   unlearning: "unlearning library",
   bioephemera: "leaves n things ive stashed in my books",
   unsubscribe: "newsletters ive unsubscribed from",
@@ -99,62 +99,70 @@ function buildHtml(unsubscribeUrl: string) {
     [projectEntries[i], projectEntries[j]] = [projectEntries[j], projectEntries[i]];
   }
 
-  let html = `<div style="font-family:sans-serif;max-width:520px;margin:0 auto;color:#000;">`;
-  html += `<h2 style="font-weight:400;font-size:18px;">${subject}</h2>`;
+  let html = `<div style="font-family:sans-serif;width:100%;max-width:600px;margin:0 auto;color:#000;">`;
+  html += `<h2 style="font-weight:400;font-size:18px;text-align:center;">${subject}</h2>`;
   if (intro) html += `<p style="font-size:14px;line-height:1.6;">${intro}</p>`;
 
   for (const [project, projImages] of projectEntries) {
     const title = PROJECT_TITLES[project] || project;
-    const projectUrl = `${SITE_BASE_URL}/#${project}`;
 
-    html += `<h3 style="font-weight:600;font-size:15px;margin:32px 0 12px;">
-      <a href="${projectUrl}" style="color:#000;text-decoration:none;">${title}</a>
-    </h3>`;
+    html += `<h3 style="font-weight:600;font-size:15px;margin:32px 0 12px;text-align:center;color:#000;">${title}</h3>`;
 
     if (project === 'memes') {
       // True masonry via column round-robin: each column is its own <td>
       // stacked vertically, so varying image heights naturally produce a
       // masonry look without relying on CSS grid/columns (unsupported in
       // Outlook desktop and several other email clients).
-      const COLS = 3;
+      const MAX_COLS = 3;
+      const COLS = Math.min(MAX_COLS, projImages.length);
       const columns: any[][] = Array.from({ length: COLS }, () => []);
       projImages.forEach((img, idx) => columns[idx % COLS].push(img));
 
-      html += `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;">`;
+      const tablePercent = ((COLS / MAX_COLS) * 100).toFixed(2);
+      const colPercent = (100 / COLS).toFixed(2);
+
+      html += `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;"><tr><td align="center" style="padding:0;">`;
+      html += `<table role="presentation" width="${tablePercent}%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;max-width:100%;">`;
       html += `<tr>`;
       for (const col of columns) {
-        html += `<td width="${(100 / COLS).toFixed(2)}%" valign="top" style="padding:0;">`;
+        html += `<td width="${colPercent}%" valign="top" style="padding:0;">`;
         for (const img of col) {
-          html += `<img src="${img.url}" width="100%" style="display:block;width:100%;">`;
+          html += `<img src="${img.url}" width="100%" style="display:block;width:100%;height:auto;">`;
         }
         html += `</td>`;
       }
-      html += `</tr>`;
-      html += `</table>`;
+      html += `</tr></table>`;
+      html += `</td></tr></table>`;
     } else {
-      html += `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;">`;
-      for (let i = 0; i < projImages.length; i += 3) {
+      const MAX_COLS = 3;
+      for (let i = 0; i < projImages.length; i += MAX_COLS) {
+        const rowImages = projImages.slice(i, i + MAX_COLS);
+        const rowPercent = ((rowImages.length / MAX_COLS) * 100).toFixed(2);
+        const cellPercent = (100 / rowImages.length).toFixed(2);
+
+        // Outer full-width table centers the (possibly narrower) row table
+        // inside it via align="center" — this works even for percentage
+        // widths, unlike margin:auto on a fixed-px table.
+        html += `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;"><tr><td align="center" style="padding:0;">`;
+        html += `<table role="presentation" width="${rowPercent}%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;max-width:100%;">`;
         html += `<tr>`;
-        for (let j = i; j < i + 3; j++) {
-          const img = projImages[j];
-          html += `<td width="33.33%" valign="top" style="padding:0;">`;
-          if (img) {
-            html += `<img src="${img.url}" width="100%" style="display:block;width:100%;border-radius:0px;">`;
-            if (img.caption) {
-              const captionHtml = img.caption
-                .replace(/\\n/g, "<br>")
-                .replace(/\r?\n/g, "<br>");
-              html += `<p style="font-size:11px;text-align:center;opacity:0.7;margin:4px 0 8px;line-height:1.5;">${captionHtml}</p>`;
-            }
+        for (const img of rowImages) {
+          html += `<td width="${cellPercent}%" valign="top" style="padding:0;">`;
+          html += `<img src="${img.url}" width="100%" style="display:block;width:100%;height:auto;border-radius:0px;">`;
+          if (img.caption) {
+            const captionHtml = img.caption
+              .replace(/\\n/g, "<br>")
+              .replace(/\r?\n/g, "<br>");
+            html += `<p style="font-size:11px;text-align:center;opacity:0.7;margin:4px 5px 8px;line-height:1.5;">${captionHtml}</p>`;
           }
           html += `</td>`;
         }
-        html += `</tr>`;
+        html += `</tr></table>`;
+        html += `</td></tr></table>`;
       }
-      html += `</table>`;
     }
   }
-  html += `<p style="font-size:11px;opacity:0.5;margin-top:32px;text-align:center;">you subscribed to this at some point on <a href="${SITE_BASE_URL}" style="color:inherit;">mollybakerragan.com.</a> <a href="${unsubscribeUrl}" style="color:inherit;">unsubscribe here</a></p>`;
+  html += `<p style="font-size:11px;opacity:0.5;margin-top:32px;text-align:center;">you subscribed to this at some point on <a href="${SITE_BASE_URL}" style="color:inherit;">mollybakerragan.com.</a> <br><br> <a href="${unsubscribeUrl}" style="color:inherit;">unsubscribe here</a></p>`;
   html += `</div>`;
   return html;
 }

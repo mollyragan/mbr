@@ -476,6 +476,7 @@ body {
   <div id="pendingToolbar">
     <button id="selectAllBtn" type="button">select all</button>
     <button id="deselectAllBtn" type="button">deselect all</button>
+    <button id="regenerateCaptionsBtn" type="button" style="margin-top:8px;">regenerate captions</button>
   </div>
 
   <div id="pendingList"></div>
@@ -603,25 +604,86 @@ let pendingImages = [];
 // an auto-generated newsletter caption when no manual caption exists.
 function deriveCaption(img) {
   const project = img.project;
-  if (project !== 'zines' && project !== 'bioephemera' && project !== 'cables') return null;
-
-  const lines = [];
 
   if (project === 'zines') {
+    const lines = [];
     if (img.question_1) lines.push(img.question_1);
     if (img.question_2) lines.push(img.question_2);
     if (img.scanned) lines.push(img.scanned);
-  } else if (project === 'bioephemera') {
-    if (img.plant) lines.push(img.plant);
-    if (img.book) lines.push(img.book);
-    if (img.location) lines.push(img.location);
-    if (img.scanned) lines.push(img.scanned);
-  } else if (project === 'cables') {
-  if (img.plant) lines.push(img.plant);
-  if (img.cable) lines.push(img.cable);
+    return lines.length ? lines.join('\n') : null;
+  }
+
+  if (project === 'bioephemera') {
+    const parts = [];
+    if (img.plant) parts.push(img.plant);
+    if (img.location) parts.push(`from ${img.location}`);
+    if (img.book) parts.push(`stashed in ${img.book}`);
+    if (img.scanned) parts.push(`in ${img.scanned}`);
+    return parts.length ? parts.join(' ') : null;
+  }
+
+  if (project === 'cables') {
+    const parts = [];
+    if (img.cable) parts.push(img.cable);
+    if (img.plant) parts.push(`cut out of ${img.plant}`);
+    if (img.taken_at) {
+      const d = new Date(img.taken_at);
+      const monthNames = ['january','february','march','april','may','june','july','august','september','october','november','december'];
+      parts.push(`in ${monthNames[d.getMonth()]} ${d.getFullYear()}`);
+    }
+    return parts.length ? parts.join(' ') : null;
+  }
+
+  return null;
 }
-  return lines.length ? lines.join('\n') : null;
+
+async function regenerateAllCaptions() {
+  const projects = ['zines', 'bioephemera', 'cables'];
+
+  const { data, error } = await supabase
+    .from('images')
+    .select('*')
+    .in('project', projects);
+
+  if (error) { alert('Lookup failed: ' + error.message); return; }
+  if (!data || !data.length) { alert('No images found in zines/bioephemera/cables.'); return; }
+
+ const updates = [];
+  for (const img of data) {
+    const newCaption = deriveCaption(img);
+    if (img.project === 'bioephemera') {
+      console.log('bioephemera check:', {
+        id: img.id,
+        plant: img.plant,
+        book: img.book,
+        location: img.location,
+        scanned: img.scanned,
+        oldCaption: img.caption,
+        newCaption: newCaption,
+        willUpdate: newCaption !== img.caption,
+      });
+    }
+    if (newCaption !== img.caption) {
+      updates.push({ id: img.id, newCaption });
+    }
+  }
+
+  if (!updates.length) {
+    alert('Nothing to update — all captions already match their metadata.');
+    return;
+  }
+
+  if (!confirm(`Regenerate captions for ${updates.length} image(s) across zines/bioephemera/cables?`)) return;
+
+  await Promise.all(
+    updates.map(u => supabase.from('images').update({ caption: u.newCaption }).eq('id', u.id))
+  );
+
+  alert(`Updated ${updates.length} caption(s).`);
+  loadPendingImages();
 }
+
+document.getElementById('regenerateCaptionsBtn').addEventListener('click', regenerateAllCaptions);
 
 viewUploadBtn.addEventListener('click', () => switchView('upload'));
 viewNewsletterBtn.addEventListener('click', () => switchView('newsletter'));
