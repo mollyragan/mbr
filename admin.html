@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <meta charset="UTF-8">
   <title>admin — molly baker ragan</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
@@ -157,6 +158,26 @@ body {
 }
 #editFields input:focus { border-bottom-color: black; }
 #editFields input::placeholder { color: rgba(0,0,0,0.35); }
+#editFields textarea {
+  width: 100%; border: none; border-bottom: 1px solid rgba(0,0,0,0.2);
+  padding: 8px 0; font-size: 14px; font-family: inherit; outline: none;
+  background: transparent; resize: vertical; min-height: 84px; line-height: 1.5;
+}
+#editFields textarea:focus { border-bottom-color: black; }
+.caption-tools { display: flex; gap: 6px; align-items: center; }
+.caption-tools button {
+  border: none; background: #f0f0f0; border-radius: 4px; cursor: pointer;
+  font: inherit; font-size: 12px; padding: 4px 9px; min-width: 28px;
+}
+.caption-tools button:hover { background: #e4e4e4; }
+.caption-tools .hint-text { font-size: 11px; opacity: 0.45; margin-left: auto; }
+.caption-preview {
+  font-size: 13px; line-height: 1.75; text-align: center;
+  padding: 8px 0 0; min-height: 1.75em; border-top: 1px dashed rgba(0,0,0,0.12);
+}
+.caption-preview:empty::before { content: 'preview'; opacity: 0.3; }
+.caption-preview a { color: inherit; text-decoration: none; font-weight: 400; }
+.caption-preview a:hover { font-weight: 700; }
 #editActions { display: flex; gap: 10px; width: min(400px, 85vw); }
 #editSave {
   flex: 1; background: black; color: white; border: none;
@@ -390,6 +411,137 @@ body {
 .history-meta { font-size: 12px; opacity: 0.6; margin-top: 2px; }
 .history-intro { font-size: 13px; opacity: 0.8; margin-top: 6px; white-space: pre-wrap; }
 
+/* --- PROJECTS VIEW --- */
+#projectsView {
+  display: none; flex: 1; flex-direction: column;
+  padding: 16px; gap: 28px; min-height: 0; overflow-y: auto;
+}
+.muted { opacity: 0.5; font-size: 13px; }
+
+.project-row { border-bottom: 1px solid rgba(0,0,0,.08); }
+.project-row summary {
+  list-style: none; cursor: pointer;
+  display: flex; align-items: center; gap: 10px; padding: 10px 0;
+}
+.project-row summary::-webkit-details-marker { display: none; }
+.project-row.is-hidden .pr-name { opacity: 0.45; }
+
+.pr-order { display: flex; flex-direction: column; gap: 2px; flex-shrink: 0; }
+.pr-order button {
+  all: unset; font-size: 11px; line-height: 1; padding: 2px 5px;
+  cursor: pointer; opacity: 0.5;
+}
+.pr-order button:hover:not(:disabled) { opacity: 1; }
+.pr-order button:disabled { opacity: 0.12; cursor: default; }
+
+.pr-title { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.pr-name { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pr-key { font-size: 11px; opacity: 0.5; }
+
+.pr-visible {
+  border: none; background: #f0f0f0; color: rgba(0,0,0,0.6);
+  padding: 5px 12px; border-radius: 999px; font: inherit; font-size: 12px;
+  cursor: pointer; flex-shrink: 0; min-width: 64px;
+}
+.pr-visible.on { background: black; color: white; }
+
+.pr-body { display: flex; flex-direction: column; gap: 12px; padding: 4px 0 18px 30px; }
+
+.pr-body input[type="text"], .np-form input[type="text"],
+.pr-body select, .np-form select {
+  width: 100%; border: none; border-bottom: 1px solid rgba(0,0,0,0.2);
+  padding: 6px 0; font: inherit; font-size: 14px; background: transparent;
+  outline: none; border-radius: 0; color: black;
+}
+.pr-body input[type="text"]:focus, .np-form input[type="text"]:focus,
+.pr-body select:focus, .np-form select:focus { border-bottom-color: black; }
+.pr-body .field-label, .np-form .field-label { margin-bottom: 0; }
+
+.inline-row { display: flex; gap: 18px; flex-wrap: wrap; align-items: center; font-size: 13px; }
+.inline-row label { display: flex; align-items: center; gap: 6px; cursor: pointer; }
+.inline-row select { width: auto !important; }
+.hint { font-size: 11px; opacity: 0.45; margin-top: -6px; }
+
+.pr-delete {
+  align-self: flex-start; border: 1px solid rgba(0,0,0,0.2); background: none;
+  padding: 7px 12px; border-radius: 5px; font: inherit; font-size: 12px; cursor: pointer;
+  margin-top: 4px;
+}
+.pr-delete:hover { border-color: #c00; color: #c00; }
+
+/* --- TOOLS --- */
+#toolsArea { display: none; flex-direction: column; gap: 24px; }
+.soft {
+  border: none; background: #f0f0f0; padding: 6px 11px; border-radius: 5px;
+  font: inherit; font-size: 12px; cursor: pointer; color: black; white-space: nowrap;
+}
+.soft:hover { background: #e4e4e4; }
+.soft:disabled { opacity: 0.5; cursor: default; }
+.soft.dark { background: black; color: white; padding: 8px 16px; font-size: 13px; }
+.soft.dark:hover { background: #222; }
+.tools-add { display: flex; gap: 10px; align-items: center; }
+.tools-add input {
+  flex: 1; border: none; border-bottom: 1px solid rgba(0,0,0,0.2); padding: 8px 0;
+  font: inherit; font-size: 14px; outline: none; background: transparent;
+}
+.tools-add input:focus { border-bottom-color: black; }
+.tool-thumb {
+  width: 44px; height: 44px; flex-shrink: 0; border-radius: 3px;
+  background: #f0f0f0; overflow: hidden;
+}
+.tool-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.tool-body textarea {
+  width: 100%; border: none; border-bottom: 1px solid rgba(0,0,0,0.2);
+  padding: 8px 0; font: inherit; font-size: 14px; outline: none;
+  background: transparent; resize: vertical; min-height: 110px; line-height: 1.5;
+}
+.tool-body textarea:focus { border-bottom-color: black; }
+.desc-editor { display: flex; flex-direction: column; gap: 8px; }
+.desc-editor .caption-preview { text-align: left; }
+.tool-file { font-size: 13px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.tool-file a { color: black; word-break: break-all; }
+.tool-file-row input[type="text"] { flex: 1; min-width: 160px; }
+.tool-images {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 8px;
+}
+.tool-images > p { grid-column: 1 / -1; margin: 0; }
+.tool-img { position: relative; }
+.tool-img img, .tool-img .pdf-thumb {
+  width: 100%; aspect-ratio: 1; object-fit: cover; display: block; border-radius: 3px;
+}
+.tool-img .pdf-thumb {
+  background: #f0f0f0; font-size: 10px; color: #666; display: flex;
+  align-items: center; justify-content: center; text-align: center; padding: 4px;
+}
+.main-badge {
+  position: absolute; top: 4px; left: 4px; background: black; color: white;
+  font-size: 10px; padding: 1px 5px; border-radius: 3px;
+}
+.tool-img-ctrls {
+  position: absolute; top: 4px; right: 4px; display: flex; gap: 3px;
+}
+.tool-images:not(.loose) .tool-img-ctrls { top: auto; bottom: 4px; left: 4px; right: 4px; justify-content: space-between; }
+.tool-img-ctrls button {
+  border: none; background: rgba(0,0,0,0.6); color: white; font-size: 10px;
+  padding: 2px 5px; border-radius: 3px; cursor: pointer; font-family: inherit;
+}
+.tool-img-ctrls button:hover:not(:disabled) { background: black; }
+.tool-img-ctrls button[data-act="del"]:hover, .loose .tool-img-ctrls button:hover { background: #c00; }
+.tool-img-ctrls button:disabled { opacity: 0.25; cursor: default; }
+.tool-img select {
+  width: 100%; margin-top: 4px; font: inherit; font-size: 11px;
+  border: 1px solid rgba(0,0,0,0.15); border-radius: 3px; padding: 3px; background: white;
+}
+
+.np-form { display: flex; flex-direction: column; gap: 12px; }
+#npCreate {
+  background: black; color: white; border: none; padding: 12px;
+  font: inherit; font-size: 14px; border-radius: 6px; cursor: pointer; letter-spacing: 0.04em;
+}
+#npCreate:hover { background: #222; }
+#npCreate:disabled { background: #999; cursor: default; }
+#npStatus { font-size: 12px; opacity: 0.6; min-height: 1em; }
+
 </style>
 </head>
 <body>
@@ -410,6 +562,7 @@ body {
 
 <div id="viewToggle">
   <button id="viewUploadBtn" class="view-tab active">upload</button>
+  <button id="viewProjectsBtn" class="view-tab">projects</button>
   <button id="viewNewsletterBtn" class="view-tab">newsletter</button>
   <button id="viewHistoryBtn" class="view-tab">history</button>
 </div>
@@ -420,19 +573,10 @@ body {
     <span class="field-label">project</span>
     <select id="projectSelect">
       <option value="">— select a project —</option>
-      <option value="zines">zines</option>
-      <option value="whatdoyousee">what do you see?</option>
-      <option value="unlearning">unlearning library</option>
-      <option value="bioephemera">bioephemera</option>
-      <option value="unsubscribe">unsubscribe</option>
-      <option value="headphones">tangled headphones</option>
-      <option value="trees">trees</option>
-      <option value="memes">memes</option>
-      <option value="cables">cables</option>
-      <option value="selfies">selfies</option>
     </select>
   </div>
 
+  <div id="gridArea" style="display:contents;">
   <div>
     <span class="field-label">add images</span>
     <div id="dropZone">
@@ -458,7 +602,60 @@ body {
   </div>
 
     <button id="retroCropSelfiesBtn" style="margin-top:10px; display:none;">re-crop existing selfies to 3:4</button>
+  </div>
 
+  <!-- shown instead of the above for projects with the "tools" layout -->
+  <div id="toolsArea"></div>
+
+</div>
+
+<!-- PROJECTS -->
+<div id="projectsView">
+  <div>
+    <span class="field-label">projects — top to bottom is the order on the site. tap one for settings.</span>
+    <div id="projectsList"></div>
+  </div>
+
+  <div class="np-form">
+    <span class="field-label" style="opacity:1;font-weight:600;font-size:13px;">add a project</span>
+
+    <input type="text" id="npTitle" placeholder="title (what shows on the site)">
+    <input type="text" id="npKey" placeholder="key (used in links, e.g. street-trees)">
+    <div class="hint">lowercase letters, numbers, - and _ only. can't be changed later.</div>
+
+    <div class="inline-row">
+      <label><input type="radio" name="npType" value="gallery" checked> gallery</label>
+      <label><input type="radio" name="npType" value="link"> link to another site</label>
+    </div>
+    <input type="text" id="npLink" placeholder="https://…" style="display:none;">
+
+    <div class="inline-row">
+      <label>columns
+        <select id="npColumns">
+          <option>1</option><option>2</option><option selected>3</option>
+          <option>4</option><option>5</option><option>6</option>
+        </select>
+      </label>
+      <label><input type="checkbox" id="npShowDate"> show date under images</label>
+    </div>
+
+    <div class="inline-row">
+      <label>layout
+        <select id="npLayout">
+          <option value="grid">grid of images</option>
+          <option value="entries">tools (main image + title, each opens with a description &amp; file)</option>
+        </select>
+      </label>
+    </div>
+
+    <div class="inline-row">
+      <label><input type="checkbox" id="npVisible"> show on site right away</label>
+    </div>
+    <div class="hint">leave this off to upload images first, then flip it on above.</div>
+
+    <button id="npCreate" type="button">add project</button>
+    <div id="npStatus"></div>
+  </div>
 </div>
 
 <div id="newsletterView">
@@ -497,7 +694,7 @@ body {
     <iframe id="previewFrame"></iframe>
   </div>
 </div>
-  
+
 
 <!-- EDIT LIGHTBOX -->
 <div id="editLightbox">
@@ -531,6 +728,61 @@ const WDYS_URL      = 'https://fyogbaeayboxjhleaqoj.supabase.co';
 const WDYS_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ5b2diYWVheWJveGpobGVhcW9qIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjczOTMxNDcsImV4cCI6MjA4Mjk2OTE0N30.JGa6qT6IkcNCJRxV5FYDFUiH1QWSKHABJ_Qu7BNV5m8';
 const wdysClient = createClient(WDYS_URL, WDYS_ANON_KEY);
 
+// Projects with hand-built metadata fields in the edit lightbox
+const META_PROJECTS = ['bioephemera', 'zines', 'cables', 'essences'];
+// Your original projects — anything NOT in this list was added from the
+// projects tab and gets a simple "caption" field instead.
+const BUILTIN_PROJECTS = ['zines','whatdoyousee','unlearning','bioephemera','unsubscribe','headphones','trees','memes','cables','selfies','essences'];
+const isCustomProject = key => !!key && !BUILTIN_PROJECTS.includes(key);
+
+// Turns a caption into safe HTML: keeps line breaks, <b>/<strong>, <i>/<em>,
+// <u> and links (http, https, mailto); anything else is reduced to plain text.
+function renderCaption(raw) {
+  if (!raw) return '';
+  const tpl = document.createElement('template');
+  tpl.innerHTML = String(raw).replace(/\r\n?/g, '\n');
+  const KEEP = { B: 1, STRONG: 1, I: 1, EM: 1, U: 1, A: 1, BR: 1 };
+  const DROP = { SCRIPT: 1, STYLE: 1, IFRAME: 1, OBJECT: 1, EMBED: 1, TEMPLATE: 1 };
+  const clean = node => {
+    [...node.childNodes].forEach(child => {
+      if (child.nodeType === 3) {
+        const parts = child.textContent.split('\n');
+        if (parts.length > 1) {
+          const frag = document.createDocumentFragment();
+          parts.forEach((part, i) => {
+            if (i) frag.appendChild(document.createElement('br'));
+            frag.appendChild(document.createTextNode(part));
+          });
+          child.replaceWith(frag);
+        }
+        return;
+      }
+      if (child.nodeType !== 1 || DROP[child.tagName]) { child.remove(); return; }
+      clean(child);
+      if (!KEEP[child.tagName]) { child.replaceWith(...child.childNodes); return; }
+      let href = (child.getAttribute('href') || '').trim();
+      [...child.attributes].forEach(a => child.removeAttribute(a.name));
+      if (child.tagName === 'A') {
+        if (/^www\./i.test(href)) href = 'https://' + href;
+        if (/^(https?:|mailto:)/i.test(href)) {
+          child.setAttribute('href', href);
+          child.setAttribute('target', '_blank');
+          child.setAttribute('rel', 'noopener');
+        } else {
+          child.replaceWith(...child.childNodes);
+        }
+      }
+    });
+  };
+  clean(tpl.content);
+  const out = document.createElement('div');
+  out.appendChild(tpl.content);
+  return out.innerHTML;
+}
+
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c =>
+  ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
 let currentUser  = null;
 let currentFiles = [];
 let editingRow   = null;
@@ -551,6 +803,7 @@ function updateLoginButton() {
 loginBtn.onclick = async () => {
   if (currentUser) {
     await supabase.auth.signOut(); currentUser = null; updateLoginButton();
+    refreshProjects();
   } else {
     loginPanel.classList.toggle('expanded');
     if (loginPanel.classList.contains('expanded')) emailInput.focus();
@@ -570,6 +823,7 @@ async function login() {
     loginPanel.classList.remove('expanded');
     emailInput.value = ''; passwordInput.value = '';
     updateLoginButton();
+    refreshProjects();   // hidden projects are only readable once logged in
   }
 }
 
@@ -580,12 +834,20 @@ async function checkUser() {
   if (data.user && data.user.id === ADMIN_USER_ID) currentUser = data.user;
   updateLoginButton();
 }
-checkUser();
+
+function requireLogin() {
+  if (currentUser) return true;
+  alert('You must be logged in to do that.');
+  return false;
+}
 
 // ── VIEW TOGGLE ──
 const viewUploadBtn     = document.getElementById('viewUploadBtn');
+const viewProjectsBtn   = document.getElementById('viewProjectsBtn');
 const viewNewsletterBtn = document.getElementById('viewNewsletterBtn');
+const viewHistoryBtn    = document.getElementById('viewHistoryBtn');
 const uploadView        = document.getElementById('adminWrapper');
+const projectsView      = document.getElementById('projectsView');
 const newsletterView    = document.getElementById('newsletterView');
 const historyView       = document.getElementById('historyView');
 const historyList       = document.getElementById('historyList');
@@ -610,6 +872,14 @@ function deriveCaption(img) {
     if (img.question_1) lines.push(img.question_1);
     if (img.question_2) lines.push(img.question_2);
     if (img.scanned) lines.push(img.scanned);
+    return lines.length ? lines.join('\n') : null;
+  }
+
+  if (project === 'essences') {
+    const lines = [];
+    if (img.type) lines.push(img.type);
+    if (img.use) lines.push(img.use);
+    if (img.contents) lines.push(img.contents);
     return lines.length ? lines.join('\n') : null;
   }
 
@@ -638,7 +908,7 @@ function deriveCaption(img) {
 }
 
 async function regenerateAllCaptions() {
-  const projects = ['zines', 'bioephemera', 'cables'];
+  const projects = ['zines', 'bioephemera', 'cables', 'essences'];
 
   const { data, error } = await supabase
     .from('images')
@@ -646,23 +916,11 @@ async function regenerateAllCaptions() {
     .in('project', projects);
 
   if (error) { alert('Lookup failed: ' + error.message); return; }
-  if (!data || !data.length) { alert('No images found in zines/bioephemera/cables.'); return; }
+  if (!data || !data.length) { alert('No images found in zines/bioephemera/cables/essences.'); return; }
 
  const updates = [];
   for (const img of data) {
     const newCaption = deriveCaption(img);
-    if (img.project === 'bioephemera') {
-      console.log('bioephemera check:', {
-        id: img.id,
-        plant: img.plant,
-        book: img.book,
-        location: img.location,
-        scanned: img.scanned,
-        oldCaption: img.caption,
-        newCaption: newCaption,
-        willUpdate: newCaption !== img.caption,
-      });
-    }
     if (newCaption !== img.caption) {
       updates.push({ id: img.id, newCaption });
     }
@@ -673,7 +931,7 @@ async function regenerateAllCaptions() {
     return;
   }
 
-  if (!confirm(`Regenerate captions for ${updates.length} image(s) across zines/bioephemera/cables?`)) return;
+  if (!confirm(`Regenerate captions for ${updates.length} image(s) across zines/bioephemera/cables/essences?`)) return;
 
   await Promise.all(
     updates.map(u => supabase.from('images').update({ caption: u.newCaption }).eq('id', u.id))
@@ -686,16 +944,20 @@ async function regenerateAllCaptions() {
 document.getElementById('regenerateCaptionsBtn').addEventListener('click', regenerateAllCaptions);
 
 viewUploadBtn.addEventListener('click', () => switchView('upload'));
+viewProjectsBtn.addEventListener('click', () => switchView('projects'));
 viewNewsletterBtn.addEventListener('click', () => switchView('newsletter'));
 viewHistoryBtn.addEventListener('click', () => switchView('history'));
 
 function switchView(view) {
   uploadView.style.display     = view === 'upload'     ? '' : 'none';
+  projectsView.style.display   = view === 'projects'   ? 'flex' : 'none';
   newsletterView.style.display = view === 'newsletter' ? 'flex' : 'none';
   historyView.style.display    = view === 'history'    ? 'flex' : 'none';
   viewUploadBtn.classList.toggle('active', view === 'upload');
+  viewProjectsBtn.classList.toggle('active', view === 'projects');
   viewNewsletterBtn.classList.toggle('active', view === 'newsletter');
   viewHistoryBtn.classList.toggle('active', view === 'history');
+  if (view === 'projects') refreshProjects();
   if (view === 'newsletter') loadPendingImages();
   if (view === 'history') loadHistory();
 }
@@ -866,7 +1128,7 @@ async function loadPendingImages() {
     });
     await Promise.all(items.map(img => saveExclude(img.key, !selected)));
   }
-  
+
   async function setAllImages(selected) {
     document.querySelectorAll(".excludeBox").forEach(box => { box.checked = selected; });
     pendingImages.forEach(img => { img.digest_exclude = !selected; });
@@ -934,7 +1196,7 @@ async function loadPendingImages() {
       captionRow.className = "pending-caption-row";
       captionRow.dataset.key = img.key;
       captionRow.innerHTML = `
-        <input type="text" class="captionInput" data-key="${img.key}" placeholder="caption…" value="${img.caption || ""}">
+        <input type="text" class="captionInput" data-key="${img.key}" placeholder="caption…" value="${esc(img.caption || "")}">
       `;
 
       thumbWrap.addEventListener("click", async (e) => {
@@ -1129,25 +1391,397 @@ sendBtn.addEventListener('click', async () => {
   sendBtn.textContent = 'send newsletter';
 });
 
+// ── PROJECTS (settings tab) ──
+const projectsList = document.getElementById('projectsList');
+const npTitle      = document.getElementById('npTitle');
+const npKey        = document.getElementById('npKey');
+const npLink       = document.getElementById('npLink');
+const npColumns    = document.getElementById('npColumns');
+const npShowDate   = document.getElementById('npShowDate');
+const npVisible    = document.getElementById('npVisible');
+const npCreate     = document.getElementById('npCreate');
+const npStatus     = document.getElementById('npStatus');
+
+let allProjects = [];
+const openProjectKeys = new Set();
+let npKeyEdited = false;
+
+async function fetchAllProjects() {
+  const { data, error } = await supabase
+    .from('projects').select('*').order('sort_order', { ascending: true });
+  if (error) {
+    console.warn('Could not load projects:', error.message);
+    allProjects = [];
+    return false;
+  }
+  allProjects = data || [];
+  return true;
+}
+
+async function refreshProjects() {
+  const ok = await fetchAllProjects();
+  populateProjectSelect();
+  renderProjectsList(ok);
+}
+
+function populateProjectSelect() {
+  const current = projectSelect.value || localStorage.getItem('adminProject') || '';
+  projectSelect.innerHTML = '<option value="">— select a project —</option>' +
+    allProjects.map(p =>
+      `<option value="${esc(p.key)}">${esc(p.key)}${p.visible ? '' : ' (hidden)'}</option>`
+    ).join('');
+  const stillExists = allProjects.some(p => p.key === current);
+  projectSelect.value = stillExists ? current : '';
+  retroCropSelfiesBtn.style.display = projectSelect.value === 'selfies' ? 'block' : 'none';
+  if (!stillExists && current) {
+    showProjectArea('');
+  }
+}
+
+function renderProjectsList(loadedOk = true) {
+  projectsList.innerHTML = '';
+  if (!loadedOk) {
+    projectsList.innerHTML = '<p class="muted">couldn\'t load projects — has the projects table been created yet?</p>';
+    return;
+  }
+  if (!allProjects.length) {
+    projectsList.innerHTML = `<p class="muted">${currentUser ? 'no projects yet — add one below.' : 'log in to see and edit all projects.'}</p>`;
+    return;
+  }
+
+  allProjects.forEach((p, i) => {
+    const d = document.createElement('details');
+    d.className = 'project-row' + (p.visible ? '' : ' is-hidden');
+    if (openProjectKeys.has(p.key)) d.open = true;
+
+    d.innerHTML = `
+      <summary>
+        <span class="pr-order">
+          <button type="button" class="pr-up"   title="move up"   ${i === 0 ? 'disabled' : ''}>▲</button>
+          <button type="button" class="pr-down" title="move down" ${i === allProjects.length - 1 ? 'disabled' : ''}>▼</button>
+        </span>
+        <span class="pr-title">
+          <span class="pr-name">${esc(p.title)}</span>
+          <span class="pr-key">${esc(p.key)} · ${esc(p.type)}${p.layout === 'entries' ? ' · tools' : ''}</span>
+        </span>
+        <button type="button" class="pr-visible ${p.visible ? 'on' : ''}">${p.visible ? 'shown' : 'hidden'}</button>
+      </summary>
+      <div class="pr-body">
+        <span class="field-label">title</span>
+        <input type="text" class="pr-f-title" value="${esc(p.title)}">
+
+        <div class="inline-row">
+          <label><input type="radio" name="type-${esc(p.key)}" value="gallery" ${p.type === 'gallery' ? 'checked' : ''}> gallery</label>
+          <label><input type="radio" name="type-${esc(p.key)}" value="link" ${p.type === 'link' ? 'checked' : ''}> link to another site</label>
+        </div>
+        <input type="text" class="pr-f-link" placeholder="https://…" value="${esc(p.link || '')}" style="${p.type === 'link' ? '' : 'display:none;'}">
+
+        <div class="inline-row">
+          <label>columns
+            <select class="pr-f-columns">
+              ${[1,2,3,4,5,6].map(n => `<option ${n === p.columns ? 'selected' : ''}>${n}</option>`).join('')}
+            </select>
+          </label>
+          ${isCustomProject(p.key)
+            ? `<label><input type="checkbox" class="pr-f-showdate" ${p.show_date ? 'checked' : ''}> show date under images</label>`
+            : ''}
+        </div>
+
+        <div class="inline-row">
+          <label>layout
+            <select class="pr-f-layout">
+              <option value="grid" ${p.layout !== 'entries' ? 'selected' : ''}>grid of images</option>
+              <option value="entries" ${p.layout === 'entries' ? 'selected' : ''}>tools</option>
+            </select>
+          </label>
+          <label class="pr-labels-wrap" style="${p.layout === 'entries' ? '' : 'display:none;'}">
+            <input type="checkbox" class="pr-f-labels" ${p.show_labels !== false ? 'checked' : ''}> show class labels
+          </label>
+        </div>
+        <div class="hint">tools: the grid shows each tool's main image and title; clicking one opens its images, description and file. add tools on the upload tab.</div>
+
+        <button type="button" class="pr-delete">delete project…</button>
+      </div>
+    `;
+
+    d.addEventListener('toggle', () => {
+      d.open ? openProjectKeys.add(p.key) : openProjectKeys.delete(p.key);
+    });
+
+    // reorder
+    d.querySelector('.pr-up').addEventListener('click', e => {
+      e.preventDefault(); e.stopPropagation(); moveProject(i, -1);
+    });
+    d.querySelector('.pr-down').addEventListener('click', e => {
+      e.preventDefault(); e.stopPropagation(); moveProject(i, 1);
+    });
+
+    // show / hide
+    d.querySelector('.pr-visible').addEventListener('click', async e => {
+      e.preventDefault(); e.stopPropagation();
+      if (await updateProject(p.key, { visible: !p.visible })) {
+        populateProjectSelect();
+        renderProjectsList();
+      }
+    });
+
+    // title
+    const titleInput = d.querySelector('.pr-f-title');
+    titleInput.addEventListener('change', async () => {
+      const v = titleInput.value.trim();
+      if (!v) { titleInput.value = p.title; return; }
+      if (await updateProject(p.key, { title: v })) {
+        d.querySelector('.pr-name').textContent = v;
+      } else {
+        titleInput.value = p.title;
+      }
+    });
+
+    // type + link
+    const linkInput = d.querySelector('.pr-f-link');
+    d.querySelectorAll(`input[name="type-${CSS.escape(p.key)}"]`).forEach(radio => {
+      radio.addEventListener('change', async () => {
+        const type = radio.value;
+        if (await updateProject(p.key, { type })) {
+          linkInput.style.display = type === 'link' ? '' : 'none';
+          d.querySelector('.pr-key').textContent = `${p.key} · ${type}`;
+          if (type === 'link' && !p.link) linkInput.focus();
+        } else {
+          d.querySelector(`input[name="type-${CSS.escape(p.key)}"][value="${p.type}"]`).checked = true;
+        }
+      });
+    });
+    linkInput.addEventListener('change', async () => {
+      const v = linkInput.value.trim();
+      if (v && !/^https?:\/\//i.test(v)) {
+        alert('Links need to start with http:// or https://');
+        linkInput.value = p.link || '';
+        return;
+      }
+      if (!(await updateProject(p.key, { link: v || null }))) linkInput.value = p.link || '';
+    });
+
+    // columns
+    const colSelect = d.querySelector('.pr-f-columns');
+    colSelect.addEventListener('change', async () => {
+      if (!(await updateProject(p.key, { columns: parseInt(colSelect.value, 10) }))) colSelect.value = p.columns;
+    });
+
+    // show date (custom projects only)
+    const showDate = d.querySelector('.pr-f-showdate');
+    if (showDate) {
+      showDate.addEventListener('change', async () => {
+        if (!(await updateProject(p.key, { show_date: showDate.checked }))) showDate.checked = p.show_date;
+      });
+    }
+
+    // layout + class labels
+    const layoutSelect = d.querySelector('.pr-f-layout');
+    layoutSelect.addEventListener('change', async () => {
+      if (await updateProject(p.key, { layout: layoutSelect.value })) {
+        d.querySelector('.pr-labels-wrap').style.display = layoutSelect.value === 'entries' ? '' : 'none';
+        d.querySelector('.pr-key').textContent = `${p.key} · ${p.type}${p.layout === 'entries' ? ' · tools' : ''}`;
+        if (projectSelect.value === p.key) showProjectArea(p.key);
+      } else {
+        layoutSelect.value = p.layout === 'entries' ? 'entries' : 'grid';
+      }
+    });
+    const labelsBox = d.querySelector('.pr-f-labels');
+    labelsBox.addEventListener('change', async () => {
+      if (!(await updateProject(p.key, { show_labels: labelsBox.checked }))) labelsBox.checked = p.show_labels !== false;
+    });
+
+    // delete
+    d.querySelector('.pr-delete').addEventListener('click', () => deleteProject(p));
+
+    projectsList.appendChild(d);
+  });
+}
+
+async function updateProject(key, patch) {
+  if (!requireLogin()) return false;
+  const { data, error } = await supabase
+    .from('projects').update(patch).eq('key', key).select();
+  if (error || !data || !data.length) {
+    alert('Could not save: ' + (error ? error.message : 'not authorized'));
+    return false;
+  }
+  const p = allProjects.find(x => x.key === key);
+  if (p) Object.assign(p, data[0]);
+  return true;
+}
+
+async function moveProject(i, dir) {
+  if (!requireLogin()) return;
+  const j = i + dir;
+  if (j < 0 || j >= allProjects.length) return;
+  const arr = [...allProjects];
+  [arr[i], arr[j]] = [arr[j], arr[i]];
+  const changes = arr
+    .map((p, idx) => ({ p, idx }))
+    .filter(({ p, idx }) => p.sort_order !== idx);
+  const results = await Promise.all(changes.map(({ p, idx }) =>
+    supabase.from('projects').update({ sort_order: idx }).eq('key', p.key)
+  ));
+  const failed = results.find(r => r.error);
+  if (failed) alert('Could not reorder: ' + failed.error.message);
+  await refreshProjects();
+}
+
+async function listStorageFolder(prefix) {
+  const names = [];
+  let offset = 0;
+  while (true) {
+    const { data, error } = await supabase.storage
+      .from(STORAGE_BUCKET).list(prefix, { limit: 1000, offset });
+    if (error || !data || !data.length) break;
+    data.forEach(f => { if (f.id) names.push(`${prefix}/${f.name}`); }); // folders have no id
+    if (data.length < 1000) break;
+    offset += 1000;
+  }
+  return names;
+}
+
+async function deleteProject(p) {
+  if (!requireLogin()) return;
+
+  const { count } = await supabase
+    .from('images').select('id', { count: 'exact', head: true }).eq('project', p.key);
+  const n = count || 0;
+
+  const typed = prompt(
+    `This permanently deletes "${p.title}" along with its ${n} image${n === 1 ? '' : 's'} and their files. ` +
+    `It can't be undone.\n\n` +
+    `(If you just want it off the site, cancel and use the shown/hidden toggle instead.)\n\n` +
+    `Type the project key "${p.key}" to confirm:`
+  );
+  if (typed === null) return;
+  if (typed.trim() !== p.key) { alert("That didn't match — nothing was deleted."); return; }
+
+  const btn = projectsList.querySelector('.pr-delete:focus') || null;
+  if (btn) { btn.disabled = true; btn.textContent = 'deleting…'; }
+
+  // 1. storage files (edited + originals, plus any paths stored on rows)
+  const paths = new Set();
+  const { data: rows } = await supabase
+    .from('images').select('storage_path').eq('project', p.key);
+  (rows || []).forEach(r => { if (r.storage_path) paths.add(r.storage_path); });
+  for (const folder of ['edit', 'originals', 'files']) {
+    (await listStorageFolder(`${p.key}/${folder}`)).forEach(path => paths.add(path));
+  }
+  const all = [...paths];
+  for (let k = 0; k < all.length; k += 100) {
+    const { error } = await supabase.storage.from(STORAGE_BUCKET).remove(all.slice(k, k + 100));
+    if (error) console.warn('Some files could not be removed:', error.message);
+  }
+
+  // 2. image rows
+  const { error: imgErr } = await supabase.from('images').delete().eq('project', p.key);
+  if (imgErr) {
+    alert('Deleted files, but could not delete image rows: ' + imgErr.message + '\nThe project was kept.');
+    await refreshProjects();
+    return;
+  }
+
+  // 3. the project itself
+  const { error: projErr } = await supabase.from('projects').delete().eq('key', p.key);
+  if (projErr) {
+    alert('Images were deleted, but the project row could not be: ' + projErr.message);
+  }
+
+  if (localStorage.getItem('adminProject') === p.key) localStorage.removeItem('adminProject');
+  openProjectKeys.delete(p.key);
+  await refreshProjects();
+}
+
+// ── NEW PROJECT FORM ──
+function slugify(s) {
+  return s.toLowerCase()
+    .normalize('NFKD').replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 40);
+}
+
+npTitle.addEventListener('input', () => {
+  if (!npKeyEdited) npKey.value = slugify(npTitle.value);
+});
+npKey.addEventListener('input', () => {
+  npKeyEdited = npKey.value.trim() !== '';
+});
+document.querySelectorAll('input[name="npType"]').forEach(r => {
+  r.addEventListener('change', () => {
+    const isLink = document.querySelector('input[name="npType"]:checked').value === 'link';
+    npLink.style.display = isLink ? '' : 'none';
+  });
+});
+
+npCreate.addEventListener('click', async () => {
+  if (!requireLogin()) return;
+
+  const title = npTitle.value.trim();
+  const key   = npKey.value.trim().toLowerCase();
+  const type  = document.querySelector('input[name="npType"]:checked').value;
+  const link  = npLink.value.trim();
+
+  if (!title) return alert('Give the project a title.');
+  if (!/^[a-z0-9][a-z0-9_-]*$/.test(key)) return alert('The key can only use lowercase letters, numbers, - and _ (and has to start with a letter or number).');
+  if (allProjects.some(p => p.key === key)) return alert(`There's already a project with the key "${key}".`);
+  if (type === 'link' && !/^https?:\/\//i.test(link)) return alert('Link projects need a URL starting with http:// or https://');
+
+  const sort_order = allProjects.reduce((m, p) => Math.max(m, p.sort_order), -1) + 1;
+
+  npCreate.disabled = true;
+  npStatus.textContent = 'adding…';
+
+  const { error } = await supabase.from('projects').insert([{
+    key, title, type,
+    link: type === 'link' ? link : null,
+    columns: parseInt(npColumns.value, 10),
+    show_date: npShowDate.checked,
+    ...(document.getElementById('npLayout').value === 'entries' ? { layout: 'entries' } : {}),
+    visible: npVisible.checked,
+    sort_order,
+  }]);
+
+  npCreate.disabled = false;
+
+  if (error) {
+    npStatus.textContent = '';
+    alert('Could not add project: ' + error.message);
+    return;
+  }
+
+  npStatus.textContent = npVisible.checked
+    ? `added "${title}" — it's live. upload images from the upload tab.`
+    : `added "${title}" (hidden). upload images from the upload tab, then flip it to shown.`;
+  npTitle.value = ''; npKey.value = ''; npLink.value = '';
+  npKeyEdited = false;
+  npShowDate.checked = false; npVisible.checked = false;
+  npColumns.value = '3';
+  document.getElementById('npLayout').value = 'grid';
+  document.querySelector('input[name="npType"][value="gallery"]').checked = true;
+  npLink.style.display = 'none';
+
+  localStorage.setItem('adminProject', key);
+  projectSelect.value = '';
+  await refreshProjects();
+  projectSelect.value = key;
+  showProjectArea(key);
+});
+
 // ── PROJECT SELECT ──
 const projectSelect   = document.getElementById('projectSelect');
 const existingSection = document.getElementById('existingSection');
 const existingLabel   = document.getElementById('existingLabel');
 const existingGrid    = document.getElementById('existingGrid');
+const retroCropSelfiesBtn = document.getElementById('retroCropSelfiesBtn');
 retroCropSelfiesBtn.addEventListener('click', retroCropExistingSelfies);
-
-// restore last selected project
-const savedProject = localStorage.getItem('adminProject');
-if (savedProject) {
-  projectSelect.value = savedProject;
-  loadExistingImages(savedProject);
-}
-retroCropSelfiesBtn.style.display = projectSelect.value === 'selfies' ? 'block' : 'none'; // ADD THIS
 
 projectSelect.addEventListener('change', () => {
   localStorage.setItem('adminProject', projectSelect.value);
-  loadExistingImages(projectSelect.value);
-  retroCropSelfiesBtn.style.display = projectSelect.value === 'selfies' ? 'block' : 'none'; // ADD THIS LINE
+  showProjectArea(projectSelect.value);
+  retroCropSelfiesBtn.style.display = projectSelect.value === 'selfies' ? 'block' : 'none';
 });
 
 async function loadExistingImages(project) {
@@ -1161,34 +1795,37 @@ async function loadExistingImages(project) {
 
   existingSection.classList.add('visible');
 
-  // label hint for bioephemera
-  existingLabel.textContent = (project === 'bioephemera' || project === 'zines' || project === 'cables')
-  ? 'current images — click to edit metadata'
-  : 'current images';
+  const editable = META_PROJECTS.includes(project) || isCustomProject(project);
+
+  existingLabel.textContent = editable
+    ? (isCustomProject(project) ? 'current images — click to add a caption' : 'current images — click to edit metadata')
+    : 'current images';
 
   data.forEach((img, i) => {
     const wrap = document.createElement('div');
     wrap.className = 'existing-img-wrap';
 
-const hasMeta = (project === 'bioephemera' && (img.plant || img.book || img.scanned || img.location || img.book_link)) ||
-                (project === 'zines' && (img.question_1 || img.question_2 || img.scanned)) ||
-                (project === 'cables' && (img.plant || img.cable));
+    const hasMeta = (project === 'bioephemera' && (img.plant || img.book || img.scanned || img.location || img.book_link)) ||
+                    (project === 'zines' && (img.question_1 || img.question_2 || img.scanned)) ||
+                    (project === 'cables' && (img.plant || img.cable)) ||
+                    (project === 'essences' && (img.type || img.use || img.contents)) ||
+                    (isCustomProject(project) && !!img.caption);
 
-  const isPdf = img.url.endsWith('.pdf');
-  wrap.innerHTML = `
-  ${isPdf
-    ? `<div style="width:100%;aspect-ratio:1;background:#f0f0f0;display:flex;align-items:center;justify-content:center;font-size:10px;color:#666;text-align:center;padding:4px;border-radius:3px;">${img.filename || 'PDF'}</div>`
-    : `<img src="${img.url}" loading="lazy">`
-  }
-  <span class="order-badge">${i + 1}</span>
-  <button class="del-btn" data-id="${img.id}" data-path="${img.storage_path}">✕</button>
-  ${(project === 'bioephemera' || project === 'cables') ? `<span class="meta-dot${hasMeta ? ' filled' : ''}"></span>` : ''}
-`;
-   // collect all rows for this project so lightbox can navigate
-    const allRows = data;  // already fetched above
+    const showDot = project === 'bioephemera' || project === 'cables' || isCustomProject(project);
 
-    if (project === 'bioephemera' || project === 'zines' || project === 'cables') {
-      wrap.querySelector('img').addEventListener('click', () => openEditLightbox(allRows, i));
+    const isPdf = img.url.endsWith('.pdf');
+    wrap.innerHTML = `
+    ${isPdf
+      ? `<div style="width:100%;aspect-ratio:1;background:#f0f0f0;display:flex;align-items:center;justify-content:center;font-size:10px;color:#666;text-align:center;padding:4px;border-radius:3px;">${esc(img.filename || 'PDF')}</div>`
+      : `<img src="${img.url}" loading="lazy">`
+    }
+    <span class="order-badge">${i + 1}</span>
+    <button class="del-btn" data-id="${img.id}" data-path="${img.storage_path}">✕</button>
+    ${showDot ? `<span class="meta-dot${hasMeta ? ' filled' : ''}"></span>` : ''}
+  `;
+
+    if (editable) {
+      wrap.addEventListener('click', () => openEditLightbox(data, i));
     }
 
     wrap.querySelector('.del-btn').addEventListener('click', async e => {
@@ -1225,37 +1862,99 @@ function openEditLightbox(rows, index) {
 function loadEditRow() {
   const row = editRows[editIndex];
   editingRow = row;
-  editImg.src = row.url;
+  editImg.src = row.url.endsWith('.pdf') ? '' : row.url;
 
   const project = projectSelect.value;
 
   if (project === 'zines') {
     editFields.innerHTML = `
-      <input id="editQuestion_1" type="text" placeholder="question 1" value="${row.question_1 || ''}">
-      <input id="editQuestion_2" type="text" placeholder="question 2" value="${row.question_2 || ''}">
-      <input id="editScanned" type="text" placeholder="scanned" value="${row.scanned || ''}">
+      <input id="editQuestion_1" type="text" placeholder="question 1" value="${esc(row.question_1 || '')}">
+      <input id="editQuestion_2" type="text" placeholder="question 2" value="${esc(row.question_2 || '')}">
+      <input id="editScanned" type="text" placeholder="scanned" value="${esc(row.scanned || '')}">
     `;
     document.getElementById('editQuestion_1').focus();
   } else if (project === 'bioephemera') {
     editFields.innerHTML = `
-      <input id="editPlant" type="text" placeholder="plant" value="${row.plant || ''}">
-      <input id="editBook" type="text" placeholder="book" value="${row.book || ''}">
-      <input id="editScanned" type="text" placeholder="scanned" value="${row.scanned || ''}">
-      <input id="editLocation" type="text" placeholder="location" value="${row.location || ''}">
-      <input id="editBook_link" type="text" placeholder="book_link" value="${row.book_link || ''}">
+      <input id="editPlant" type="text" placeholder="plant" value="${esc(row.plant || '')}">
+      <input id="editBook" type="text" placeholder="book" value="${esc(row.book || '')}">
+      <input id="editScanned" type="text" placeholder="scanned" value="${esc(row.scanned || '')}">
+      <input id="editLocation" type="text" placeholder="location" value="${esc(row.location || '')}">
+      <input id="editBook_link" type="text" placeholder="book_link" value="${esc(row.book_link || '')}">
     `;
     document.getElementById('editPlant').focus();
   } else if (project === 'cables') {
     editFields.innerHTML = `
-    <input id="editPlant" type="text" placeholder="plant" value="${row.plant || ''}">
-    <input id="editCable" type="text" placeholder="cable" value="${row.cable || ''}">
+    <input id="editPlant" type="text" placeholder="plant" value="${esc(row.plant || '')}">
+    <input id="editCable" type="text" placeholder="cable" value="${esc(row.cable || '')}">
   `;
   document.getElementById('editPlant').focus();
+  } else if (project === 'essences') {
+    editFields.innerHTML = `
+    <input id="editType" type="text" placeholder="type" value="${esc(row.type || '')}">
+    <input id="editUse" type="text" placeholder="use" value="${esc(row.use || '')}">
+    <input id="editContents" type="text" placeholder="contents" value="${esc(row.contents || '')}">
+  `;
+  document.getElementById('editType').focus();
+  } else if (isCustomProject(project)) {
+    editFields.innerHTML = `
+    <div class="caption-tools">
+      <button type="button" data-wrap="b" title="bold (⌘/Ctrl+B)"><b>B</b></button>
+      <button type="button" data-wrap="i" title="italic (⌘/Ctrl+I)"><i>I</i></button>
+      <button type="button" data-link title="link (⌘/Ctrl+K)">link</button>
+      <span class="hint-text">return = new line</span>
+    </div>
+    <textarea id="editCaption" placeholder="caption (shows under the image on the site)">${esc(row.caption || '')}</textarea>
+    <div class="caption-preview" id="captionPreview"></div>
+  `;
+  initCaptionEditor(editFields);
+  document.getElementById('editCaption').focus();
   }
-
-  editFields.querySelectorAll('input').forEach(input => {
+  editFields.querySelectorAll('input, textarea').forEach(input => {
     input.addEventListener('blur', () => saveCurrentRow());
   });
+}
+
+// B / I / link buttons and live preview for the caption box
+function initCaptionEditor(root) {
+  const box     = root.querySelector('textarea');
+  const preview = root.querySelector('.caption-preview');
+  const refresh = () => { preview.innerHTML = renderCaption(box.value); };
+
+  const wrap = (open, close) => {
+    const { selectionStart: a, selectionEnd: b, value } = box;
+    const picked = value.slice(a, b);
+    box.setRangeText(open + picked + close, a, b, 'end');
+    if (!picked) box.setSelectionRange(a + open.length, a + open.length);
+    box.focus();
+    refresh();
+  };
+  const addLink = () => {
+    let url = prompt('Link to (https://…):', 'https://');
+    if (!url || url === 'https://') return;
+    url = url.trim().replace(/"/g, '%22');
+    const { selectionStart: a, selectionEnd: b, value } = box;
+    const text = value.slice(a, b) || url.replace(/^https?:\/\//, '');
+    box.setRangeText(`<a href="${url}">${text}</a>`, a, b, 'end');
+    box.focus();
+    refresh();
+  };
+
+  root.querySelectorAll('.caption-tools button').forEach(btn => {
+    btn.addEventListener('mousedown', e => e.preventDefault()); // keep the text selected
+    btn.addEventListener('click', () => {
+      if (btn.dataset.wrap) wrap(`<${btn.dataset.wrap}>`, `</${btn.dataset.wrap}>`);
+      else addLink();
+    });
+  });
+  box.addEventListener('input', refresh);
+  box.addEventListener('keydown', e => {
+    if (!(e.metaKey || e.ctrlKey)) return;
+    const k = e.key.toLowerCase();
+    if (k === 'b') { e.preventDefault(); wrap('<b>', '</b>'); }
+    if (k === 'i') { e.preventDefault(); wrap('<i>', '</i>'); }
+    if (k === 'k') { e.preventDefault(); addLink(); }
+  });
+  refresh();
 }
 
 function closeEditLightbox() {
@@ -1282,7 +1981,13 @@ async function saveCurrentRow() {
       plant: document.getElementById('editPlant')?.value.trim() || null,
       cable: document.getElementById('editCable')?.value.trim() || null,
     };
-  } else {
+  } else if (project === 'essences') {
+    updates = {
+      type:     document.getElementById('editType')?.value.trim() || null,
+      use:      document.getElementById('editUse')?.value.trim() || null,
+      contents: document.getElementById('editContents')?.value.trim() || null,
+  };
+  } else if (project === 'bioephemera') {
     updates = {
       plant:     document.getElementById('editPlant')?.value.trim() || null,
       book:      document.getElementById('editBook')?.value.trim() || null,
@@ -1290,7 +1995,13 @@ async function saveCurrentRow() {
       location:  document.getElementById('editLocation')?.value.trim() || null,
       book_link: document.getElementById('editBook_link')?.value.trim() || null,
     };
+  } else if (isCustomProject(project)) {
+    updates = {
+      caption: document.getElementById('editCaption')?.value.trim() || null,
+    };
   }
+
+  if (!Object.keys(updates).length) return true;
 
   const { error } = await supabase.from('images').update(updates).eq('id', editingRow.id);
   if (error) { console.warn('Auto-save failed:', error.message); return false; }
@@ -1322,6 +2033,7 @@ document.addEventListener('keydown', e => {
   if (!editLightbox.classList.contains('visible')) return;
   if (e.key === 'Escape') closeEditLightbox();
   if (e.key === 'Enter' && e.target.tagName === 'INPUT') editSave.click();
+  if (e.target.tagName === 'TEXTAREA') return; // arrows move the cursor in the caption box
   if (e.key === 'ArrowLeft')  document.getElementById('editPrev').click();
   if (e.key === 'ArrowRight') document.getElementById('editNext').click();
 });
@@ -1339,7 +2051,8 @@ dropZone.addEventListener('click', () => fileInput.click());
 fileInput.addEventListener('change', () => handleFiles(fileInput.files));
 
 function handleFiles(files) {
-  currentFiles = Array.from(files).filter(f => f.type.startsWith('image/') || f.type === 'application/pdf');  if (!currentFiles.length) return;
+  currentFiles = Array.from(files).filter(f => f.type.startsWith('image/') || f.type === 'application/pdf');
+  if (!currentFiles.length) return;
   previewGrid.innerHTML = '';
   dropZoneText.style.display = 'none';
   currentFiles.forEach(file => {
@@ -1357,6 +2070,49 @@ function handleFiles(files) {
 }
 
 // ── IMAGE PROCESSING ──
+// GIFs keep their animation: they skip resizing, and are set to loop forever.
+// (Whether a GIF repeats is stored inside the file; this rewrites that one
+// setting — or adds it if missing — and leaves every frame untouched.)
+const isGifFile = f => f.type === 'image/gif' || /\.gif$/i.test(f.name);
+
+async function makeGifLoopForever(file) {
+  const bytes = new Uint8Array(await file.arrayBuffer());
+  const sig = String.fromCharCode(...bytes.slice(0, 6));
+  if (sig !== 'GIF89a' && sig !== 'GIF87a') return file;   // not a real GIF; leave it alone
+
+  const packed = bytes[10];
+  const start  = 13 + ((packed & 0x80) ? 3 * (1 << ((packed & 7) + 1)) : 0);
+
+  // look for an existing loop setting before the first frame
+  let pos = start;
+  while (pos < bytes.length && bytes[pos] === 0x21) {
+    const label = bytes[pos + 1];
+    if (label === 0xFF && bytes[pos + 2] === 11) {
+      const app = String.fromCharCode(...bytes.slice(pos + 3, pos + 14));
+      if ((app === 'NETSCAPE2.0' || app === 'ANIMEXTS1.0') && bytes[pos + 14] === 3 && bytes[pos + 15] === 1) {
+        const out = bytes.slice();
+        out[pos + 16] = 0; out[pos + 17] = 0;                 // 0 = loop forever
+        return new Blob([out], { type: 'image/gif' });
+      }
+    }
+    pos += 2;                                               // skip this extension's data blocks
+    while (pos < bytes.length && bytes[pos] !== 0) pos += bytes[pos] + 1;
+    pos += 1;
+  }
+
+  // none found: add one right after the header
+  const loopBlock = new Uint8Array([
+    0x21, 0xFF, 0x0B, ...[...'NETSCAPE2.0'].map(c => c.charCodeAt(0)),
+    0x03, 0x01, 0x00, 0x00, 0x00,
+  ]);
+  const out = new Uint8Array(bytes.length + loopBlock.length);
+  out.set(bytes.slice(0, start), 0);
+  out.set(loopBlock, start);
+  out.set(bytes.slice(start), start + loopBlock.length);
+  out.set([0x47, 0x49, 0x46, 0x38, 0x39, 0x61], 0);          // "GIF89a" (needed for animation)
+  return new Blob([out], { type: 'image/gif' });
+}
+
 function resizeImage(file, maxW, quality) {
   return new Promise(resolve => {
     const img = new Image(), url = URL.createObjectURL(file);
@@ -1416,7 +2172,7 @@ async function retroCropExistingSelfies() {
 
   if (error) { alert('Lookup failed: ' + error.message); return; }
 
-  const targets = (data || []).filter(img => !img.url.endsWith('.pdf'));
+  const targets = (data || []).filter(img => !img.url.endsWith('.pdf') && !/\.gif(\?|$)/i.test(img.url));
   if (!targets.length) { alert('No selfies found.'); return; }
 
   if (!confirm(`Re-crop ${targets.length} existing selfie(s) to 3:4? This overwrites the stored images (originals are untouched).`)) return;
@@ -1468,6 +2224,455 @@ function setProgress(done, total) {
   progressLabel.innerText = `${done} / ${total} uploaded`;
 }
 
+// Upload one image (original + resized copy) and add its row to `images`.
+// `extra` adds fields to the row, e.g. sort_order or entry_id.
+async function uploadImage(file, project, extra = {}) {
+  const ext      = file.name.split('.').pop() || 'jpg';
+  const baseName = file.name.replace(/\.[^.]+$/, '');
+  const ts       = Date.now();
+  const origPath   = `${project}/originals/${baseName}_${ts}.${ext}`;
+
+  const { error: origErr } = await supabase.storage.from(STORAGE_BUCKET).upload(origPath, file, { contentType: file.type });
+  if (origErr) throw origErr;
+
+  let masterPath, blob;
+  if (file.type === 'application/pdf') {
+    masterPath = `${project}/edit/${baseName}_${ts}.pdf`;
+    blob = file;
+  } else if (isGifFile(file)) {
+    masterPath = `${project}/edit/${baseName}_${ts}.gif`;
+    blob = await makeGifLoopForever(file);
+  } else if (project === 'zines') {
+    masterPath = `${project}/edit/${baseName}_${ts}.jpg`;
+    blob = await resizeImage(file, file.naturalWidth || 99999, JPEG_QUALITY);
+  } else if (project === 'selfies') {
+    masterPath = `${project}/edit/${baseName}_${ts}.jpg`;
+    blob = await cropAndResizeImage(file, IMAGE_MAX_W, JPEG_QUALITY, 3 / 4);
+  } else {
+    masterPath = `${project}/edit/${baseName}_${ts}.jpg`;
+    blob = await resizeImage(file, IMAGE_MAX_W, JPEG_QUALITY);
+  }
+  const { error: uploadErr } = await supabase.storage.from(STORAGE_BUCKET).upload(masterPath, blob, { contentType: blob.type || file.type });
+  if (uploadErr) throw uploadErr;
+
+  const { data: urlData } = supabase.storage.from(STORAGE_BUCKET).getPublicUrl(masterPath);
+
+  let takenAt = null, lat = null, lng = null;
+  try {
+    const exif = await exifr.parse(file, { tiff: true, gps: true });
+    if (exif?.DateTimeOriginal) takenAt = exif.DateTimeOriginal.toISOString();
+    if (exif?.latitude)  lat = exif.latitude;
+    if (exif?.longitude) lng = exif.longitude;
+  } catch (exifErr) { console.warn('EXIF read failed:', exifErr); }
+  if (!takenAt && file.lastModified) takenAt = new Date(file.lastModified).toISOString();
+
+  const { data, error: dbErr } = await supabase.from('images').insert([{
+    project, filename: file.name, url: urlData.publicUrl,
+    storage_path: masterPath, taken_at: takenAt, lat, lng,
+    ...extra,
+  }]).select().single();
+  if (dbErr) throw dbErr;
+  return data;
+}
+
+// ── TOOLS (projects using the "tools" layout) ──
+// Each tool is a row in `entries`; its images are rows in `images` with
+// entry_id set. Images are shown in sort_order (low → high); the first is the
+// tool's main image, used on the home page and in the grid.
+const gridArea  = document.getElementById('gridArea');
+const toolsArea = document.getElementById('toolsArea');
+let toolsProject = null, toolsEntries = [], toolsImages = [];
+const openToolIds = new Set();
+
+function projectLayout(key) {
+  const p = allProjects.find(x => x.key === key);
+  return p && p.layout === 'entries' ? 'entries' : 'grid';
+}
+
+function showProjectArea(project) {
+  const tools = !!project && projectLayout(project) === 'entries';
+  gridArea.style.display  = tools ? 'none' : 'contents';
+  toolsArea.style.display = tools ? 'flex' : 'none';
+  if (tools) {
+    loadTools(project);
+  } else {
+    toolsProject = null;
+    loadExistingImages(project);
+  }
+}
+
+async function loadTools(project) {
+  toolsProject = project;
+  toolsArea.innerHTML = '<p class="muted">loading…</p>';
+  const [ent, img] = await Promise.all([
+    supabase.from('entries').select('*').eq('project', project).order('sort_order', { ascending: true }),
+    supabase.from('images').select('*').eq('project', project).order('sort_order', { ascending: true }),
+  ]);
+  if (toolsProject !== project) return;
+  if (ent.error) {
+    toolsArea.innerHTML = `<p class="muted">couldn't load tools. has tools.sql been run in Supabase? (${esc(ent.error.message)})</p>`;
+    return;
+  }
+  toolsEntries = ent.data || [];
+  toolsImages  = img.data || [];
+  renderTools();
+}
+
+const toolImagesOf = id => toolsImages
+  .filter(i => i.entry_id === id)
+  .sort((a, b) => a.sort_order - b.sort_order);
+
+async function updateEntry(id, patch) {
+  if (!requireLogin()) return false;
+  const { data, error } = await supabase.from('entries').update(patch).eq('id', id).select();
+  if (error || !data || !data.length) {
+    alert('Could not save: ' + (error ? error.message : 'not authorized'));
+    return false;
+  }
+  Object.assign(toolsEntries.find(e => e.id === id), data[0]);
+  return true;
+}
+
+function renderTools() {
+  const labels = [...new Set(toolsEntries.map(e => e.label).filter(Boolean))];
+  toolsArea.innerHTML = `
+    <div>
+      <span class="field-label">add a tool</span>
+      <div class="tools-add">
+        <input type="text" id="newToolTitle" placeholder="title, e.g. intro zine template">
+        <button type="button" id="newToolBtn" class="soft dark">add</button>
+      </div>
+    </div>
+    <div>
+      <span class="field-label">tools. top to bottom is the order on the site. tap one to edit it.</span>
+      <div id="toolsList">${toolsEntries.length ? '' : '<p class="muted">no tools yet.</p>'}</div>
+      <datalist id="toolLabels">${labels.map(l => `<option value="${esc(l)}">`).join('')}</datalist>
+    </div>
+    <div id="unassignedWrap"></div>
+  `;
+
+  const titleInput = document.getElementById('newToolTitle');
+  const addTool = async () => {
+    if (!requireLogin()) return;
+    const title = titleInput.value.trim();
+    if (!title) { titleInput.focus(); return; }
+    const sort_order = toolsEntries.reduce((m, e) => Math.max(m, e.sort_order), -1) + 1;
+    const { data, error } = await supabase.from('entries')
+      .insert([{ project: toolsProject, title, sort_order, visible: false }]).select().single();
+    if (error) return alert('Could not add tool: ' + error.message);
+    toolsEntries.push(data);
+    openToolIds.add(data.id);
+    renderTools();
+  };
+  document.getElementById('newToolBtn').addEventListener('click', addTool);
+  titleInput.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); addTool(); } });
+
+  const list = document.getElementById('toolsList');
+  toolsEntries.forEach((e, i) => list.appendChild(renderToolCard(e, i)));
+  renderUnassigned();
+}
+
+function renderToolCard(e, i) {
+  const imgs = toolImagesOf(e.id);
+  const main = imgs.find(x => !x.url.endsWith('.pdf'));
+  const bits = [e.label || 'no class', `${imgs.length} image${imgs.length === 1 ? '' : 's'}`];
+  if (e.file_url) bits.push('file');
+  if (!imgs.length) bits.push('needs an image to appear');
+
+  const d = document.createElement('details');
+  d.className = 'project-row tool-card' + (e.visible ? '' : ' is-hidden');
+  if (openToolIds.has(e.id)) d.open = true;
+
+  d.innerHTML = `
+    <summary>
+      <span class="pr-order">
+        <button type="button" class="t-up"   title="move up"   ${i === 0 ? 'disabled' : ''}>▲</button>
+        <button type="button" class="t-down" title="move down" ${i === toolsEntries.length - 1 ? 'disabled' : ''}>▼</button>
+      </span>
+      <span class="tool-thumb">${main ? `<img src="${esc(main.url)}" alt="">` : ''}</span>
+      <span class="pr-title">
+        <span class="pr-name">${esc(e.title)}</span>
+        <span class="pr-key">${esc(bits.join(' · '))}</span>
+      </span>
+      <button type="button" class="pr-visible ${e.visible ? 'on' : ''}">${e.visible ? 'shown' : 'hidden'}</button>
+    </summary>
+    <div class="pr-body tool-body">
+      <span class="field-label">title</span>
+      <input type="text" class="t-title" value="${esc(e.title)}">
+
+      <span class="field-label">class</span>
+      <input type="text" class="t-label" list="toolLabels" placeholder="e.g. intro to design" value="${esc(e.label || '')}">
+
+      <span class="field-label">description</span>
+      <div class="desc-editor">
+        <div class="caption-tools">
+          <button type="button" data-wrap="b" title="bold (⌘/Ctrl+B)"><b>B</b></button>
+          <button type="button" data-wrap="i" title="italic (⌘/Ctrl+I)"><i>I</i></button>
+          <button type="button" data-link title="link (⌘/Ctrl+K)">link</button>
+          <span class="hint-text">return = new line</span>
+        </div>
+        <textarea class="t-desc" placeholder="what it is, how students use it, what it teaches…">${esc(e.description || '')}</textarea>
+        <div class="caption-preview"></div>
+      </div>
+
+      <span class="field-label">file</span>
+      <div class="tool-file">
+        ${e.file_url
+          ? `<a href="${esc(e.file_url)}" target="_blank" rel="noopener">${esc(e.file_path ? (e.file_name || 'uploaded file') : e.file_url)} ↗</a>
+             <button type="button" class="soft t-file-remove">remove</button>`
+          : '<span class="muted">no file yet</span>'}
+      </div>
+      <div class="inline-row tool-file-row">
+        <button type="button" class="soft t-file-upload">${e.file_path ? 'replace with a file' : 'upload a file'}</button>
+        <span class="muted">or</span>
+        <input type="text" class="t-link" placeholder="paste a link (https://…)" value="${e.file_url && !e.file_path ? esc(e.file_url) : ''}">
+      </div>
+      <input type="file" class="t-file-input" style="display:none;">
+
+      <span class="field-label">images. the first is the main image</span>
+      <div class="tool-images"></div>
+      <div class="inline-row">
+        <button type="button" class="soft t-add-imgs">add images</button>
+        <span class="muted t-progress"></span>
+      </div>
+      <input type="file" class="t-img-input" accept="image/*" multiple style="display:none;">
+
+      <button type="button" class="pr-delete t-delete">delete tool…</button>
+    </div>
+  `;
+
+  d.addEventListener('toggle', () => { d.open ? openToolIds.add(e.id) : openToolIds.delete(e.id); });
+
+  // order + visibility
+  const stop = ev => { ev.preventDefault(); ev.stopPropagation(); };
+  d.querySelector('.t-up').addEventListener('click',   ev => { stop(ev); moveTool(i, -1); });
+  d.querySelector('.t-down').addEventListener('click', ev => { stop(ev); moveTool(i, 1); });
+  d.querySelector('.pr-visible').addEventListener('click', async ev => {
+    stop(ev);
+    if (await updateEntry(e.id, { visible: !e.visible })) renderTools();
+  });
+
+  // title, class, description (save when you click away)
+  const tTitle = d.querySelector('.t-title');
+  tTitle.addEventListener('change', async () => {
+    const v = tTitle.value.trim();
+    if (!v) { tTitle.value = e.title; return; }
+    if (await updateEntry(e.id, { title: v })) d.querySelector('.pr-name').textContent = v;
+  });
+  const tLabel = d.querySelector('.t-label');
+  tLabel.addEventListener('change', async () => {
+    if (await updateEntry(e.id, { label: tLabel.value.trim() || null })) renderTools();
+  });
+  const descRoot = d.querySelector('.desc-editor');
+  initCaptionEditor(descRoot);
+  d.querySelector('.t-desc').addEventListener('blur', async ev => {
+    const v = ev.target.value.trim() || null;
+    if (v !== (e.description || null)) await updateEntry(e.id, { description: v });
+  });
+
+  // file: upload, link, remove
+  const fileInput = d.querySelector('.t-file-input');
+  d.querySelector('.t-file-upload').addEventListener('click', () => fileInput.click());
+  fileInput.addEventListener('change', async () => {
+    const f = fileInput.files[0];
+    if (!f || !requireLogin()) return;
+    const btn = d.querySelector('.t-file-upload');
+    btn.disabled = true; btn.textContent = 'uploading…';
+    const ext  = (f.name.split('.').pop() || 'bin').toLowerCase();
+    const base = f.name.replace(/\.[^.]+$/, '').replace(/[^\w.-]+/g, '_');
+    const path = `${toolsProject}/files/${base}_${Date.now()}.${ext}`;
+    const { error } = await supabase.storage.from(STORAGE_BUCKET)
+      .upload(path, f, { contentType: f.type || 'application/octet-stream' });
+    if (error) {
+      alert('Upload failed: ' + error.message);
+      btn.disabled = false; btn.textContent = 'upload a file';
+      return;
+    }
+    const { data: urlData } = supabase.storage.from(STORAGE_BUCKET).getPublicUrl(path);
+    const old = e.file_path;
+    if (await updateEntry(e.id, { file_url: urlData.publicUrl, file_path: path, file_name: f.name })) {
+      if (old) await supabase.storage.from(STORAGE_BUCKET).remove([old]);
+    }
+    renderTools();
+  });
+  const tLink = d.querySelector('.t-link');
+  tLink.addEventListener('change', async () => {
+    let v = tLink.value.trim();
+    if (!v) return;
+    if (/^www\./i.test(v)) v = 'https://' + v;
+    if (!/^https?:\/\//i.test(v)) { alert('Links need to start with http:// or https://'); return; }
+    const old = e.file_path;
+    if (await updateEntry(e.id, { file_url: v, file_path: null, file_name: null })) {
+      if (old) await supabase.storage.from(STORAGE_BUCKET).remove([old]);
+      renderTools();
+    }
+  });
+  const rm = d.querySelector('.t-file-remove');
+  if (rm) rm.addEventListener('click', async () => {
+    if (!confirm(e.file_path ? 'Remove this file? The uploaded copy will be deleted.' : 'Remove this link?')) return;
+    const old = e.file_path;
+    if (await updateEntry(e.id, { file_url: null, file_path: null, file_name: null })) {
+      if (old) await supabase.storage.from(STORAGE_BUCKET).remove([old]);
+      renderTools();
+    }
+  });
+
+  // images
+  const grid = d.querySelector('.tool-images');
+  if (!imgs.length) grid.innerHTML = '<p class="muted">no images yet.</p>';
+  imgs.forEach((img, k) => {
+    const t = document.createElement('div');
+    t.className = 'tool-img';
+    t.innerHTML = `
+      <img src="${esc(img.url)}" loading="lazy" alt="">
+      ${k === 0 ? '<span class="main-badge">main</span>' : ''}
+      <div class="tool-img-ctrls">
+        <button type="button" data-act="left"  title="move earlier" ${k === 0 ? 'disabled' : ''}>◀</button>
+        <button type="button" data-act="right" title="move later"   ${k === imgs.length - 1 ? 'disabled' : ''}>▶</button>
+        ${k > 0 ? '<button type="button" data-act="main" title="make this the main image">main</button>' : ''}
+        <button type="button" data-act="del" title="delete image">✕</button>
+      </div>`;
+    t.querySelectorAll('button').forEach(b => b.addEventListener('click', async () => {
+      const act = b.dataset.act;
+      if (act === 'del') {
+        if (!confirm('Delete this image?')) return;
+        if (img.storage_path) await supabase.storage.from(STORAGE_BUCKET).remove([img.storage_path]);
+        const { error } = await supabase.from('images').delete().eq('id', img.id);
+        if (error) return alert('Could not delete: ' + error.message);
+        toolsImages = toolsImages.filter(x => x.id !== img.id);
+        return renderTools();
+      }
+      const order = [...imgs];
+      order.splice(k, 1);
+      const to = act === 'main' ? 0 : act === 'left' ? k - 1 : k + 1;
+      order.splice(to, 0, img);
+      await saveImageOrder(order);
+    }));
+    grid.appendChild(t);
+  });
+
+  const imgInput = d.querySelector('.t-img-input');
+  d.querySelector('.t-add-imgs').addEventListener('click', () => imgInput.click());
+  imgInput.addEventListener('change', async () => {
+    const files = Array.from(imgInput.files).filter(f => f.type.startsWith('image/'));
+    if (!files.length || !requireLogin()) return;
+    const prog = d.querySelector('.t-progress');
+    const addBtn = d.querySelector('.t-add-imgs');
+    addBtn.disabled = true;
+    let next = imgs.reduce((m, x) => Math.max(m, x.sort_order), -1) + 1;
+    let failed = 0, lastError = '';
+    for (let k = 0; k < files.length; k++) {
+      prog.textContent = `uploading ${k + 1} / ${files.length}…`;
+      try {
+        const row = await uploadImage(files[k], toolsProject, { entry_id: e.id, sort_order: next++ });
+        toolsImages.push(row);
+      } catch (err) {
+        console.error(err);
+        failed++; lastError = err.message || String(err);
+      }
+    }
+    if (failed) alert(`${failed} image${failed > 1 ? 's' : ''} failed to upload. ${lastError}`);
+    renderTools();
+  });
+
+  d.querySelector('.t-delete').addEventListener('click', () => deleteTool(e));
+  return d;
+}
+
+// give each image in `order` a sort_order matching its position
+async function saveImageOrder(order) {
+  if (!requireLogin()) return;
+  const changes = order.map((img, idx) => ({ img, idx })).filter(({ img, idx }) => img.sort_order !== idx);
+  const results = await Promise.all(changes.map(({ img, idx }) =>
+    supabase.from('images').update({ sort_order: idx }).eq('id', img.id)));
+  const bad = results.find(r => r.error);
+  if (bad) alert('Could not reorder: ' + bad.error.message);
+  else changes.forEach(({ img, idx }) => { img.sort_order = idx; });
+  renderTools();
+}
+
+async function moveTool(i, dir) {
+  if (!requireLogin()) return;
+  const j = i + dir;
+  if (j < 0 || j >= toolsEntries.length) return;
+  const arr = [...toolsEntries];
+  [arr[i], arr[j]] = [arr[j], arr[i]];
+  const changes = arr.map((e, idx) => ({ e, idx })).filter(({ e, idx }) => e.sort_order !== idx);
+  const results = await Promise.all(changes.map(({ e, idx }) =>
+    supabase.from('entries').update({ sort_order: idx }).eq('id', e.id)));
+  const bad = results.find(r => r.error);
+  if (bad) { alert('Could not reorder: ' + bad.error.message); return; }
+  changes.forEach(({ e, idx }) => { e.sort_order = idx; });
+  toolsEntries = arr;
+  renderTools();
+}
+
+async function deleteTool(e) {
+  if (!requireLogin()) return;
+  const imgs = toolImagesOf(e.id);
+  const what = [`${imgs.length} image${imgs.length === 1 ? '' : 's'}`];
+  if (e.file_path) what.push('its uploaded file');
+  if (!confirm(`Delete "${e.title}" along with ${what.join(' and ')}? This can't be undone.`)) return;
+
+  const paths = imgs.map(x => x.storage_path).filter(Boolean);
+  if (e.file_path) paths.push(e.file_path);
+  if (paths.length) {
+    const { error } = await supabase.storage.from(STORAGE_BUCKET).remove(paths);
+    if (error) console.warn('Some files could not be removed:', error.message);
+  }
+  const { error: imgErr } = await supabase.from('images').delete().eq('entry_id', e.id);
+  if (imgErr) return alert('Could not delete the images: ' + imgErr.message);
+  const { error } = await supabase.from('entries').delete().eq('id', e.id);
+  if (error) return alert('Could not delete the tool: ' + error.message);
+
+  toolsImages  = toolsImages.filter(x => x.entry_id !== e.id);
+  toolsEntries = toolsEntries.filter(x => x.id !== e.id);
+  openToolIds.delete(e.id);
+  renderTools();
+}
+
+// images uploaded to this project before it used the tools layout
+function renderUnassigned() {
+  const wrap  = document.getElementById('unassignedWrap');
+  const loose = toolsImages.filter(i => i.entry_id == null);
+  if (!loose.length) { wrap.innerHTML = ''; return; }
+  wrap.innerHTML = `
+    <span class="field-label">images not in a tool yet. these don't show on the site; move each into a tool or delete it.</span>
+    <div class="tool-images loose"></div>`;
+  const grid = wrap.querySelector('.tool-images');
+  loose.forEach(img => {
+    const t = document.createElement('div');
+    t.className = 'tool-img';
+    t.innerHTML = `
+      ${img.url.endsWith('.pdf')
+        ? `<div class="pdf-thumb">${esc(img.filename || 'PDF')}</div>`
+        : `<img src="${esc(img.url)}" loading="lazy" alt="">`}
+      <div class="tool-img-ctrls"><button type="button" title="delete image">✕</button></div>
+      <select>
+        <option value="">move to…</option>
+        ${toolsEntries.map(e => `<option value="${e.id}">${esc(e.title)}</option>`).join('')}
+      </select>`;
+    t.querySelector('select').addEventListener('change', async ev => {
+      const id = parseInt(ev.target.value, 10);
+      if (!id || !requireLogin()) return;
+      const sort_order = toolImagesOf(id).reduce((m, x) => Math.max(m, x.sort_order), -1) + 1;
+      const { error } = await supabase.from('images').update({ entry_id: id, sort_order }).eq('id', img.id);
+      if (error) return alert('Could not move: ' + error.message);
+      Object.assign(img, { entry_id: id, sort_order });
+      renderTools();
+    });
+    t.querySelector('button').addEventListener('click', async () => {
+      if (!confirm('Delete this image?')) return;
+      if (img.storage_path) await supabase.storage.from(STORAGE_BUCKET).remove([img.storage_path]);
+      const { error } = await supabase.from('images').delete().eq('id', img.id);
+      if (error) return alert('Could not delete: ' + error.message);
+      toolsImages = toolsImages.filter(x => x.id !== img.id);
+      renderTools();
+    });
+    grid.appendChild(t);
+  });
+}
+
 submitBtn.addEventListener('click', async () => {
   if (!currentUser)         return alert('You must be logged in to upload.');
   if (!projectSelect.value) return alert('Please select a project first.');
@@ -1489,47 +2694,7 @@ submitBtn.addEventListener('click', async () => {
     progressLabel.innerText = `Processing ${i + 1} / ${currentFiles.length}: ${file.name}`;
 
     try {
-      const ext      = file.name.split('.').pop() || 'jpg';
-      const baseName = file.name.replace(/\.[^.]+$/, '');
-      const ts       = Date.now();
-      const origPath   = `${project}/originals/${baseName}_${ts}.${ext}`;
-
-      const { error: origErr } = await supabase.storage.from(STORAGE_BUCKET).upload(origPath, file, { contentType: file.type });
-      if (origErr) throw origErr;
-
-      let masterPath, blob;
-      if (file.type === 'application/pdf') {
-        masterPath = `${project}/edit/${baseName}_${ts}.pdf`;
-        blob = file;
-      } else if (project === 'zines') {
-        masterPath = `${project}/edit/${baseName}_${ts}.jpg`;
-        blob = await resizeImage(file, file.naturalWidth || 99999, JPEG_QUALITY);
-      } else if (project === 'selfies') {
-        masterPath = `${project}/edit/${baseName}_${ts}.jpg`;
-        blob = await cropAndResizeImage(file, IMAGE_MAX_W, JPEG_QUALITY, 3 / 4);
-      } else {
-        masterPath = `${project}/edit/${baseName}_${ts}.jpg`;
-        blob = await resizeImage(file, IMAGE_MAX_W, JPEG_QUALITY);
-      }
-            const { error: uploadErr } = await supabase.storage.from(STORAGE_BUCKET).upload(masterPath, blob, { contentType: file.type });
-
-      const { data: urlData } = supabase.storage.from(STORAGE_BUCKET).getPublicUrl(masterPath);
-
-      let takenAt = null, lat = null, lng = null;
-      try {
-        const exif = await exifr.parse(file, { tiff: true, gps: true });
-        if (exif?.DateTimeOriginal) takenAt = exif.DateTimeOriginal.toISOString();
-        if (exif?.latitude)  lat = exif.latitude;
-        if (exif?.longitude) lng = exif.longitude;
-      } catch (exifErr) { console.warn('EXIF read failed:', exifErr); }
-      if (!takenAt && file.lastModified) takenAt = new Date(file.lastModified).toISOString();
-
-      const { error: dbErr } = await supabase.from('images').insert([{
-        project, filename: file.name, url: urlData.publicUrl,
-        storage_path: masterPath, sort_order: sortStart + i,
-        taken_at: takenAt, lat, lng,
-      }]);
-      if (dbErr) throw dbErr;
+      await uploadImage(file, project, { sort_order: sortStart + i });
 
       successCount++;
     } catch (err) {
@@ -1552,6 +2717,15 @@ submitBtn.addEventListener('click', async () => {
   fileInput.value = '';
   loadExistingImages(project);
 });
+
+// ── INIT ──
+async function init() {
+  await checkUser();
+  await refreshProjects();
+  const saved = localStorage.getItem('adminProject');
+  if (saved && projectSelect.value === saved) showProjectArea(saved);
+}
+init();
 </script>
 </body>
 </html>

@@ -224,6 +224,54 @@
   #gallery-grid { display: grid; gap: 0; width: 100%; }
   #gallery-grid img { width: 100%; object-fit: cover; display: block; cursor: pointer; }
 
+  /* tools layout: main image + title under it */
+  .entry-tile { cursor: pointer; min-width: 0; }
+  #gallery-grid .entry-tile img { aspect-ratio: 1; object-fit: contain; object-position: center bottom; }  
+    .entry-tile-text {
+    display: flex; flex-direction: column; gap: 2px;
+    align-items: center; text-align: center;
+    padding: 8px 10px 22px; font-size: 13px; line-height: 1.4;
+  }
+  .entry-tile:hover .entry-tile-title { font-weight: 700; }
+  .entry-tile-label { font-size: 12px; opacity: 0.55; }
+
+  /* tools layout: the larger view of one tool. image in the left third,
+     text in the right two thirds; the text scrolls on its own */
+  #lightbox.entry-mode {
+    flex-direction: row; align-items: center; justify-content: flex-start;
+    gap: 56px; padding: 56px; overflow: hidden;
+  }
+  #lightbox.entry-mode #lightbox-inner {
+    flex: 0 0 calc((100% - 56px) * 2 / 5);
+    width: calc((100% - 56px) * 2 / 5);
+    max-width: none; min-width: 0;
+  }
+  #lightbox.entry-mode #lightbox-img {
+    width: 100%; height: auto;
+    object-fit: contain; object-position: left center;
+    max-width: 100%;
+    max-height: calc(100vh - 112px);
+    max-height: calc(100dvh - 112px);
+  }
+  #lightbox.entry-mode #lightbox-prev { left: -44px; }
+  #lightbox.entry-mode #lightbox-next { right: -44px; }
+  #lightbox.entry-mode #lightbox-meta {
+    flex: 1 1 0; min-width: 0; width: auto; max-width: none;
+    max-height: calc(100vh - 112px);
+    max-height: calc(100dvh - 112px);
+    overflow-y: auto; overscroll-behavior: contain;
+    text-align: left; line-height: 1.6; padding-right: 8px;
+  }
+  #lightbox.entry-mode .entry-meta-head { text-align: left; }
+  .entry-meta-head { text-align: center; }
+  .entry-meta-label, .entry-meta-count { opacity: 0.55; }
+  .entry-meta-desc { text-align: left; margin-top: 14px; }
+  #lightbox-meta .entry-meta-desc a { text-decoration: underline; text-underline-offset: 3px; }
+  #lightbox-meta a.entry-meta-file {
+    display: block; text-align: left; margin-top: 16px; text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
   #gallery-grid.memes {
   column-count: 4;
   column-gap: 0px;
@@ -322,9 +370,36 @@
     #gallery-close-btn { top: 16px; right: 16px; }
     #lightbox-close { top: 16px; right: 16px; display: none; }
     #gallery-overlay { width: 100% !important; overscroll-behavior: auto; }
+    #gallery-grid.entries { grid-template-columns: repeat(2, 1fr) !important; }
+    /* phones: image on top, text below it scrolls on its own */
+    #lightbox.entry-mode {
+      flex-direction: column; justify-content: flex-start; align-items: center;
+      gap: 14px; padding: 24px 16px 16px;
+      padding-bottom: max(16px, env(safe-area-inset-bottom));
+    }
+    #lightbox.entry-mode #lightbox-inner {
+      flex: 0 0 auto;
+      width: calc(100% - 64px); max-width: calc(100% - 64px);
+    }
+    #lightbox.entry-mode #lightbox-prev,
+    #lightbox.entry-mode #lightbox-next { display: block; padding: 24px 6px; }
+    #lightbox.entry-mode #lightbox-prev { left: -30px; }
+    #lightbox.entry-mode #lightbox-next { right: -30px; }    #lightbox.entry-mode #lightbox-img {object-position: center; max-width: 100%; max-height: 45vh; max-height: 45dvh; }
+    #lightbox.entry-mode #lightbox-meta {
+      flex: 1 1 auto; min-height: 0; width: 100%; max-width: none; max-height: none; padding-right: 0;
+    }
+    #lightbox.entry-mode .entry-meta-head { text-align: center; }
     #gallery-grid.memes {
       column-count: 3;
     }
+    #lightbox.entry-mode #lightbox-prev,
+    #lightbox.entry-mode #lightbox-next {
+      display: block;
+      background: rgba(255, 255, 255, 0.7);
+    }
+    #lightbox.entry-mode #lightbox-prev { left: 0; }
+    #lightbox.entry-mode #lightbox-next { right: 0; }
+
     #lightbox-img { max-width: 90vw; max-height: 70vh; }
     #lightbox-prev, #lightbox-next { padding: 24px 16px; font-size: 11px; }
     #lightbox-prev { left: -20px; display: none; }
@@ -364,18 +439,8 @@
   <span id="site-name-label">molly baker ragan</span>
 </span>
 
-<div id="canvas">
-  <div class="index-item" data-project="zines"><div class="index-thumb-wrap"><img alt="zines"><div class="resize-handle"></div><div class="edge-n"></div><div class="edge-s"></div><div class="edge-e"></div><div class="edge-w"></div></div></div>
-  <div class="index-item" data-project="whatdoyousee"><div class="index-thumb-wrap"><img alt="what do you see?"><div class="resize-handle"></div><div class="edge-n"></div><div class="edge-s"></div><div class="edge-e"></div><div class="edge-w"></div></div></div>
-  <div class="index-item" data-project="unlearning"><div class="index-thumb-wrap"><img alt="unlearning library"><div class="resize-handle"></div><div class="edge-n"></div><div class="edge-s"></div><div class="edge-e"></div><div class="edge-w"></div></div></div>
-  <div class="index-item" data-project="bioephemera"><div class="index-thumb-wrap"><img alt="bioephemera"><div class="resize-handle"></div><div class="edge-n"></div><div class="edge-s"></div><div class="edge-e"></div><div class="edge-w"></div></div></div>
-  <!-- <div class="index-item" data-project="unsubscribe"><div class="index-thumb-wrap"><img alt="unsubscribe"><div class="resize-handle"></div><div class="edge-n"></div><div class="edge-s"></div><div class="edge-e"></div><div class="edge-w"></div></div></div> -->
-  <!-- <div class="index-item" data-project="headphones"><div class="index-thumb-wrap"><img alt="untangling headphones"><div class="resize-handle"></div><div class="edge-n"></div><div class="edge-s"></div><div class="edge-e"></div><div class="edge-w"></div></div></div> -->
-  <div class="index-item" data-project="trees"><div class="index-thumb-wrap"><img alt="trees"><div class="resize-handle"></div><div class="edge-n"></div><div class="edge-s"></div><div class="edge-e"></div><div class="edge-w"></div></div></div>
-  <!-- <div class="index-item" data-project="memes"><div class="index-thumb-wrap"><img alt="memes"><div class="resize-handle"></div><div class="edge-n"></div><div class="edge-s"></div><div class="edge-e"></div><div class="edge-w"></div></div></div> -->
-  <div class="index-item" data-project="cables"><div class="index-thumb-wrap"><img alt="cables"><div class="resize-handle"></div><div class="edge-n"></div><div class="edge-s"></div><div class="edge-e"></div><div class="edge-w"></div></div></div>
-  <!-- <div class="index-item" data-project="selfies"><div class="index-thumb-wrap"><img alt="selfies"><div class="resize-handle"></div><div class="edge-n"></div><div class="edge-s"></div><div class="edge-e"></div><div class="edge-w"></div></div></div> -->
-</div>
+<!-- index items are built from the `projects` table in Supabase -->
+<div id="canvas"></div>
 
 <span id="gallery-close-btn">✕</span>
 <span id="desk-panel-title"></span>
@@ -418,21 +483,6 @@
 </div>
 
 <script>
-// ── PROJECTS ──
-const projects = {
-  zines:        { title: 'zines ive made', gallery: true  },
-  whatdoyousee: { title: 'whatdoyousee.nyc', link: 'https://www.whatdoyousee.nyc' },
-  unlearning:   { title: 'unlearning library', link: 'https://www.unlearninglibrary.com' },
-  bioephemera:  { title: 'leaves n things ive stashed in my books', gallery: true  },
-  // unsubscribe:  { title: 'newsletters ive unsubscribed from', gallery: true  },
-  // headphones:   { title: 'times ive untangled my headphones', gallery: true  },
-  trees:        { title: 'street trees ive met', gallery: true },
-  // memes:        { title: 'memes ive saved', gallery: true  },
-  cables:       { title: 'dead internet cables ive cut out of street trees', gallery: true  },
-  // selfies:      { title: 'self-reflection', gallery: true  },
-  essences:     { title: 'essences', gallery: true  }
-};
-
 // ── SUPABASE ──
 const SUPABASE_URL      = 'https://krkcskfledxweimduvvn.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imtya2Nza2ZsZWR4d2VpbWR1dnZuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODExMjYzNzIsImV4cCI6MjA5NjcwMjM3Mn0.QIX2_UqDzATZ-NzhjFQUGIpsBxGn1D640viI9QG38rY';
@@ -440,7 +490,98 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 const WDYS_URL      = 'https://fyogbaeayboxjhleaqoj.supabase.co';
 const WDYS_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ5b2diYWVheWJveGpobGVhcW9qIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjczOTMxNDcsImV4cCI6MjA4Mjk2OTE0N30.JGa6qT6IkcNCJRxV5FYDFUiH1QWSKHABJ_Qu7BNV5m8';
 
+// Turns a caption into safe HTML: keeps line breaks, <b>/<strong>, <i>/<em>,
+// <u> and links (http, https, mailto); anything else is reduced to plain text.
+function renderCaption(raw) {
+  if (!raw) return '';
+  const tpl = document.createElement('template');
+  tpl.innerHTML = String(raw).replace(/\r\n?/g, '\n');
+  const KEEP = { B: 1, STRONG: 1, I: 1, EM: 1, U: 1, A: 1, BR: 1 };
+  const DROP = { SCRIPT: 1, STYLE: 1, IFRAME: 1, OBJECT: 1, EMBED: 1, TEMPLATE: 1 };
+  const clean = node => {
+    [...node.childNodes].forEach(child => {
+      if (child.nodeType === 3) {
+        const parts = child.textContent.split('\n');
+        if (parts.length > 1) {
+          const frag = document.createDocumentFragment();
+          parts.forEach((part, i) => {
+            if (i) frag.appendChild(document.createElement('br'));
+            frag.appendChild(document.createTextNode(part));
+          });
+          child.replaceWith(frag);
+        }
+        return;
+      }
+      if (child.nodeType !== 1 || DROP[child.tagName]) { child.remove(); return; }
+      clean(child);
+      if (!KEEP[child.tagName]) { child.replaceWith(...child.childNodes); return; }
+      let href = (child.getAttribute('href') || '').trim();
+      [...child.attributes].forEach(a => child.removeAttribute(a.name));
+      if (child.tagName === 'A') {
+        if (/^www\./i.test(href)) href = 'https://' + href;
+        if (/^(https?:|mailto:)/i.test(href)) {
+          child.setAttribute('href', href);
+          child.setAttribute('target', '_blank');
+          child.setAttribute('rel', 'noopener');
+        } else {
+          child.replaceWith(...child.childNodes);
+        }
+      }
+    });
+  };
+  clean(tpl.content);
+  const out = document.createElement('div');
+  out.appendChild(tpl.content);
+  return out.innerHTML;
+}
+
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c =>
+  ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+// ── PROJECTS (loaded from the `projects` table; only visible ones come back) ──
+let projects     = {};
+let projectOrder = [];
+
+async function fetchProjects() {
+  try {
+    const res = await fetch(
+      `${SUPABASE_URL}/rest/v1/projects?select=*&visible=eq.true&order=sort_order.asc`,
+      { headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` } }
+    );
+    const data = await res.json();
+    if (!Array.isArray(data)) return;
+    projects = {};
+    projectOrder = [];
+    data.forEach(row => {
+      projects[row.key] = {
+        title:     row.title,
+        gallery:   row.type === 'gallery',
+        link:      row.type === 'link' ? row.link : null,
+        columns:   row.columns || 3,
+        show_date: !!row.show_date,
+        layout:    row.layout || 'grid',          // 'entries' = tools layout
+        show_labels: row.show_labels !== false,
+      };
+      projectOrder.push(row.key);
+    });
+  } catch (e) {
+    console.warn('Could not fetch projects:', e);
+  }
+}
+
+function buildIndexItems() {
+  canvas.innerHTML = '';
+  projectOrder.forEach(key => {
+    const item = document.createElement('div');
+    item.className = 'index-item';
+    item.dataset.project = key;
+    item.innerHTML = `<div class="index-thumb-wrap"><img alt="${esc(projects[key].title)}"><div class="resize-handle"></div><div class="edge-n"></div><div class="edge-s"></div><div class="edge-e"></div><div class="edge-w"></div></div>`;
+    canvas.appendChild(item);
+  });
+}
+
 async function fetchWdysImages() {
+  if (!projects.whatdoyousee) return;
   try {
     const res = await fetch(
       `${WDYS_URL}/rest/v1/images?select=url,created_at&order=created_at.desc`,
@@ -466,10 +607,13 @@ async function fetchWdysImages() {
 
 async function fetchGalleryImages() {
   try {
-    const res = await fetch(
-      `${SUPABASE_URL}/rest/v1/images?select=project,url,sort_order,taken_at,location,lat,lng,plant,book,scanned,book_link,question_1,question_2,cable,type,use,contents&order=sort_order.desc`,
+    const cols = 'project,url,sort_order,taken_at,location,lat,lng,plant,book,scanned,book_link,question_1,question_2,cable,type,use,contents,caption';
+    const get  = select => fetch(
+      `${SUPABASE_URL}/rest/v1/images?select=${select}&order=sort_order.desc`,
       { headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` } }
     );
+    let res = await get(cols + ',entry_id');
+    if (!res.ok) res = await get(cols);          // tools.sql not run yet
     const data = await res.json();
     if (!Array.isArray(data)) return;
 
@@ -488,10 +632,13 @@ async function fetchGalleryImages() {
         book_link: row.book_link || null,
         question_1:row.question_1 || null,
         question_2:row.question_2 || null,
-        cable:     row.cable || null,
-        essences:  row.type || null,
-        essences:  row.use || null,
-        essences:  row.contents || null,
+        cable:     row.cable     || null,
+        type:      row.type      || null,
+        use:       row.use       || null,
+        contents:  row.contents  || null,
+        caption:   row.caption   || null,
+        sort_order: row.sort_order ?? 0,
+        entry_id:  row.entry_id  ?? null,
       });
     });
 
@@ -525,6 +672,7 @@ async function fetchGalleryImages() {
       }
 
       projects[key].images = byProject[key];
+      if (projects[key].layout === 'entries') return;   // handled by applyEntries below
 
       const item = document.querySelector(`.index-item[data-project="${key}"]`);
       if (item) {
@@ -535,9 +683,89 @@ async function fetchGalleryImages() {
         }
       }
     });
+
+    await applyEntries(byProject);
   } catch (e) {
     console.warn('Could not fetch gallery images:', e);
   }
+}
+
+// ── TOOLS LAYOUT ──
+// Each tool (an "entry") has several images; the first is its main image.
+// The home-page slideshow and the grid use the main images only.
+async function applyEntries(byProject) {
+  const keys = projectOrder.filter(k => projects[k].layout === 'entries');
+  if (!keys.length) return;
+
+  let rows = [];
+  try {
+    const res = await fetch(
+      `${SUPABASE_URL}/rest/v1/entries?select=*&visible=eq.true&project=in.(${keys.map(encodeURIComponent).join(',')})&order=sort_order.asc`,
+      { headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` } }
+    );
+    const data = await res.json();
+    if (Array.isArray(data)) rows = data;
+  } catch (e) {
+    console.warn('Could not fetch tools:', e);
+  }
+
+  keys.forEach(key => {
+    const imgs = (byProject[key] || []).filter(i => i.entry_id != null && !i.url.endsWith('.pdf'));
+    const entries = rows
+      .filter(e => e.project === key)
+      .map(e => ({
+        ...e,
+        images: imgs.filter(i => i.entry_id === e.id).sort((a, b) => a.sort_order - b.sort_order),
+      }))
+      .filter(e => e.images.length);        // a tool needs at least one image to appear
+
+    const p = projects[key];
+    p.entries = entries;
+    p.images  = entries.map(e => e.images[0]);
+
+    const item = document.querySelector(`.index-item[data-project="${key}"]`);
+    const img  = item && item.querySelector('.index-thumb-wrap img');
+    if (img && p.images.length) img.src = p.images[0].url;
+  });
+}
+
+function buildEntriesGrid(p) {
+  p.entries.forEach((e, i) => {
+    const tile = document.createElement('div');
+    tile.className = 'entry-tile';
+    tile.dataset.entry = i;
+    tile.innerHTML = `
+      <img src="${esc(e.images[0].url)}" loading="lazy" alt="">
+      <div class="entry-tile-text">
+        <span class="entry-tile-title">${esc(e.title)}</span>
+        ${p.show_labels && e.label ? `<span class="entry-tile-label">${esc(e.label)}</span>` : ''}
+      </div>`;
+    galleryGrid.appendChild(tile);
+  });
+}
+
+function formatEntryMeta(e, p) {
+  const head = [`<div>${esc(e.title)}</div>`];
+  if (p.show_labels && e.label) head.push(`<div class="entry-meta-label">${esc(e.label)}</div>`);
+  let html = `<div class="entry-meta-head">${head.join('')}</div>`;
+  if (e.file_url && /^(https?:|mailto:)/i.test(e.file_url)) {
+    const text = e.file_path ? `download ${e.file_name || 'file'}` : 'open link';
+    html += `<a class="entry-meta-file" href="${esc(e.file_url)}" target="_blank" rel="noopener">${esc(text)} ↗</a>`;
+  }
+  if (e.description) html += `<div class="entry-meta-desc">${renderCaption(e.description)}</div>`;
+  return html;
+}
+
+let activeEntry = null, activeEntryIndex = null;
+
+function openEntry(i) {
+  const p = projects[activeKey];
+  if (!p || !p.entries || !p.entries[i]) return;
+  activeEntry = p.entries[i];
+  activeEntryIndex = i;
+  lightboxMeta.scrollTop = 0;   // start each tool's text at the top
+  showLightboxUI(0);
+  history.pushState({ view: 'lightbox', key: activeKey, entry: i }, '', `#${activeKey}/${i}`);
 }
 
 
@@ -561,7 +789,7 @@ const lightboxNext    = document.getElementById('lightbox-next');
 const notifyBox  = document.getElementById('notify-box');
 const notifyIcon = document.getElementById('notify-icon');
 const subscribeForm = document.getElementById('subscribe-form');
-const linksBox = document.getElementById('links-box'); // add this DOM ref
+const linksBox = document.getElementById('links-box');
 
 
 // ── STATE ──
@@ -628,6 +856,13 @@ const LAYOUTS_MOBILE = [
 ];
 let currentLayout = 0;
 
+// Scatter position for any project beyond the 6 hand-made slots
+function randomSlot(mob) {
+  return mob
+    ? [6 + Math.random() * 50, 6 + Math.random() * 80, 34 + Math.random() * 4]
+    : [4 + Math.random() * 72, 4 + Math.random() * 62, 19 + Math.random() * 5];
+}
+
 function randomLayout(animate) {
   const iw = window.innerWidth, ih = window.innerHeight;
   const mob = isMob();
@@ -643,7 +878,7 @@ function randomLayout(animate) {
       return;
     }
 
-    const [xPct, yPct, wPct] = layout[i] || [10 + i * 12, 30, 15];
+    const [xPct, yPct, wPct] = layout[i] || randomSlot(mob);
     const sz     = Math.round((wPct / 100) * iw);
     const wrap   = item.querySelector('.index-thumb-wrap');
     const aspect = getItemAspect(item);
@@ -787,11 +1022,6 @@ function initResize(item) {
     cornerSW.style.left = '-10px';        cornerSW.style.top = (h - 10) + 'px';
   }
 
-  const img = wrap.querySelector('img');
-  img.addEventListener('load', updateHandleAndEdges);
-  if (img.complete && img.naturalWidth) updateHandleAndEdges();
-  new ResizeObserver(updateHandleAndEdges).observe(wrap);
-
   // Extra corner handles: nw, ne, sw (se = the dot handle)
   const cornerNW = document.createElement('div');
   const cornerNE = document.createElement('div');
@@ -801,6 +1031,11 @@ function initResize(item) {
     c.style.cssText = 'position:absolute;width:20px;height:20px;z-index:11;opacity:0;';
     wrap.appendChild(c);
   });
+
+  const img = wrap.querySelector('img');
+  img.addEventListener('load', updateHandleAndEdges);
+  if (img.complete && img.naturalWidth) updateHandleAndEdges();
+  new ResizeObserver(updateHandleAndEdges).observe(wrap);
 
   let resizing = false, resizeDidFire = false;
   let startX, startY, origW, origH, origLeft, origTop, resizeAxis, aspect;
@@ -933,7 +1168,7 @@ function initMobileTouch(item) {
       item.style.left = (dragOrigLeft + dx) + 'px';
       item.style.top  = (dragOrigTop + dy) + 'px';
 
-      constrainItemToViewport(item);    
+      constrainItemToViewport(item);
     } else if (mode === 'pinch' && e.touches.length >= 2) {
       const d      = touchDist(e.touches[0], e.touches[1]);
       const scale  = d / pinchStartDist;
@@ -1009,47 +1244,58 @@ function handleItemActivate(key, item) {
 }
 
 // ── INIT ──
-window.addEventListener('load', () => {
+window.addEventListener('load', async () => {
+  await fetchProjects();
+  buildIndexItems();
   randomLayout(false);
 
-    document.querySelectorAll('.index-item').forEach(item => {
+  document.querySelectorAll('.index-item').forEach(item => {
     if (!('ontouchstart' in window)) {
       initDrag(item);
     }
     initResize(item);
     initMobileTouch(item);
 
-    const key = item.dataset.project;
+    const key  = item.dataset.project;
+    const wrap = item.querySelector('.index-thumb-wrap');
     if (projects[key] && projects[key].link) {
-      const wrap = item.querySelector('.index-thumb-wrap');
       const overlay = document.createElement('div');
       overlay.className = 'external-overlay';
       overlay.innerHTML = `<img src="/images/link.png" alt=""><span>links to external site</span>`;
       wrap.appendChild(overlay);
     }
+
+    // desktop click
+    wrap.addEventListener('click', () => {
+      if (suppressNextClick) return;
+      handleItemActivate(key, item);
+    });
   });
 
-  Promise.all([fetchGalleryImages(), fetchWdysImages()]).then(() => {
-    const imgs = Array.from(document.querySelectorAll('.index-thumb-wrap img'));
-    let loaded = 0, relaidOut = false;
-    function checkDone() {
-      loaded++;
-      if (loaded >= imgs.length && !relaidOut) {
-        relaidOut = true;
-        randomLayout(true);
-        startAllSlideshows();
-        document.querySelectorAll('.index-item').forEach(el => el.style.opacity = '1');
-        openFromHash();
-      }
+  await Promise.all([fetchGalleryImages(), fetchWdysImages()]);
+
+  const imgs = Array.from(document.querySelectorAll('.index-thumb-wrap img'));
+  let loaded = 0, relaidOut = false;
+  function finish() {
+    if (relaidOut) return;
+    relaidOut = true;
+    randomLayout(true);
+    startAllSlideshows();
+    document.querySelectorAll('.index-item').forEach(el => el.style.opacity = '1');
+    openFromHash();
+  }
+  function checkDone() {
+    loaded++;
+    if (loaded >= imgs.length) finish();
+  }
+  if (!imgs.length) finish();
+  imgs.forEach(img => {
+    if (img.complete && img.naturalHeight > 0) checkDone();
+    else if (!img.src || img.src === window.location.href) checkDone(); // no src set
+    else {
+      img.addEventListener('load',  checkDone);
+      img.addEventListener('error', checkDone);
     }
-    imgs.forEach(img => {
-      if (img.complete && img.naturalHeight > 0) checkDone();
-      else if (!img.src || img.src === window.location.href) checkDone(); // no src set
-      else {
-        img.addEventListener('load',  checkDone);
-        img.addEventListener('error', checkDone);
-      }
-    });
   });
 });
 
@@ -1144,14 +1390,6 @@ document.addEventListener('click', e => {
   }
 });
 
-// ── ITEM CLICKS (desktop) ──
-document.querySelectorAll('.index-item').forEach(item => {
-  item.querySelector('.index-thumb-wrap').addEventListener('click', () => {
-    if (suppressNextClick) return;
-    handleItemActivate(item.dataset.project, item);
-  });
-});
-
 // ── GALLERY UI (no history manipulation) ──
 function openGalleryUI(key) {
   const p = projects[key];
@@ -1164,7 +1402,10 @@ function openGalleryUI(key) {
   galleryGrid.style.opacity = isMemes ? '0' : '';
 
   const memeImgs = [];
-  p.images.forEach((imgData, i) => {
+  galleryGrid.classList.toggle('entries', p.layout === 'entries');
+  if (p.layout === 'entries') buildEntriesGrid(p);
+
+  (p.layout === 'entries' ? [] : p.images).forEach((imgData, i) => {
     if (imgData.url.endsWith('.pdf')) {
       const wrap = document.createElement('div');
       wrap.style.cssText = 'width:100%;position:relative;';
@@ -1208,8 +1449,8 @@ function openGalleryUI(key) {
     }
   }
 
-  const cols = { bioephemera: 3, headphones: 4, unsubscribe: 4, zines: 1, trees: 3, memes: 4, cables: 3, selfies: 4, essences: 3 }[key] ?? 3;  galleryGrid.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
-  galleryGrid.style.gridTemplateColumns = key === 'memes' ? '' : `repeat(${cols}, 1fr)`;
+  const cols = p.columns || 3;
+  galleryGrid.style.gridTemplateColumns = isMemes ? '' : `repeat(${cols}, 1fr)`;
 
   galleryCloseBtn.style.display = 'block';
   notifyBox.style.display = 'none';
@@ -1217,8 +1458,8 @@ function openGalleryUI(key) {
 
   const titleEl = isMob() ? mobPanelTitle : deskPanelTitle;
   titleEl.innerHTML = p.link
-    ? `<a href="${p.link}" target="_blank" rel="noopener">${p.title}</a>`
-    : p.title;
+    ? `<a href="${esc(p.link)}" target="_blank" rel="noopener">${esc(p.title)}</a>`
+    : esc(p.title);
     mobPanelTitle.style.transform = '';
     mobPanelTitle.style.transition = '';
   titleEl.classList.add('visible');
@@ -1288,7 +1529,16 @@ function openFromHash() {
   openGalleryUI(key);
 
   if (idxStr !== undefined && !isNaN(parseInt(idxStr, 10))) {
-    showLightboxUI(parseInt(idxStr, 10));
+    const n = parseInt(idxStr, 10);
+    if (p.layout === 'entries') {
+      if (p.entries && p.entries[n]) {
+        activeEntry = p.entries[n];
+        activeEntryIndex = n;
+        showLightboxUI(0);
+      }
+    } else {
+      showLightboxUI(n);
+    }
   }
 
   // Sync history state without adding a duplicate entry
@@ -1349,13 +1599,14 @@ function initGallerySwipe() {
 initGallerySwipe();
 
 // ── LIGHTBOX META ──
+const MONTH_NAMES = ['january','february','march','april','may','june','july','august','september','october','november','december'];
+
 function formatMeta(imgData, key) {
   const lines = [];
   if (key === 'selfies' || key === 'unsubscribe' || key === 'headphones' || key === 'memes' || key === 'trees') {
     if (imgData.taken_at) {
       const d = new Date(imgData.taken_at);
-      const monthNames = ['january','february','march','april','may','june','july','august','september','october','november','december'];
-      lines.push(`${monthNames[d.getMonth()]} ${d.getFullYear()}`);
+      lines.push(`${MONTH_NAMES[d.getMonth()]} ${d.getFullYear()}`);
     }
   if (key === 'headphones' && imgData.lat != null && imgData.lng != null) {
       lines.push(`(${parseFloat(imgData.lat).toFixed(4)}, ${parseFloat(imgData.lng).toFixed(4)})`);
@@ -1364,18 +1615,17 @@ function formatMeta(imgData, key) {
     if (imgData.question_1) lines.push(imgData.question_1);
     if (imgData.question_2) lines.push(imgData.question_2);
     if (imgData.scanned)    lines.push(imgData.scanned);
-} else if (key === 'essences') {
+  } else if (key === 'essences') {
     if (imgData.type) lines.push(imgData.type);
     if (imgData.use) lines.push(imgData.use);
     if (imgData.contents) lines.push(imgData.contents);
- } else if (key === 'cables') {
+  } else if (key === 'cables') {
     const parts = [];
     if (imgData.cable) parts.push(imgData.cable);
     if (imgData.plant) parts.push(`cut out of ${imgData.plant}`);
     if (imgData.taken_at) {
       const d = new Date(imgData.taken_at);
-      const monthNames = ['january','february','march','april','may','june','july','august','september','october','november','december'];
-      parts.push(`in ${monthNames[d.getMonth()]} ${d.getFullYear()}`);
+      parts.push(`in ${MONTH_NAMES[d.getMonth()]} ${d.getFullYear()}`);
     }
     if (parts.length) lines.push(parts.join(' '));
   } else if (key === 'bioephemera') {
@@ -1390,6 +1640,13 @@ function formatMeta(imgData, key) {
     }
     if (imgData.scanned) parts.push(`in ${imgData.scanned}`);
     if (parts.length) lines.push(parts.join(' '));
+  } else {
+    // projects added from the admin page: caption, plus date if turned on
+    if (imgData.caption) lines.push(renderCaption(imgData.caption));
+    if (projects[key] && projects[key].show_date && imgData.taken_at) {
+      const d = new Date(imgData.taken_at);
+      lines.push(`${MONTH_NAMES[d.getMonth()]} ${d.getFullYear()}`);
+    }
   }
   return lines.join('<br>');
 }
@@ -1397,12 +1654,14 @@ function formatMeta(imgData, key) {
 // ── LIGHTBOX UI (no history manipulation) ──
 function showLightboxUI(index) {
   const p = projects[activeKey];
-  if (!p || !p.images) return;
-  lightboxImages = p.images;
+  if (!p) return;
+  lightboxImages = activeEntry ? activeEntry.images : p.images;
+  if (!lightboxImages || !lightboxImages.length) return;
   lightboxIndex  = ((index % lightboxImages.length) + lightboxImages.length) % lightboxImages.length;
   const imgData  = lightboxImages[lightboxIndex];
   lightboxImg.src        = imgData.url;
-  lightboxMeta.innerHTML = formatMeta(imgData, activeKey);
+  lightboxMeta.innerHTML = activeEntry ? formatEntryMeta(activeEntry, p) : formatMeta(imgData, activeKey);
+  lightbox.classList.toggle('entry-mode', !!activeEntry);
   lightbox.classList.add('visible');
   mobileZoomScale    = 1;
   mobileZoomLastDist = null;
@@ -1410,7 +1669,9 @@ function showLightboxUI(index) {
 }
 
 function closeLightboxUI() {
-  lightbox.classList.remove('visible');
+  lightbox.classList.remove('visible', 'entry-mode');
+  activeEntry = null;
+  activeEntryIndex = null;
   lightboxImg.src        = '';
   lightboxMeta.textContent = '';
   lightboxImages     = [];
@@ -1433,10 +1694,17 @@ function closeLightbox() {
 
 function navigateLightbox(index) {
   showLightboxUI(index);
-  history.replaceState({ view: 'lightbox', key: activeKey, index: lightboxIndex }, '', `#${activeKey}/${lightboxIndex}`);
+  const n = activeEntry ? activeEntryIndex : lightboxIndex;   // tools: the address points at the tool
+  history.replaceState({ view: 'lightbox', key: activeKey, index: n }, '', `#${activeKey}/${n}`);
 }
 
 galleryGrid.addEventListener('click', e => {
+  const tile = e.target.closest('.entry-tile');
+  if (tile) {
+    e.stopPropagation();
+    openEntry(parseInt(tile.dataset.entry, 10));
+    return;
+  }
   const img = e.target.closest('#gallery-grid img');
   if (!img) return;
   e.stopPropagation();
